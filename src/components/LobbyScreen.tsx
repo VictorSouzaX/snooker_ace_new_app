@@ -382,46 +382,77 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
           </motion.div>
         </AnimatePresence>
 
-        <div className="flex flex-col items-center gap-2.5">
-          <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={selected + '-btn-wrap'}
+            initial={{ opacity: 0, y: 14, scale: 0.93 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.93 }}
+            transition={{ duration: 0.28, ease: 'easeOut' }}
+            className="relative flex items-center justify-center"
+          >
+            {/* Breathing outer bloom */}
+            <motion.div
+              animate={{ opacity: [0.55, 1, 0.55], scale: [1, 1.06, 1] }}
+              transition={{ repeat: Infinity, duration: 2.6, ease: 'easeInOut' }}
+              className="absolute inset-0 rounded-[22px] pointer-events-none"
+              style={{ boxShadow: `0 0 55px ${cfg.glow}80, 0 0 110px ${cfg.glow}35` }}
+            />
+
             <motion.button
-              key={selected + '-btn'}
-              initial={{ opacity: 0, y: 10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -6, scale: 0.95 }}
-              transition={{ duration: 0.22 }}
-              whileHover={{ scale: 1.05, y: -2 }}
-              whileTap={{ scale: 0.96, y: 0 }}
+              whileHover={{ scale: 1.05, y: -5 }}
+              whileTap={{ scale: 0.97, y: 0 }}
               onClick={handlePlay}
-              className="relative font-display leading-none tracking-[0.14em] px-16 py-[14px] overflow-hidden cursor-pointer"
+              className="relative overflow-hidden cursor-pointer"
               style={{
-                fontSize: '30px',
+                width: '292px',
+                padding: '22px 0',
+                borderRadius: '22px',
                 background: cfg.btnGrad,
-                color: cfg.btnColor,
-                clipPath: 'polygon(13px 0%, calc(100% - 13px) 0%, 100% 13px, 100% calc(100% - 13px), calc(100% - 13px) 100%, 13px 100%, 0% calc(100% - 13px), 0% 13px)',
-                boxShadow: `0 8px 36px ${cfg.glow}58, 0 2px 10px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.26)`,
+                boxShadow: [
+                  `0 20px 55px rgba(0,0,0,0.75)`,
+                  `inset 0 2.5px 0 rgba(255,255,255,0.72)`,
+                  `inset 0 -2px 0 rgba(0,0,0,0.28)`,
+                  `inset 2px 0 0 rgba(255,255,255,0.22)`,
+                  `inset -2px 0 0 rgba(255,255,255,0.1)`,
+                ].join(', '),
               }}
             >
-              <div className="absolute inset-0 pointer-events-none"
-                style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 52%)' }} />
-              <span className="relative z-10">{cfg.btnText}</span>
-            </motion.button>
-          </AnimatePresence>
+              {/* Primary specular — top-half glass reflection */}
+              <div className="absolute inset-x-0 top-0 pointer-events-none"
+                style={{
+                  height: '54%',
+                  borderRadius: '22px 22px 0 0',
+                  background: 'linear-gradient(180deg, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.2) 40%, transparent 100%)',
+                }} />
 
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={selected + '-sub'}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
-              className="font-black uppercase leading-none tracking-[0.26em]"
-              style={{ fontSize: '10px', color: cfg.accent + '80' }}
-            >
-              {cfg.liveLabel}
-            </motion.p>
-          </AnimatePresence>
-        </div>
+              {/* Ultra-bright top rim */}
+              <div className="absolute top-0 inset-x-6 h-[2px] pointer-events-none rounded-full"
+                style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.95), transparent)' }} />
+
+              {/* Left edge light */}
+              <div className="absolute left-0 top-4 bottom-4 w-[2.5px] pointer-events-none rounded-r-full"
+                style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.06) 100%)' }} />
+
+              {/* Right edge subtle */}
+              <div className="absolute right-0 top-4 bottom-4 w-[1.5px] pointer-events-none rounded-l-full"
+                style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%)' }} />
+
+              {/* Bottom inner glow — depth */}
+              <div className="absolute inset-x-8 bottom-0 pointer-events-none"
+                style={{
+                  height: '38%',
+                  background: `linear-gradient(0deg, ${cfg.glow}38 0%, transparent 100%)`,
+                }} />
+
+              {/* Label */}
+              <span className="relative z-10 block text-center font-display leading-none tracking-[0.18em]"
+                style={{ fontSize: '40px', color: cfg.btnColor }}>
+                {cfg.btnText}
+              </span>
+            </motion.button>
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       {/* ── RIGHT PANEL: Widgets ── */}
