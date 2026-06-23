@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "snooker-ace",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["C:\\Users\\victo\\OneDrive\\READET~1\\SNOOKE~1\\APP-SN~1\\node_modules\\vite\\bin\\vite.js", "--port", "3005", "--host", "localhost"],
+      "port": 3005
+    }
+  ]
+}

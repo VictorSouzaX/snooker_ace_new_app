@@ -1,0 +1,6 @@
+{
+  "name": "Snooker Ace",
+  "description": "A premium mobile snooker game interface with multiple game modes, player statistics, and social integration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

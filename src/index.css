@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Bebas Neue", sans-serif;
+  --font-body: "Outfit", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Brand */
+  --color-brand-green: #00d26a;
+  --color-brand-green-neon: #00e870;
+  --color-brand-green-dark: #001f0d;
+  --color-brand-pink: #ED0A65;
+  --color-brand-red: #ff3b5c;
+  --color-brand-yellow: #f8e71c;
+  --color-brand-gold: #c9952a;
+  --color-brand-gold-light: #f5c518;
+
+  /* Rarity system */
+  --color-rarity-legendary: #c9952a;
+  --color-rarity-epic: #a855f7;
+  --color-rarity-rare: #3b82f6;
+  --color-rarity-common: #9ca3af;
+  --color-rarity-exclusive: #ED0A65;
+  --color-rarity-special: #fde047;
+
+  /* Arena surfaces */
+  --color-arena-deep: #020508;
+  --color-arena-mid: #060c09;
+  --color-arena-felt: #04180c;
+}
+
+@layer base {
+  body {
+    @apply bg-black text-white antialiased overflow-hidden;
+    background: #020508;
+  }
+}
+
+.glass {
+  @apply bg-black/40 backdrop-blur-md border border-white/10;
+}
+
+.btn-gradient-green {
+  @apply bg-linear-to-b from-[#00d26a] to-[#00a855] text-black font-bold;
+}
+
+.btn-gradient-yellow {
+  @apply bg-linear-to-b from-[#f8e71c] to-[#d4c418] text-black font-bold;
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .text-glow-green {
+    text-shadow: 0 0 20px rgba(0,210,106,0.55), 0 0 40px rgba(0,210,106,0.25);
+  }
+  .text-glow-gold {
+    text-shadow: 0 0 20px rgba(201,149,42,0.6), 0 0 40px rgba(201,149,42,0.28);
+  }
+  .text-glow-pink {
+    text-shadow: 0 0 20px rgba(237,10,101,0.55), 0 0 40px rgba(237,10,101,0.25);
+  }
+
+  .arena-panel {
+    background: rgba(4,8,6,0.7);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,255,255,0.07);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 24px 60px rgba(0,0,0,0.55);
+  }
+}
