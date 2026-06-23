@@ -64,16 +64,6 @@ function AppContent() {
       highlightColor: '#f8e71c'
     },
     {
-      id: 'clubs',
-      title: t('clubsTitle'),
-      subtitle: t('clubsSubtitle'),
-      tag: t('clubsTag'),
-      buttonText: t('clubsButton'),
-      buttonType: 'outline',
-      backgroundImage: 'https://images.unsplash.com/photo-1544178170-c97191192cc0?q=80&w=1200&auto=format&fit=crop',
-      highlightColor: '#ffffff'
-    },
-    {
       id: 'training',
       title: t('trainingTitle'),
       subtitle: t('trainingSubtitle'),
@@ -82,6 +72,15 @@ function AppContent() {
       buttonType: 'outline',
       backgroundImage: 'https://images.unsplash.com/photo-1511193311914-0346f16efe90?q=80&w=1200&auto=format&fit=crop',
       highlightColor: '#ffffff'
+    },
+    {
+      id: 'store',
+      title: 'LOJA',
+      subtitle: 'ITENS PREMIUM',
+      tag: 'OFERTAS',
+      buttonText: 'EXPLORAR',
+      buttonType: 'outline',
+      highlightColor: '#fbbf24'
     }
   ];
 

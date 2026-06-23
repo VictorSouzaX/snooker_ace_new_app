@@ -11,7 +11,7 @@ interface LobbyScreenProps {
   onOpenBattlePass: () => void;
 }
 
-type ModeId = 'duel' | 'tournaments' | 'clubs' | 'training';
+type ModeId = 'duel' | 'tournaments' | 'training' | 'store';
 
 const MODE_CFG: Record<string, {
   accent: string;
@@ -43,15 +43,15 @@ const MODE_CFG: Record<string, {
     btnColor: '#000',
     liveLabel: 'PRÓXIMO TORNEIO EM 03:42',
   },
-  clubs: {
-    accent: 'rgba(255,255,255,0.65)',
-    glow: 'rgba(255,255,255,0.12)',
-    label: 'CLUBES',
-    sub: 'LIGAS',
+  store: {
+    accent: '#fbbf24',
+    glow: 'rgba(251,191,36,0.55)',
+    label: 'LOJA',
+    sub: 'ITENS PREMIUM',
     btnText: 'EXPLORAR',
-    btnGrad: 'linear-gradient(160deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 100%)',
-    btnColor: 'rgba(255,255,255,0.75)',
-    liveLabel: 'VER TODAS AS LIGAS',
+    btnGrad: 'linear-gradient(160deg, #fbbf24 0%, #d97706 55%, #92400e 100%)',
+    btnColor: '#000',
+    liveLabel: 'OFERTAS ESPECIAIS',
   },
   training: {
     accent: 'rgba(255,255,255,0.65)',
@@ -210,10 +210,13 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
   const cfg = MODE_CFG[selected];
 
   const handlePlay = () => {
+    if (selected === 'store') {
+      onViewChange('store');
+      return;
+    }
     const msgs: Record<string, { title: string; desc: string }> = {
       duel:        { title: 'Buscando adversário…',    desc: 'Encontrando o melhor oponente para você.' },
       tournaments: { title: 'Inscrevendo no torneio…', desc: 'Você está na fila para o próximo torneio.' },
-      clubs:       { title: 'Explorando clubes…',      desc: 'Carregando as ligas disponíveis.' },
       training:    { title: 'Modo treino iniciado',    desc: 'Boa prática!' },
     };
     const m = msgs[selected];
@@ -228,23 +231,28 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         {modes.map((mode) => {
           const mc = MODE_CFG[mode.id] ?? MODE_CFG.training;
           const isActive = mode.id === selected;
+          const isStore = mode.id === 'store';
           return (
             <motion.button
               key={mode.id}
-              onClick={() => setSelected(mode.id as ModeId)}
+              onClick={() => isStore ? onViewChange('store') : setSelected(mode.id as ModeId)}
               whileHover={{ x: 4, scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               className="relative flex flex-col gap-1.5 px-4 py-4 rounded-[15px] overflow-hidden text-left cursor-pointer"
               style={{
                 background: isActive
                   ? `linear-gradient(155deg, rgba(14,14,20,0.97) 0%, rgba(6,6,10,0.99) 60%, ${mc.accent}0a 100%)`
-                  : 'linear-gradient(155deg, rgba(12,12,18,0.95) 0%, rgba(5,5,8,0.98) 100%)',
+                  : isStore
+                    ? 'linear-gradient(155deg, rgba(20,14,0,0.97) 0%, rgba(8,5,0,0.99) 60%, rgba(251,191,36,0.06) 100%)'
+                    : 'linear-gradient(155deg, rgba(12,12,18,0.95) 0%, rgba(5,5,8,0.98) 100%)',
                 backdropFilter: 'blur(20px)',
                 WebkitBackdropFilter: 'blur(20px)',
-                border: `1px solid ${isActive ? mc.accent + '55' : 'rgba(255,255,255,0.1)'}`,
+                border: `1px solid ${isActive ? mc.accent + '55' : isStore ? 'rgba(251,191,36,0.35)' : 'rgba(255,255,255,0.1)'}`,
                 boxShadow: isActive
                   ? `0 12px 40px rgba(0,0,0,0.9), 0 4px 16px rgba(0,0,0,0.7), 0 0 0 1px ${mc.accent}22, inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.5), inset 1px 0 0 rgba(255,255,255,0.07), inset -1px 0 0 rgba(0,0,0,0.4)`
-                  : '0 8px 32px rgba(0,0,0,0.85), 0 2px 8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4), inset 1px 0 0 rgba(255,255,255,0.06), inset -1px 0 0 rgba(0,0,0,0.3)',
+                  : isStore
+                    ? '0 8px 32px rgba(0,0,0,0.85), 0 0 18px rgba(251,191,36,0.22), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4)'
+                    : '0 8px 32px rgba(0,0,0,0.85), 0 2px 8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4), inset 1px 0 0 rgba(255,255,255,0.06), inset -1px 0 0 rgba(0,0,0,0.3)',
               }}
             >
               {/* Active left accent bar */}
@@ -257,12 +265,43 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
                 />
               )}
 
+              {/* Store: shimmer sweep */}
+              {isStore && (
+                <motion.div
+                  animate={{ x: ['-100%', '320%'] }}
+                  transition={{ repeat: Infinity, duration: 2.4, ease: 'easeInOut', repeatDelay: 2 }}
+                  className="absolute inset-y-0 pointer-events-none z-20"
+                  style={{
+                    width: '45%',
+                    background: 'linear-gradient(90deg, transparent, rgba(251,191,36,0.22), rgba(255,230,100,0.14), transparent)',
+                  }}
+                />
+              )}
+
+              {/* Store: pulsing outer glow ring */}
+              {isStore && (
+                <motion.div
+                  animate={{
+                    opacity: [0.5, 1, 0.5],
+                    boxShadow: [
+                      'inset 0 0 0px rgba(251,191,36,0)',
+                      'inset 0 0 14px rgba(251,191,36,0.18)',
+                      'inset 0 0 0px rgba(251,191,36,0)',
+                    ],
+                  }}
+                  transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
+                  className="absolute inset-0 rounded-[15px] pointer-events-none z-10"
+                />
+              )}
+
               {/* Top edge glass highlight */}
               <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
                 style={{
                   background: isActive
                     ? `linear-gradient(90deg, transparent 5%, ${mc.accent}60 25%, rgba(255,255,255,0.55) 50%, ${mc.accent}40 75%, transparent 95%)`
-                    : 'linear-gradient(90deg, transparent 5%, rgba(255,255,255,0.22) 30%, rgba(255,255,255,0.42) 50%, rgba(255,255,255,0.18) 70%, transparent 95%)',
+                    : isStore
+                      ? 'linear-gradient(90deg, transparent 5%, rgba(251,191,36,0.45) 25%, rgba(255,230,100,0.65) 50%, rgba(251,191,36,0.35) 75%, transparent 95%)'
+                      : 'linear-gradient(90deg, transparent 5%, rgba(255,255,255,0.22) 30%, rgba(255,255,255,0.42) 50%, rgba(255,255,255,0.18) 70%, transparent 95%)',
                 }} />
 
               {/* Left edge glass highlight */}
@@ -291,13 +330,13 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
 
               <span className="font-display text-[21px] leading-none tracking-[0.06em] relative z-10"
                 style={{
-                  color: isActive ? mc.accent : 'rgba(255,255,255,0.38)',
-                  textShadow: isActive ? `0 0 20px ${mc.accent}60` : 'none',
+                  color: isActive ? mc.accent : isStore ? 'rgba(251,191,36,0.85)' : 'rgba(255,255,255,0.38)',
+                  textShadow: isActive ? `0 0 20px ${mc.accent}60` : isStore ? '0 0 16px rgba(251,191,36,0.5)' : 'none',
                 }}>
                 {mc.label}
               </span>
               <span className="text-[10px] font-black uppercase tracking-widest leading-none relative z-10"
-                style={{ color: isActive ? mc.accent + 'bb' : 'rgba(255,255,255,0.22)' }}>
+                style={{ color: isActive ? mc.accent + 'bb' : isStore ? 'rgba(251,191,36,0.55)' : 'rgba(255,255,255,0.22)' }}>
                 {mc.sub}
               </span>
 
@@ -308,6 +347,21 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
                   className="absolute top-3 right-3 w-2 h-2 rounded-full"
                   style={{ background: mc.accent, boxShadow: `0 0 7px ${mc.accent}, 0 0 14px ${mc.accent}70` }}
                 />
+              )}
+              {isStore && (
+                <motion.div
+                  animate={{ scale: [1, 1.35, 1], opacity: [0.7, 1, 0.7] }}
+                  transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
+                  className="absolute top-2.5 right-2.5 px-1.5 py-[3px] rounded-full text-[7px] font-black uppercase tracking-wide z-20"
+                  style={{
+                    background: 'rgba(251,191,36,0.18)',
+                    border: '1px solid rgba(251,191,36,0.6)',
+                    color: '#fbbf24',
+                    boxShadow: '0 0 8px rgba(251,191,36,0.5)',
+                  }}
+                >
+                  HOT
+                </motion.div>
               )}
             </motion.button>
           );
