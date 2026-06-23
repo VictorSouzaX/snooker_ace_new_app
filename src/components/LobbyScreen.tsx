@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ShoppingBag, History, Newspaper, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { GameMode } from '../types';
 
@@ -425,7 +425,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
       </div>
 
       {/* ── RIGHT PANEL: Widgets ── */}
-      <div className="flex flex-col gap-2.5 px-3 py-4 w-[220px] shrink-0 justify-center z-10">
+      <div className="flex flex-col gap-2.5 px-3 py-4 w-[220px] shrink-0 z-10">
 
         {/* ── shared glass ── */}
         {(() => {
@@ -544,69 +544,97 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
                 </div>
               </div>
 
-              {/* ── Amigos ── */}
-              <div className="relative rounded-[16px] overflow-hidden" style={glass}>
-                <EdgeLayers />
-                <div className="relative z-10 px-4 pt-3 pb-0 flex items-center justify-between">
-                  <span className="font-display text-[14px] leading-none tracking-[0.06em]"
-                    style={{ color: 'rgba(255,255,255,0.82)' }}>AMIGOS</span>
-                  <motion.button whileTap={{ scale: 0.95 }} onClick={onOpenFriends}
-                    className="cursor-pointer leading-none font-display text-[11px] tracking-[0.06em]"
-                    style={{ color: '#00e870' }}>
-                    VER TODOS
-                  </motion.button>
+              {/* ── Ranking ── */}
+              <motion.div
+                whileHover={{ y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => toast('Em breve', { description: 'Rankings chegando em breve.' })}
+                className="relative rounded-[16px] overflow-hidden flex-1 flex flex-col cursor-pointer"
+                style={{
+                  ...glass,
+                  border: '1px solid rgba(245,197,24,0.28)',
+                  background: 'linear-gradient(155deg, rgba(16,12,0,0.97) 0%, rgba(6,4,0,0.99) 65%, rgba(245,197,24,0.05) 100%)',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.85), 0 0 20px rgba(245,197,24,0.1), inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.4)',
+                }}
+              >
+                <EdgeLayers accent="#f5c518" />
+                {/* gold ambient bloom */}
+                <div className="absolute inset-0 pointer-events-none"
+                  style={{ background: 'radial-gradient(ellipse at 20% 50%, rgba(245,197,24,0.07) 0%, transparent 60%)' }} />
+
+                {/* Header */}
+                <div className="relative z-10 px-4 pt-3.5 pb-0 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Star className="w-[14px] h-[14px]" style={{ color: '#f5c518', filter: 'drop-shadow(0 0 4px rgba(245,197,24,0.7))' }} />
+                    <span className="font-display text-[16px] leading-none tracking-[0.08em]"
+                      style={{ color: '#f5c518', textShadow: '0 0 18px rgba(245,197,24,0.5)' }}>
+                      RANKING
+                    </span>
+                  </div>
+                  <span className="text-[7px] font-black uppercase tracking-wider px-2 py-[3px] rounded-full"
+                    style={{
+                      background: 'rgba(245,197,24,0.1)',
+                      border: '1px solid rgba(245,197,24,0.3)',
+                      color: 'rgba(245,197,24,0.75)',
+                    }}>
+                    GLOBAL
+                  </span>
                 </div>
-                <div className="relative z-10 px-4 pb-3 flex items-center gap-2.5 mt-2">
+
+                {/* Top 3 */}
+                <div className="relative z-10 px-4 pt-3 pb-0 flex flex-col gap-2">
                   {[
-                    { url: 'https://i.pravatar.cc/100?u=lbfriend1', name: 'Carlos' },
-                    { url: 'https://i.pravatar.cc/100?u=lbfriend2', name: 'Ana' },
-                    { url: 'https://i.pravatar.cc/100?u=lbfriend3', name: 'Pedro' },
-                  ].map((f, i) => (
-                    <div key={i} className="flex flex-col items-center gap-1">
-                      <div className="relative">
-                        <img src={f.url} className="w-9 h-9 rounded-full object-cover"
-                          style={{ border: '2px solid rgba(0,210,106,0.3)' }} />
-                        <div className="absolute -bottom-0.5 -right-0.5 w-[10px] h-[10px] rounded-full"
-                          style={{ background: '#00d26a', border: '2px solid rgba(5,5,8,0.95)', boxShadow: '0 0 5px rgba(0,210,106,0.9)' }} />
-                      </div>
-                      <span className="text-[9px] font-semibold leading-none" style={{ color: 'rgba(255,255,255,0.35)' }}>{f.name}</span>
+                    { pos: 1, name: 'LegendAce',  pts: '14.820', medal: '#f5c518',  img: 'rank1' },
+                    { pos: 2, name: 'SnookerPro', pts: '12.340', medal: '#b8c4cc',  img: 'rank2' },
+                    { pos: 3, name: 'CueMaster',  pts: '10.990', medal: '#c47c3a',  img: 'rank3' },
+                  ].map(({ pos, name, pts, medal, img }) => (
+                    <div key={pos} className="flex items-center gap-2.5">
+                      <span className="font-display text-[14px] w-4 text-center leading-none shrink-0"
+                        style={{ color: medal, textShadow: `0 0 8px ${medal}80` }}>
+                        {pos}
+                      </span>
+                      <img
+                        src={`https://i.pravatar.cc/40?u=${img}`}
+                        className="w-6 h-6 rounded-full object-cover shrink-0"
+                        style={{ border: `1.5px solid ${medal}55`, boxShadow: `0 0 6px ${medal}30` }}
+                      />
+                      <span className="flex-1 text-[9px] font-black uppercase tracking-wide leading-none min-w-0 truncate"
+                        style={{ color: 'rgba(255,255,255,0.62)' }}>
+                        {name}
+                      </span>
+                      <span className="text-[9px] font-black leading-none shrink-0"
+                        style={{ color: medal }}>
+                        {pts}
+                      </span>
                     </div>
                   ))}
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="w-9 h-9 rounded-full flex items-center justify-center"
-                      style={{ background: 'rgba(0,0,0,0.55)', border: '1px solid rgba(0,210,106,0.2)' }}>
-                      <span className="font-display text-[13px] leading-none" style={{ color: '#00e870' }}>+4</span>
-                    </div>
-                    <span className="text-[9px] font-semibold leading-none" style={{ color: 'rgba(255,255,255,0.2)' }}>mais</span>
-                  </div>
                 </div>
-              </div>
 
-              {/* ── Nav 2×2 ── */}
-              <div className="grid grid-cols-2 gap-2 mt-auto">
-                {[
-                  { icon: <ShoppingBag className="w-[15px] h-[15px]" />, label: 'LOJA',      action: () => onViewChange('store') },
-                  { icon: <History     className="w-[15px] h-[15px]" />, label: 'HISTÓRICO', action: () => onViewChange('history') },
-                  { icon: <Star        className="w-[15px] h-[15px]" />, label: 'RANKING',   action: () => toast('Em breve', { description: 'Rankings chegando.' }) },
-                  { icon: <Newspaper   className="w-[15px] h-[15px]" />, label: 'NOTÍCIAS',  action: () => toast('Em breve', { description: 'Novidades chegando.' }) },
-                ].map(({ icon, label, action }) => (
-                  <motion.button
-                    key={label}
-                    onClick={action}
-                    whileTap={{ scale: 0.94 }}
-                    whileHover={{ y: -2 }}
-                    className="relative flex flex-col items-center gap-1.5 py-3 rounded-[12px] overflow-hidden cursor-pointer"
-                    style={glass}
-                  >
-                    <EdgeLayers />
-                    <span className="relative z-10" style={{ color: 'rgba(255,255,255,0.4)' }}>{icon}</span>
-                    <span className="relative z-10 font-display leading-none tracking-[0.06em]"
-                      style={{ fontSize: '11px', color: 'rgba(255,255,255,0.36)' }}>
-                      {label}
-                    </span>
-                  </motion.button>
-                ))}
-              </div>
+                {/* Divider */}
+                <div className="mx-4 mt-3 mb-2 h-px"
+                  style={{ background: 'linear-gradient(90deg, transparent, rgba(245,197,24,0.18), transparent)' }} />
+
+                {/* Minha posição */}
+                <div className="relative z-10 px-4 pb-3.5 flex items-center gap-2.5">
+                  <span className="font-display text-[12px] w-4 text-center leading-none shrink-0"
+                    style={{ color: 'rgba(255,255,255,0.3)' }}>
+                    47
+                  </span>
+                  <img
+                    src="https://i.pravatar.cc/40?u=me"
+                    className="w-6 h-6 rounded-full object-cover shrink-0"
+                    style={{ border: '1.5px solid rgba(0,210,106,0.45)', boxShadow: '0 0 6px rgba(0,210,106,0.3)' }}
+                  />
+                  <span className="flex-1 text-[9px] font-black uppercase tracking-wide leading-none"
+                    style={{ color: '#00e870' }}>
+                    Você
+                  </span>
+                  <span className="text-[9px] font-black leading-none shrink-0"
+                    style={{ color: 'rgba(255,255,255,0.38)' }}>
+                    3.210
+                  </span>
+                </div>
+              </motion.div>
             </>
           );
         })()}
