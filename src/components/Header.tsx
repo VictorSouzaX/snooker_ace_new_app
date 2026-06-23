@@ -9,8 +9,6 @@ interface HeaderProps {
   onOpenSettings: () => void;
 }
 
-const LEVEL = 12;
-
 export default function Header({ onOpenSettings }: HeaderProps) {
   const { t } = useLanguage();
   const [showBalanceInfo, setShowBalanceInfo] = useState(false);
@@ -28,87 +26,52 @@ export default function Header({ onOpenSettings }: HeaderProps) {
       >
         {/* ── LEFT: Avatar + player info ── */}
         <div className="flex items-center gap-3">
-          {/* Animated fire avatar frame */}
-          <div className="relative shrink-0" style={{ width: 64, height: 64, overflow: 'visible' }}>
-            {/* Outer fire bloom glow */}
+          {/* Avatar with flaming arc */}
+          <div className="relative shrink-0" style={{ width: 52, height: 52 }}>
+            {/* Rotating fire arc */}
             <motion.div
-              animate={{ opacity: [0.35, 0.72, 0.35], scale: [0.94, 1.1, 0.94] }}
-              transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
-              className="absolute pointer-events-none"
-              style={{
-                inset: '-6px', borderRadius: '50%',
-                background: 'radial-gradient(circle, rgba(255,80,0,0.28) 0%, rgba(200,30,0,0.12) 50%, transparent 72%)',
-                filter: 'blur(8px)',
-              }}
-            />
-            {/* Inner fire ring glow */}
-            <motion.div
-              animate={{ opacity: [0.5, 0.95, 0.5] }}
-              transition={{ repeat: Infinity, duration: 1.1, ease: 'easeInOut', delay: 0.25 }}
-              className="absolute pointer-events-none rounded-full"
-              style={{ inset: '9px', boxShadow: '0 0 20px rgba(255,100,0,0.75), 0 0 40px rgba(255,50,0,0.4)' }}
-            />
-            {/* Flame tongues — 10 around the avatar */}
-            {Array.from({ length: 10 }, (_, i) => {
-              const deg = i * 36;
-              const fH = i % 2 === 0 ? 16 : 11;
-              const fW = i % 2 === 0 ? 8 : 6;
-              return (
-                <div key={i} style={{
-                  position: 'absolute',
-                  left: '50%', top: '50%',
-                  width: fW, height: fH,
-                  marginLeft: -fW / 2, marginTop: -fH / 2,
-                  transform: `rotate(${deg}deg) translateY(-28px)`,
-                  transformOrigin: 'center center',
-                  pointerEvents: 'none',
-                }}>
-                  <motion.div
-                    animate={{
-                      scaleY: [1, 1.35, 0.8, 1.25, 1],
-                      scaleX: [1, 0.75, 1.2, 0.8, 1],
-                      opacity: [0.8, 1, 0.55, 0.92, 0.8],
-                    }}
-                    transition={{
-                      repeat: Infinity,
-                      duration: 0.4 + (i % 5) * 0.08,
-                      delay: i * 0.065,
-                      ease: 'easeInOut',
-                    }}
-                    style={{
-                      width: '100%', height: '100%',
-                      transformOrigin: 'center bottom',
-                      borderRadius: '50% 50% 20% 20% / 60% 60% 40% 40%',
-                      background: 'linear-gradient(0deg, #cc1100 0%, #ff4400 28%, #ff8800 60%, #ffcc00 82%, rgba(255,240,120,0) 100%)',
-                      filter: 'blur(0.5px)',
-                      boxShadow: '0 0 5px rgba(255,90,0,0.9)',
-                    }}
-                  />
-                </div>
-              );
-            })}
+              className="absolute inset-0"
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 6, ease: 'linear' }}
+            >
+              <svg viewBox="0 0 52 52" className="w-full h-full" style={{ transform: 'rotate(-90deg)' }}>
+                <defs>
+                  <linearGradient id="flameArcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%"   stopColor="#ff6600" stopOpacity="0" />
+                    <stop offset="20%"  stopColor="#ff3300" stopOpacity="0.9" />
+                    <stop offset="50%"  stopColor="#ffbb00" stopOpacity="1" />
+                    <stop offset="80%"  stopColor="#ff3300" stopOpacity="0.9" />
+                    <stop offset="100%" stopColor="#ff6600" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                {/* Soft glow layer */}
+                <circle cx="26" cy="26" r="22"
+                  fill="none" stroke="#ff5500" strokeWidth="6"
+                  strokeLinecap="round" strokeDasharray="77 61"
+                  style={{ filter: 'blur(4px)', opacity: 0.38 }}
+                />
+                {/* Sharp arc */}
+                <circle cx="26" cy="26" r="22"
+                  fill="none" stroke="url(#flameArcGrad)" strokeWidth="2.5"
+                  strokeLinecap="round" strokeDasharray="77 61"
+                  style={{ filter: 'drop-shadow(0 0 3px rgba(255,110,0,0.95)) drop-shadow(0 0 7px rgba(255,55,0,0.6))' }}
+                />
+              </svg>
+            </motion.div>
+
+            {/* Faint track */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 52 52">
+              <circle cx="26" cy="26" r="22" fill="none" stroke="rgba(255,90,0,0.08)" strokeWidth="1.5" />
+            </svg>
+
             {/* Avatar */}
             <div className="absolute rounded-full overflow-hidden"
-              style={{
-                inset: '10px',
-                border: '2px solid rgba(255,130,0,0.75)',
-                boxShadow: '0 0 14px rgba(255,100,0,0.65), 0 0 28px rgba(255,50,0,0.3), inset 0 0 10px rgba(200,60,0,0.2)',
-              }}>
+              style={{ inset: '5px', border: '1.5px solid rgba(255,110,0,0.3)' }}>
               <img
                 src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
                 alt="Avatar"
                 className="w-full h-full rounded-full bg-slate-800"
               />
-            </div>
-            {/* Level badge */}
-            <div className="absolute -bottom-1 -right-1 flex items-center justify-center rounded-full font-black text-white text-[9px] leading-none"
-              style={{
-                width: 18, height: 18,
-                background: 'linear-gradient(145deg, #ff8800, #cc2200)',
-                boxShadow: '0 0 10px rgba(255,100,0,0.75), 0 0 20px rgba(255,50,0,0.4), 0 2px 4px rgba(0,0,0,0.6)',
-                border: '1.5px solid rgba(0,0,0,0.8)',
-              }}>
-              {LEVEL}
             </div>
           </div>
 
