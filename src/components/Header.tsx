@@ -9,15 +9,11 @@ interface HeaderProps {
   onOpenSettings: () => void;
 }
 
-const XP_PCT = 0.65; // 65% to next level
 const LEVEL = 12;
 
 export default function Header({ onOpenSettings }: HeaderProps) {
   const { t } = useLanguage();
   const [showBalanceInfo, setShowBalanceInfo] = useState(false);
-  const R = 18; // SVG arc radius
-  const circ = 2 * Math.PI * R;
-
   return (
     <Tooltip.Provider delayDuration={400}>
       <header
@@ -32,23 +28,72 @@ export default function Header({ onOpenSettings }: HeaderProps) {
       >
         {/* ── LEFT: Avatar + player info ── */}
         <div className="flex items-center gap-3">
-          {/* Avatar with XP arc */}
-          <div className="relative shrink-0" style={{ width: 48, height: 48 }}>
-            <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 44 44">
-              {/* Track */}
-              <circle cx="22" cy="22" r={R} fill="none"
-                stroke="rgba(0,210,106,0.1)" strokeWidth="2.5" />
-              {/* Progress */}
-              <circle cx="22" cy="22" r={R} fill="none"
-                stroke="#00d26a" strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeDasharray={circ}
-                strokeDashoffset={circ * (1 - XP_PCT)}
-                style={{ filter: 'drop-shadow(0 0 4px rgba(0,210,106,0.8))' }}
-              />
-            </svg>
-            <div className="absolute inset-[5px] rounded-full overflow-hidden"
-              style={{ border: '1.5px solid rgba(0,210,106,0.2)' }}>
+          {/* Animated fire avatar frame */}
+          <div className="relative shrink-0" style={{ width: 64, height: 64, overflow: 'visible' }}>
+            {/* Outer fire bloom glow */}
+            <motion.div
+              animate={{ opacity: [0.35, 0.72, 0.35], scale: [0.94, 1.1, 0.94] }}
+              transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}
+              className="absolute pointer-events-none"
+              style={{
+                inset: '-6px', borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(255,80,0,0.28) 0%, rgba(200,30,0,0.12) 50%, transparent 72%)',
+                filter: 'blur(8px)',
+              }}
+            />
+            {/* Inner fire ring glow */}
+            <motion.div
+              animate={{ opacity: [0.5, 0.95, 0.5] }}
+              transition={{ repeat: Infinity, duration: 1.1, ease: 'easeInOut', delay: 0.25 }}
+              className="absolute pointer-events-none rounded-full"
+              style={{ inset: '9px', boxShadow: '0 0 20px rgba(255,100,0,0.75), 0 0 40px rgba(255,50,0,0.4)' }}
+            />
+            {/* Flame tongues — 10 around the avatar */}
+            {Array.from({ length: 10 }, (_, i) => {
+              const deg = i * 36;
+              const fH = i % 2 === 0 ? 16 : 11;
+              const fW = i % 2 === 0 ? 8 : 6;
+              return (
+                <div key={i} style={{
+                  position: 'absolute',
+                  left: '50%', top: '50%',
+                  width: fW, height: fH,
+                  marginLeft: -fW / 2, marginTop: -fH / 2,
+                  transform: `rotate(${deg}deg) translateY(-28px)`,
+                  transformOrigin: 'center center',
+                  pointerEvents: 'none',
+                }}>
+                  <motion.div
+                    animate={{
+                      scaleY: [1, 1.35, 0.8, 1.25, 1],
+                      scaleX: [1, 0.75, 1.2, 0.8, 1],
+                      opacity: [0.8, 1, 0.55, 0.92, 0.8],
+                    }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 0.4 + (i % 5) * 0.08,
+                      delay: i * 0.065,
+                      ease: 'easeInOut',
+                    }}
+                    style={{
+                      width: '100%', height: '100%',
+                      transformOrigin: 'center bottom',
+                      borderRadius: '50% 50% 20% 20% / 60% 60% 40% 40%',
+                      background: 'linear-gradient(0deg, #cc1100 0%, #ff4400 28%, #ff8800 60%, #ffcc00 82%, rgba(255,240,120,0) 100%)',
+                      filter: 'blur(0.5px)',
+                      boxShadow: '0 0 5px rgba(255,90,0,0.9)',
+                    }}
+                  />
+                </div>
+              );
+            })}
+            {/* Avatar */}
+            <div className="absolute rounded-full overflow-hidden"
+              style={{
+                inset: '10px',
+                border: '2px solid rgba(255,130,0,0.75)',
+                boxShadow: '0 0 14px rgba(255,100,0,0.65), 0 0 28px rgba(255,50,0,0.3), inset 0 0 10px rgba(200,60,0,0.2)',
+              }}>
               <img
                 src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix"
                 alt="Avatar"
@@ -56,11 +101,11 @@ export default function Header({ onOpenSettings }: HeaderProps) {
               />
             </div>
             {/* Level badge */}
-            <div className="absolute -bottom-1 -right-1 flex items-center justify-center rounded-full font-black text-black text-[9px] leading-none"
+            <div className="absolute -bottom-1 -right-1 flex items-center justify-center rounded-full font-black text-white text-[9px] leading-none"
               style={{
                 width: 18, height: 18,
-                background: 'linear-gradient(145deg, #00e870, #00a84a)',
-                boxShadow: '0 0 8px rgba(0,210,106,0.7), 0 2px 4px rgba(0,0,0,0.6)',
+                background: 'linear-gradient(145deg, #ff8800, #cc2200)',
+                boxShadow: '0 0 10px rgba(255,100,0,0.75), 0 0 20px rgba(255,50,0,0.4), 0 2px 4px rgba(0,0,0,0.6)',
                 border: '1.5px solid rgba(0,0,0,0.8)',
               }}>
               {LEVEL}
