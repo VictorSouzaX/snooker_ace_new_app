@@ -87,8 +87,7 @@ function AppContent() {
 
   return (
     <div
-      className="w-screen relative overflow-hidden flex flex-col select-none font-sans"
-      style={{ height: '100dvh' }}
+      className="w-full h-full relative overflow-hidden flex flex-col select-none font-sans"
     >
 
         {showSplash && <IntroSplash onComplete={() => setShowSplash(false)} />}
