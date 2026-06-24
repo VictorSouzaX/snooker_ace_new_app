@@ -9,7 +9,6 @@ import { ChevronLeft } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 import Header from './components/Header';
 import LobbyScreen from './components/LobbyScreen';
-import SvgFluidLinesBackground from './components/SvgFluidLinesBackground';
 import MatchHistory from './components/MatchHistory';
 import Store from './components/Store';
 import IntroSplash from './components/IntroSplash';
@@ -87,15 +86,22 @@ function AppContent() {
   const overlayTransition = { type: 'spring', stiffness: 380, damping: 42 } as const;
 
   return (
-    <div className="w-screen bg-[#050505] relative overflow-hidden flex flex-col select-none font-sans" style={{ height: '100dvh' }}>
+    <div
+      className="w-screen bg-[#050505] relative overflow-hidden flex flex-col select-none font-sans"
+      style={{
+        height: '100dvh',
+        backgroundImage: "url('/wallpaper%20snooke%20ace.png')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center bottom',
+        backgroundRepeat: 'no-repeat',
+      }}
+    >
 
         {showSplash && <IntroSplash onComplete={() => setShowSplash(false)} />}
 
         {/* Main layer */}
         <div className="flex-1 flex flex-col relative overflow-hidden">
-          <SvgFluidLinesBackground />
-
-          {/* Background depth: spotlight + vignette */}
+          {/* Background depth: spotlight + vignette over the wallpaper */}
           <div className="absolute inset-0 pointer-events-none z-[1]">
             <div className="absolute bottom-[10%] inset-x-0 h-[55%]"
               style={{ background: 'radial-gradient(ellipse at 50% 100%, rgba(0,28,10,0.16) 0%, transparent 65%)' }} />
@@ -163,8 +169,7 @@ function AppContent() {
                   transition={overlayTransition}
                   className="absolute inset-0 z-[150] flex flex-col overflow-hidden"
                 >
-                  {/* Animated background — same as home screen */}
-                  <SvgFluidLinesBackground />
+                  {/* Wallpaper from the root div shows through */}
 
                   {/* ── Refined header ── */}
                   <div
