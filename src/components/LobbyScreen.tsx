@@ -312,7 +312,10 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
       style={{
         display: 'grid',
         gridTemplateColumns: '155px 1fr 200px',
-        gridTemplateRows: '1fr auto',
+        // minmax(0, 1fr) lets the top row actually shrink to fit short
+        // (landscape) viewports instead of overflowing and clipping the
+        // bottom button row.
+        gridTemplateRows: 'minmax(0, 1fr) auto',
         columnGap: '8px',
         rowGap: '8px',
         padding: '12px 12px calc(12px + env(safe-area-inset-bottom)) 12px',
@@ -320,7 +323,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
     >
 
       {/* ══ COL 1: Mode buttons (flex column, each flex-1 → identical heights) ══ */}
-      <div className="z-10 flex flex-col gap-2" style={{ gridColumn: 1, gridRow: 1 }}>
+      <div className="z-10 flex flex-col gap-2 min-h-0" style={{ gridColumn: 1, gridRow: 1 }}>
         {topModes.map((mode) => {
           const mc = MODE_CFG[mode.id] ?? MODE_CFG.training;
           const isActive = mode.id === selected;
@@ -381,7 +384,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
       </div>
 
       {/* ══ COL 2: Banner ══ */}
-      <div className="flex items-stretch z-10" style={{ gridColumn: 2, gridRow: 1 }}>
+      <div className="flex items-stretch z-10 min-h-0 min-w-0" style={{ gridColumn: 2, gridRow: 1 }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide.id}
