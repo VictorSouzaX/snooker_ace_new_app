@@ -404,7 +404,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
     >
 
       {/* ══ ROW 1 — LEFT: Duelo / Torneios / Treino ══ */}
-      <div className="flex flex-col gap-3 px-3 pt-4 pb-2 justify-center z-10">
+      <div className="flex flex-col gap-3 px-3 pt-4 pb-2 justify-end z-10">
         {topModes.map((mode) => {
           const mc = MODE_CFG[mode.id] ?? MODE_CFG.training;
           const isActive = mode.id === selected;
@@ -465,7 +465,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
       </div>
 
       {/* ══ ROW 1 — CENTER: Banner ══ */}
-      <div className="flex items-center justify-center px-3 pt-4 pb-2 z-10">
+      <div className="flex items-end justify-center px-3 pt-4 pb-2 z-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide.id}
@@ -488,7 +488,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
       </div>
 
       {/* ══ ROW 1 — RIGHT: Icon buttons + Passe Ace ══ */}
-      <div className="flex flex-col gap-3 px-3 pt-4 pb-2 justify-center z-10">
+      <div className="flex flex-col gap-3 px-3 pt-4 pb-2 justify-end z-10">
         {/* Icon buttons */}
         <div className="flex gap-2">
           {([
