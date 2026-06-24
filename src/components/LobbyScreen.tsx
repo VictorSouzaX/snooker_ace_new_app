@@ -438,8 +438,8 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         })}
       </div>
 
-      {/* ══ COL 2: Banner ══ */}
-      <div className="flex items-stretch z-10 min-h-0 min-w-0 relative" style={{ gridColumn: 2, gridRow: 1 }}>
+      {/* ══ COL 2: Banner — spans both rows when no mode selected ══ */}
+      <div className="flex items-stretch z-10 min-h-0 min-w-0 relative" style={{ gridColumn: 2, gridRow: selected === null ? '1 / 3' : 1 }}>
         <motion.div
           className="absolute inset-0"
           style={{ touchAction: 'pan-y' }}
