@@ -39,91 +39,34 @@ const MODE_CFG: Record<string, {
   },
 };
 
-// ── Banner data ───────────────────────────────────────────────────────────────
-
 interface BannerSlide {
-  id: string;
-  tag: string;
-  title: string;
-  sub: string;
-  desc: string;
-  flair?: 'live' | 'free';
+  id: string; tag: string; title: string; sub: string; desc: string; flair?: 'live' | 'free';
 }
 
 const BANNER_DATA: Record<string, BannerSlide[]> = {
   duel: [
-    {
-      id: 'bola8',
-      tag: 'MAIS POPULAR',
-      title: 'BOLA 8',
-      sub: 'DUELO 1v1',
-      desc: 'Embole todas as suas bolas e finalize com a bola 8 para vencer a partida.',
-    },
-    {
-      id: 'par-impar',
-      tag: 'ESTRATÉGIA',
-      title: 'PAR & ÍMPAR',
-      sub: 'DUELO 1v1',
-      desc: 'Escolha pares ou ímpares e embole as suas bolas antes do adversário.',
-    },
-    {
-      id: 'bolinho',
-      tag: 'MODO RÁPIDO',
-      title: 'BOLINHO',
-      sub: 'DUELO 1v1',
-      desc: 'Partidas relâmpago com poucas bolas. Pura habilidade em minutos.',
-    },
+    { id: 'bola8',     tag: 'MAIS POPULAR', title: 'BOLA 8',   sub: 'DUELO 1v1', desc: 'Embole todas as suas bolas e finalize com a bola 8 para vencer a partida.' },
+    { id: 'par-impar', tag: 'ESTRATÉGIA',   title: 'PAR & ÍMPAR', sub: 'DUELO 1v1', desc: 'Escolha pares ou ímpares e embole as suas bolas antes do adversário.' },
+    { id: 'bolinho',   tag: 'MODO RÁPIDO',  title: 'BOLINHO',  sub: 'DUELO 1v1', desc: 'Partidas relâmpago com poucas bolas. Pura habilidade em minutos.' },
   ],
   tournaments: [
-    {
-      id: 'torneio-rapido',
-      tag: 'AO VIVO',
-      title: 'TORNEIO',
-      sub: 'RÁPIDO',
-      desc: 'Eliminação direta. Vença os adversários em série e leve o prêmio.',
-      flair: 'live',
-    },
-    {
-      id: 'torneio-classico',
-      tag: 'SEMANAL',
-      title: 'TORNEIO',
-      sub: 'CLÁSSICO',
-      desc: 'Formato liga. Pontuação acumulada ao longo da semana com recompensas exclusivas.',
-    },
+    { id: 'torneio-rapido',   tag: 'AO VIVO', title: 'TORNEIO', sub: 'RÁPIDO',   desc: 'Eliminação direta. Vença os adversários em série e leve o prêmio.', flair: 'live' },
+    { id: 'torneio-classico', tag: 'SEMANAL', title: 'TORNEIO', sub: 'CLÁSSICO', desc: 'Formato liga. Pontuação acumulada ao longo da semana com recompensas exclusivas.' },
   ],
   training: [
-    {
-      id: 'treino-solo',
-      tag: 'SEM FICHAS',
-      title: 'TREINO',
-      sub: 'SOLO',
-      desc: 'Jogue à vontade sem consumir fichas. Melhore sua técnica no seu ritmo.',
-      flair: 'free',
-    },
+    { id: 'treino-solo', tag: 'SEM FICHAS', title: 'TREINO', sub: 'SOLO', desc: 'Jogue à vontade sem consumir fichas. Melhore sua técnica no seu ritmo.', flair: 'free' },
   ],
   store: [
-    {
-      id: 'store-banner',
-      tag: 'OFERTAS',
-      title: 'LOJA',
-      sub: 'PREMIUM',
-      desc: 'Tacos exclusivos, avatares e personalizações para destacar seu perfil.',
-    },
+    { id: 'store-banner', tag: 'OFERTAS', title: 'LOJA', sub: 'PREMIUM', desc: 'Tacos exclusivos, avatares e personalizações para destacar seu perfil.' },
   ],
 };
-
-// ── Slide visuals ─────────────────────────────────────────────────────────────
 
 function Ball({ size = 88, color, label, blackBall = false }: {
   size?: number; color: string; label: string; blackBall?: boolean;
 }) {
   return (
     <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
-      <div style={{
-        position: 'absolute', inset: -18, borderRadius: '50%',
-        background: `radial-gradient(circle, ${color}40 0%, transparent 65%)`,
-        filter: 'blur(14px)',
-      }} />
+      <div style={{ position: 'absolute', inset: -18, borderRadius: '50%', background: `radial-gradient(circle, ${color}40 0%, transparent 65%)`, filter: 'blur(14px)' }} />
       <div style={{
         position: 'absolute', inset: 0, borderRadius: '50%',
         background: `radial-gradient(circle at 36% 30%, rgba(255,255,255,${blackBall ? '0.18' : '0.28'}) 0%, ${color} 38%, rgba(0,0,0,0.72) 100%)`,
@@ -131,11 +74,7 @@ function Ball({ size = 88, color, label, blackBall = false }: {
       }}>
         {blackBall ? (
           <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{
-              width: Math.round(size * 0.45), height: Math.round(size * 0.45),
-              borderRadius: '50%', background: 'rgba(255,255,255,0.96)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
+            <div style={{ width: Math.round(size * 0.45), height: Math.round(size * 0.45), borderRadius: '50%', background: 'rgba(255,255,255,0.96)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <span style={{ fontSize: Math.round(size * 0.22), fontWeight: 900, color: '#000' }}>{label}</span>
             </div>
           </div>
@@ -152,7 +91,6 @@ function Ball({ size = 88, color, label, blackBall = false }: {
 
 function SlideVisual({ id, accent }: { id: string; accent: string }) {
   if (id === 'bola8') return <Ball size={90} color="#111" label="8" blackBall />;
-
   if (id === 'par-impar') {
     return (
       <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
@@ -161,21 +99,17 @@ function SlideVisual({ id, accent }: { id: string; accent: string }) {
       </div>
     );
   }
-
   if (id === 'bolinho') {
     const MINI = [
-      { c: '#c80000', x: 0,  y: 0  },
-      { c: '#1a7a1a', x: 30, y: 0  },
-      { c: '#1a3b99', x: 60, y: 0  },
-      { c: '#9932cc', x: 15, y: 28 },
+      { c: '#c80000', x: 0,  y: 0  }, { c: '#1a7a1a', x: 30, y: 0  },
+      { c: '#1a3b99', x: 60, y: 0  }, { c: '#9932cc', x: 15, y: 28 },
       { c: '#c8a000', x: 45, y: 28 },
     ];
     return (
       <div style={{ position: 'relative', width: 84, height: 54, flexShrink: 0 }}>
         {MINI.map((b, i) => (
           <div key={i} style={{
-            position: 'absolute', width: 26, height: 26, borderRadius: '50%',
-            left: b.x, top: b.y,
+            position: 'absolute', width: 26, height: 26, borderRadius: '50%', left: b.x, top: b.y,
             background: `radial-gradient(circle at 36% 30%, rgba(255,255,255,0.28) 0%, ${b.c} 40%, rgba(0,0,0,0.65) 100%)`,
             boxShadow: '0 4px 12px rgba(0,0,0,0.9)',
           }}>
@@ -185,7 +119,6 @@ function SlideVisual({ id, accent }: { id: string; accent: string }) {
       </div>
     );
   }
-
   if (id.startsWith('torneio')) {
     const isFast = id === 'torneio-rapido';
     return (
@@ -208,8 +141,6 @@ function SlideVisual({ id, accent }: { id: string; accent: string }) {
       </div>
     );
   }
-
-  // Training
   return (
     <div style={{ position: 'relative', width: 80, height: 80, flexShrink: 0 }}>
       <div style={{
@@ -225,8 +156,6 @@ function SlideVisual({ id, accent }: { id: string; accent: string }) {
     </div>
   );
 }
-
-// ── BannerCard ────────────────────────────────────────────────────────────────
 
 function BannerCard({ slide, accent, glow, slideCount, slideIdx, onDot }: {
   slide: BannerSlide; accent: string; glow: string;
@@ -244,7 +173,6 @@ function BannerCard({ slide, accent, glow, slideCount, slideIdx, onDot }: {
         style={{ background: `linear-gradient(90deg, transparent 5%, ${accent}50 30%, rgba(255,255,255,0.42) 50%, ${accent}32 70%, transparent 95%)` }} />
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: 'linear-gradient(130deg, rgba(255,255,255,0.036) 0%, rgba(255,255,255,0.01) 36%, transparent 56%)' }} />
-
       <div className="absolute inset-0 flex">
         <div className="flex flex-col justify-between px-5 py-4 flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -266,21 +194,11 @@ function BannerCard({ slide, accent, glow, slideCount, slideIdx, onDot }: {
               </span>
             )}
           </div>
-
           <div>
-            <h2 className="font-display leading-none" style={{ fontSize: '38px', color: '#fff', letterSpacing: '0.04em' }}>
-              {slide.title}
-            </h2>
-            <div className="font-display leading-none mt-0.5" style={{ fontSize: '24px', color: accent, letterSpacing: '0.07em', opacity: 0.82 }}>
-              {slide.sub}
-            </div>
+            <h2 className="font-display leading-none" style={{ fontSize: '38px', color: '#fff', letterSpacing: '0.04em' }}>{slide.title}</h2>
+            <div className="font-display leading-none mt-0.5" style={{ fontSize: '24px', color: accent, letterSpacing: '0.07em', opacity: 0.82 }}>{slide.sub}</div>
           </div>
-
-          <p className="text-[9.5px] leading-[1.45] pr-2"
-            style={{ color: 'rgba(255,255,255,0.34)', letterSpacing: '0.02em', fontWeight: 500 }}>
-            {slide.desc}
-          </p>
-
+          <p className="text-[9.5px] leading-[1.45] pr-2" style={{ color: 'rgba(255,255,255,0.34)', letterSpacing: '0.02em', fontWeight: 500 }}>{slide.desc}</p>
           {slideCount > 1 && (
             <div className="flex items-center gap-1.5">
               {Array.from({ length: slideCount }, (_, i) => (
@@ -297,7 +215,6 @@ function BannerCard({ slide, accent, glow, slideCount, slideIdx, onDot }: {
             </div>
           )}
         </div>
-
         <div className="flex items-center justify-center shrink-0 pr-4" style={{ width: '132px' }}>
           <SlideVisual id={slide.id} accent={accent} />
         </div>
@@ -306,28 +223,18 @@ function BannerCard({ slide, accent, glow, slideCount, slideIdx, onDot }: {
   );
 }
 
-// ── ChestIcon ─────────────────────────────────────────────────────────────────
-
 function ChestIcon() {
   return (
     <div className="shrink-0 w-12 h-12 rounded-[13px] relative overflow-hidden"
-      style={{
-        background: 'linear-gradient(145deg, #6b4a10 0%, #3d2800 100%)',
-        border: '1px solid rgba(201,149,42,0.5)',
-        boxShadow: '0 0 18px rgba(201,149,42,0.28)',
-      }}>
-      <div className="absolute top-0 inset-x-0 h-[44%] rounded-t-[12px]"
-        style={{ background: 'linear-gradient(180deg, #9b7030 0%, #6b4a10 100%)' }} />
+      style={{ background: 'linear-gradient(145deg, #6b4a10 0%, #3d2800 100%)', border: '1px solid rgba(201,149,42,0.5)', boxShadow: '0 0 18px rgba(201,149,42,0.28)' }}>
+      <div className="absolute top-0 inset-x-0 h-[44%] rounded-t-[12px]" style={{ background: 'linear-gradient(180deg, #9b7030 0%, #6b4a10 100%)' }} />
       <div className="absolute top-0 inset-x-0 h-[44%] border-b" style={{ borderColor: 'rgba(201,149,42,0.7)' }} />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full"
         style={{ background: 'linear-gradient(135deg,#f5c518,#c9952a)', boxShadow: '0 0 8px rgba(245,197,24,0.8)' }} />
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ background: 'linear-gradient(130deg, rgba(255,255,255,0.12) 0%, transparent 55%)' }} />
+      <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(130deg, rgba(255,255,255,0.12) 0%, transparent 55%)' }} />
     </div>
   );
 }
-
-// ── LobbyScreen ───────────────────────────────────────────────────────────────
 
 export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpenBattlePass }: LobbyScreenProps) {
   const [selected, setSelected] = useState<ModeId>('duel');
@@ -389,31 +296,43 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
     </>
   );
 
-  // Shared bottom-row height so LOJA / JOGAR / CAIXA align perfectly
   const BOTTOM_H = 76;
-
-  // Mode buttons that live in the top section (all except store)
   const topModes = modes.filter(m => m.id !== 'store');
 
+  const iconButtons = [
+    { icon: Trophy,  onClick: () => toast('Em breve', { description: 'Rankings chegando em breve.' }) },
+    { icon: Package, onClick: () => toast('Em breve', { description: 'Inventário chegando em breve.' }) },
+    { icon: Users,   onClick: onOpenFriends },
+  ] as const;
+
   return (
-    // CSS grid: 3 columns × 2 rows — bottom row is shared, so all three elements align
+    // 4-column grid: [modes | banner | icon-btns | passe-ace], bottom row shared
     <div
       className="h-full w-full overflow-hidden"
-      style={{ display: 'grid', gridTemplateColumns: '200px 1fr 200px', gridTemplateRows: '1fr auto' }}
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '155px 1fr 54px 185px',
+        gridTemplateRows: '1fr 1fr 1fr auto',
+      }}
     >
 
-      {/* ══ ROW 1 — LEFT: Duelo / Torneios / Treino ══ */}
-      <div className="flex flex-col px-3 pt-4 pb-2 justify-between z-10">
-        {topModes.map((mode) => {
-          const mc = MODE_CFG[mode.id] ?? MODE_CFG.training;
-          const isActive = mode.id === selected;
-          return (
+      {/* ══ COL 1, ROWS 1-3: Mode buttons (one per row) ══ */}
+      {topModes.map((mode, idx) => {
+        const mc = MODE_CFG[mode.id] ?? MODE_CFG.training;
+        const isActive = mode.id === selected;
+        const ptStyle = idx === 0 ? '16px' : '4px';
+        const pbStyle = idx === topModes.length - 1 ? '8px' : '4px';
+        return (
+          <div
+            key={mode.id}
+            className="z-10"
+            style={{ gridColumn: 1, gridRow: idx + 1, padding: `${ptStyle} 12px ${pbStyle} 12px` }}
+          >
             <motion.button
-              key={mode.id}
               onClick={() => { setSelected(mode.id as ModeId); setSlideIdx(0); }}
               whileHover={{ x: 4, scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
-              className="relative flex flex-col gap-1.5 px-4 py-4 rounded-[15px] overflow-hidden text-left cursor-pointer"
+              className="relative flex flex-col gap-1.5 px-4 py-4 rounded-[15px] overflow-hidden text-left cursor-pointer w-full h-full"
               style={{
                 background: isActive
                   ? `linear-gradient(155deg, rgba(14,14,20,0.97) 0%, rgba(6,6,10,0.99) 60%, ${mc.accent}0a 100%)`
@@ -459,12 +378,15 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
                   style={{ background: mc.accent, boxShadow: `0 0 7px ${mc.accent}, 0 0 14px ${mc.accent}70` }} />
               )}
             </motion.button>
-          );
-        })}
-      </div>
+          </div>
+        );
+      })}
 
-      {/* ══ ROW 1 — CENTER: Banner ══ */}
-      <div className="flex items-stretch justify-center px-3 pt-4 pb-2 z-10">
+      {/* ══ COL 2, ROWS 1-3: Banner ══ */}
+      <div
+        className="flex items-stretch z-10"
+        style={{ gridColumn: 2, gridRow: '1 / 4', padding: '16px 12px 8px 12px' }}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide.id}
@@ -475,32 +397,28 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
             className="w-full h-full"
           >
             <BannerCard
-              slide={currentSlide}
-              accent={cfg.accent}
-              glow={cfg.glow}
-              slideCount={slides.length}
-              slideIdx={Math.min(slideIdx, slides.length - 1)}
-              onDot={setSlideIdx}
+              slide={currentSlide} accent={cfg.accent} glow={cfg.glow}
+              slideCount={slides.length} slideIdx={Math.min(slideIdx, slides.length - 1)} onDot={setSlideIdx}
             />
           </motion.div>
         </AnimatePresence>
       </div>
 
-      {/* ══ ROW 1 — RIGHT: Icon buttons + Passe Ace ══ */}
-      <div className="flex flex-col px-3 pt-4 pb-2 justify-between z-10">
-        {/* Icon buttons */}
-        <div className="flex gap-2">
-          {([
-            { icon: Trophy,  onClick: () => toast('Em breve', { description: 'Rankings chegando em breve.' }) },
-            { icon: Package, onClick: () => toast('Em breve', { description: 'Inventário chegando em breve.' }) },
-            { icon: Users,   onClick: onOpenFriends },
-          ] as const).map(({ icon: Icon, onClick }, i) => (
+      {/* ══ COL 3, ROWS 1-3: Icon buttons (one per row, same height as mode buttons) ══ */}
+      {iconButtons.map(({ icon: Icon, onClick }, i) => {
+        const pt = i === 0 ? '16px' : '4px';
+        const pb = i === iconButtons.length - 1 ? '8px' : '4px';
+        return (
+          <div
+            key={i}
+            className="z-10"
+            style={{ gridColumn: 3, gridRow: i + 1, padding: `${pt} 6px ${pb} 6px` }}
+          >
             <motion.button
-              key={i}
               onClick={onClick}
               whileHover={{ scale: 1.08, y: -2 }}
               whileTap={{ scale: 0.93 }}
-              className="relative flex-1 flex items-center justify-center py-4 rounded-[14px] overflow-hidden cursor-pointer"
+              className="relative flex items-center justify-center w-full h-full rounded-[14px] overflow-hidden cursor-pointer"
               style={{ ...glass, border: '1px solid rgba(255,255,255,0.08)' }}
             >
               <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
@@ -509,11 +427,16 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
                 style={{ background: 'linear-gradient(128deg, rgba(255,255,255,0.04) 0%, transparent 55%)' }} />
               <Icon style={{ width: 18, height: 18, color: 'rgba(255,255,255,0.45)' }} />
             </motion.button>
-          ))}
-        </div>
+          </div>
+        );
+      })}
 
-        {/* Passe Ace */}
-        <div className="relative rounded-[16px] overflow-hidden" style={{
+      {/* ══ COL 4, ROWS 1-3: Passe Ace ══ */}
+      <div
+        className="z-10"
+        style={{ gridColumn: 4, gridRow: '1 / 4', padding: '16px 12px 8px 12px' }}
+      >
+        <div className="relative rounded-[16px] overflow-hidden h-full flex flex-col" style={{
           ...glass, border: '1px solid rgba(237,10,101,0.22)',
           background: 'linear-gradient(155deg, rgba(14,8,12,0.97) 0%, rgba(5,3,5,0.99) 70%, rgba(237,10,101,0.04) 100%)',
           boxShadow: '0 8px 32px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4)',
@@ -521,7 +444,9 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
           <EdgeLayers accent="#ED0A65" />
           <div className="absolute inset-0 pointer-events-none"
             style={{ background: 'radial-gradient(ellipse at 15% 50%, rgba(237,10,101,0.08) 0%, transparent 60%)' }} />
-          <div className="relative z-10 px-4 pt-3.5 pb-0 flex items-center justify-between">
+
+          {/* Header */}
+          <div className="relative z-10 px-4 pt-3.5 flex items-center justify-between">
             <span className="font-display text-[16px] leading-none tracking-[0.08em]"
               style={{ color: '#ED0A65', textShadow: '0 0 18px rgba(237,10,101,0.5)' }}>PASSE ACE</span>
             <div className="flex items-center gap-1.5 px-2 py-1 rounded-full"
@@ -530,6 +455,8 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
               <span className="font-display text-[13px] leading-none" style={{ color: '#fff' }}>12</span>
             </div>
           </div>
+
+          {/* XP bar */}
           <div className="relative z-10 px-4 pt-2.5 pb-1">
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[9px] font-semibold" style={{ color: 'rgba(255,255,255,0.35)' }}>6.500 / 10.000 XP</span>
@@ -541,6 +468,11 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
                 style={{ background: 'linear-gradient(90deg, #c00038, #ED0A65)', boxShadow: '0 0 8px rgba(237,10,101,0.7)' }} />
             </div>
           </div>
+
+          {/* Spacer pushes rewards to bottom */}
+          <div className="flex-1" />
+
+          {/* Rewards */}
           <div className="relative z-10 px-4 pb-3.5 pt-2 flex gap-2">
             {[
               { lv: 11, done: true,   label: 'TACO'   },
@@ -569,8 +501,8 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         </div>
       </div>
 
-      {/* ══ ROW 2 — LEFT: LOJA (aligned with JOGAR & CAIXA) ══ */}
-      <div className="px-3 pt-2 pb-4 z-10">
+      {/* ══ ROW 4, COL 1: LOJA ══ */}
+      <div className="z-10" style={{ gridColumn: 1, gridRow: 4, padding: '0 12px 16px 12px' }}>
         <motion.button
           onClick={() => onViewChange('store')}
           whileHover={{ x: 4, scale: 1.02 }}
@@ -607,19 +539,15 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
           </motion.div>
           <div className="relative z-10">
             <div className="font-display text-[21px] leading-none tracking-[0.06em]"
-              style={{ color: 'rgba(251,191,36,0.85)', textShadow: '0 0 16px rgba(251,191,36,0.5)' }}>
-              LOJA
-            </div>
+              style={{ color: 'rgba(251,191,36,0.85)', textShadow: '0 0 16px rgba(251,191,36,0.5)' }}>LOJA</div>
             <div className="text-[10px] font-black uppercase tracking-widest leading-none mt-1"
-              style={{ color: 'rgba(251,191,36,0.55)' }}>
-              ITENS PREMIUM
-            </div>
+              style={{ color: 'rgba(251,191,36,0.55)' }}>ITENS PREMIUM</div>
           </div>
         </motion.button>
       </div>
 
-      {/* ══ ROW 2 — CENTER: JOGAR (full width, same height as LOJA & CAIXA) ══ */}
-      <div className="px-3 pt-2 pb-4 z-10">
+      {/* ══ ROW 4, COL 2-3: JOGAR ══ */}
+      <div className="z-10" style={{ gridColumn: '2 / 4', gridRow: 4, padding: '0 6px 16px 12px' }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={selected + '-btn-wrap'}
@@ -670,8 +598,8 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         </AnimatePresence>
       </div>
 
-      {/* ══ ROW 2 — RIGHT: CAIXA GRÁTIS (same height as LOJA & JOGAR) ══ */}
-      <div className="px-3 pt-2 pb-4 z-10">
+      {/* ══ ROW 4, COL 4: CAIXA GRÁTIS ══ */}
+      <div className="z-10" style={{ gridColumn: 4, gridRow: 4, padding: '0 12px 16px 12px' }}>
         <div className="relative rounded-[16px] overflow-hidden w-full" style={{ ...glass, height: BOTTOM_H }}>
           <EdgeLayers />
           <div className="relative z-10 px-4 h-full flex items-center gap-3">
