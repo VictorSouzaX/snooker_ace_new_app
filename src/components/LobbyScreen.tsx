@@ -306,12 +306,12 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
   ] as const;
 
   return (
-    // 4-column grid: [modes | banner | icon-btns | passe-ace], bottom row shared
+    // 3-column grid: [modes | banner | (icons + passe-ace)], bottom row shared
     <div
       className="h-full w-full overflow-hidden"
       style={{
         display: 'grid',
-        gridTemplateColumns: '155px 1fr 54px 185px',
+        gridTemplateColumns: '155px 1fr 200px',
         gridTemplateRows: '1fr auto',
         columnGap: '8px',
         rowGap: '8px',
@@ -399,29 +399,30 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         </AnimatePresence>
       </div>
 
-      {/* ══ COL 3: Icon buttons (flex column, each flex-1 → match mode button heights) ══ */}
-      <div className="z-10 flex flex-col gap-2" style={{ gridColumn: 3, gridRow: 1 }}>
-        {iconButtons.map(({ icon: Icon, onClick }, i) => (
-          <motion.button
-            key={i}
-            onClick={onClick}
-            whileHover={{ scale: 1.08, y: -2 }}
-            whileTap={{ scale: 0.93 }}
-            className="relative flex items-center justify-center w-full flex-1 min-h-0 rounded-[14px] overflow-hidden cursor-pointer"
-            style={{ ...glass, border: '1px solid rgba(255,255,255,0.08)' }}
-          >
-            <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
-              style={{ background: 'linear-gradient(90deg, transparent 10%, rgba(255,255,255,0.18) 50%, transparent 90%)' }} />
-            <div className="absolute inset-0 pointer-events-none"
-              style={{ background: 'linear-gradient(128deg, rgba(255,255,255,0.04) 0%, transparent 55%)' }} />
-            <Icon style={{ width: 18, height: 18, color: 'rgba(255,255,255,0.45)' }} />
-          </motion.button>
-        ))}
-      </div>
+      {/* ══ COL 3: Icon buttons row (top) + Passe Ace (fills rest) ══ */}
+      <div className="z-10 flex flex-col gap-2 min-h-0" style={{ gridColumn: 3, gridRow: 1 }}>
+        {/* Icon buttons (horizontal row) */}
+        <div className="flex gap-2 shrink-0">
+          {iconButtons.map(({ icon: Icon, onClick }, i) => (
+            <motion.button
+              key={i}
+              onClick={onClick}
+              whileHover={{ scale: 1.08, y: -2 }}
+              whileTap={{ scale: 0.93 }}
+              className="relative flex-1 flex items-center justify-center py-4 rounded-[14px] overflow-hidden cursor-pointer"
+              style={{ ...glass, border: '1px solid rgba(255,255,255,0.08)' }}
+            >
+              <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
+                style={{ background: 'linear-gradient(90deg, transparent 10%, rgba(255,255,255,0.18) 50%, transparent 90%)' }} />
+              <div className="absolute inset-0 pointer-events-none"
+                style={{ background: 'linear-gradient(128deg, rgba(255,255,255,0.04) 0%, transparent 55%)' }} />
+              <Icon style={{ width: 18, height: 18, color: 'rgba(255,255,255,0.45)' }} />
+            </motion.button>
+          ))}
+        </div>
 
-      {/* ══ COL 4: Passe Ace ══ */}
-      <div className="z-10" style={{ gridColumn: 4, gridRow: 1 }}>
-        <div className="relative rounded-[16px] overflow-hidden h-full flex flex-col" style={{
+        {/* Passe Ace fills the remaining space */}
+        <div className="relative rounded-[16px] overflow-hidden flex-1 min-h-0 flex flex-col" style={{
           ...glass, border: '1px solid rgba(237,10,101,0.22)',
           background: 'linear-gradient(155deg, rgba(14,8,12,0.97) 0%, rgba(5,3,5,0.99) 70%, rgba(237,10,101,0.04) 100%)',
           boxShadow: '0 8px 32px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4)',
@@ -531,8 +532,8 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         </motion.button>
       </div>
 
-      {/* ══ ROW 2, COL 2-3: JOGAR ══ */}
-      <div className="z-10" style={{ gridColumn: '2 / 4', gridRow: 2 }}>
+      {/* ══ ROW 2, COL 2: JOGAR ══ */}
+      <div className="z-10" style={{ gridColumn: 2, gridRow: 2 }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={selected + '-btn-wrap'}
@@ -583,8 +584,8 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         </AnimatePresence>
       </div>
 
-      {/* ══ ROW 2, COL 4: CAIXA GRÁTIS ══ */}
-      <div className="z-10" style={{ gridColumn: 4, gridRow: 2 }}>
+      {/* ══ ROW 2, COL 3: CAIXA GRÁTIS ══ */}
+      <div className="z-10" style={{ gridColumn: 3, gridRow: 2 }}>
         <div className="relative rounded-[16px] overflow-hidden w-full" style={{ ...glass, height: BOTTOM_H }}>
           <EdgeLayers />
           <div className="relative z-10 px-4 h-full flex items-center gap-3">
