@@ -172,8 +172,8 @@ function AppContent() {
                     style={{
                       paddingTop: 'calc(12px + env(safe-area-inset-top))',
                       paddingBottom: '12px',
-                      paddingLeft: 'calc(20px + env(safe-area-inset-left))',
-                      paddingRight: 'calc(20px + env(safe-area-inset-right))',
+                      paddingLeft: 'max(20px, env(safe-area-inset-left))',
+                      paddingRight: 'max(20px, env(safe-area-inset-right))',
                       background: 'rgba(2,5,8,0.6)',
                       backdropFilter: 'blur(28px)',
                       WebkitBackdropFilter: 'blur(28px)',
