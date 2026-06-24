@@ -55,6 +55,19 @@
   @apply bg-linear-to-b from-[#f8e71c] to-[#d4c418] text-black font-bold;
 }
 
+@media (orientation: portrait) {
+  html {
+    transform: rotate(90deg);
+    transform-origin: left top;
+    width: 100dvh;
+    height: 100dvw;
+    overflow: hidden;
+    position: absolute;
+    top: 100%;
+    left: 0;
+  }
+}
+
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }

@@ -95,14 +95,6 @@ function AppContent() {
 
         {/* Main layer */}
         <div className="flex-1 flex flex-col relative overflow-hidden">
-          {/* Background depth: spotlight + vignette over the wallpaper */}
-          <div className="absolute inset-0 pointer-events-none z-[1]">
-            <div className="absolute bottom-[10%] inset-x-0 h-[55%]"
-              style={{ background: 'radial-gradient(ellipse at 50% 100%, rgba(0,28,10,0.16) 0%, transparent 65%)' }} />
-            <div className="absolute inset-0"
-              style={{ background: 'radial-gradient(ellipse at 50% 48%, transparent 30%, rgba(0,0,0,0.38) 100%)' }} />
-          </div>
-
           {!isAuthenticated && !showSplash && (
             <LoginScreen onLogin={() => {
               setIsAuthenticated(true);
