@@ -312,27 +312,25 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
       style={{
         display: 'grid',
         gridTemplateColumns: '155px 1fr 54px 185px',
-        gridTemplateRows: '1fr 1fr 1fr auto',
+        gridTemplateRows: '1fr auto',
+        columnGap: '8px',
+        rowGap: '8px',
+        padding: '12px',
       }}
     >
 
-      {/* ══ COL 1, ROWS 1-3: Mode buttons (one per row) ══ */}
-      {topModes.map((mode, idx) => {
-        const mc = MODE_CFG[mode.id] ?? MODE_CFG.training;
-        const isActive = mode.id === selected;
-        const ptStyle = idx === 0 ? '16px' : '4px';
-        const pbStyle = idx === topModes.length - 1 ? '8px' : '4px';
-        return (
-          <div
-            key={mode.id}
-            className="z-10"
-            style={{ gridColumn: 1, gridRow: idx + 1, padding: `${ptStyle} 12px ${pbStyle} 12px` }}
-          >
+      {/* ══ COL 1: Mode buttons (flex column, each flex-1 → identical heights) ══ */}
+      <div className="z-10 flex flex-col gap-2" style={{ gridColumn: 1, gridRow: 1 }}>
+        {topModes.map((mode) => {
+          const mc = MODE_CFG[mode.id] ?? MODE_CFG.training;
+          const isActive = mode.id === selected;
+          return (
             <motion.button
+              key={mode.id}
               onClick={() => { setSelected(mode.id as ModeId); setSlideIdx(0); }}
               whileHover={{ x: 4, scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
-              className="relative flex flex-col gap-1.5 px-4 py-4 rounded-[15px] overflow-hidden text-left cursor-pointer w-full h-full"
+              className="relative flex flex-col gap-1.5 px-4 py-4 rounded-[15px] overflow-hidden text-left cursor-pointer w-full flex-1 min-h-0"
               style={{
                 background: isActive
                   ? `linear-gradient(155deg, rgba(14,14,20,0.97) 0%, rgba(6,6,10,0.99) 60%, ${mc.accent}0a 100%)`
@@ -378,15 +376,12 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
                   style={{ background: mc.accent, boxShadow: `0 0 7px ${mc.accent}, 0 0 14px ${mc.accent}70` }} />
               )}
             </motion.button>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
 
-      {/* ══ COL 2, ROWS 1-3: Banner ══ */}
-      <div
-        className="flex items-stretch z-10"
-        style={{ gridColumn: 2, gridRow: '1 / 4', padding: '16px 12px 8px 12px' }}
-      >
+      {/* ══ COL 2: Banner ══ */}
+      <div className="flex items-stretch z-10" style={{ gridColumn: 2, gridRow: 1 }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide.id}
@@ -404,38 +399,28 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         </AnimatePresence>
       </div>
 
-      {/* ══ COL 3, ROWS 1-3: Icon buttons (one per row, same height as mode buttons) ══ */}
-      {iconButtons.map(({ icon: Icon, onClick }, i) => {
-        const pt = i === 0 ? '16px' : '4px';
-        const pb = i === iconButtons.length - 1 ? '8px' : '4px';
-        return (
-          <div
+      {/* ══ COL 3: Icon buttons (flex column, each flex-1 → match mode button heights) ══ */}
+      <div className="z-10 flex flex-col gap-2" style={{ gridColumn: 3, gridRow: 1 }}>
+        {iconButtons.map(({ icon: Icon, onClick }, i) => (
+          <motion.button
             key={i}
-            className="z-10"
-            style={{ gridColumn: 3, gridRow: i + 1, padding: `${pt} 6px ${pb} 6px` }}
+            onClick={onClick}
+            whileHover={{ scale: 1.08, y: -2 }}
+            whileTap={{ scale: 0.93 }}
+            className="relative flex items-center justify-center w-full flex-1 min-h-0 rounded-[14px] overflow-hidden cursor-pointer"
+            style={{ ...glass, border: '1px solid rgba(255,255,255,0.08)' }}
           >
-            <motion.button
-              onClick={onClick}
-              whileHover={{ scale: 1.08, y: -2 }}
-              whileTap={{ scale: 0.93 }}
-              className="relative flex items-center justify-center w-full h-full rounded-[14px] overflow-hidden cursor-pointer"
-              style={{ ...glass, border: '1px solid rgba(255,255,255,0.08)' }}
-            >
-              <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
-                style={{ background: 'linear-gradient(90deg, transparent 10%, rgba(255,255,255,0.18) 50%, transparent 90%)' }} />
-              <div className="absolute inset-0 pointer-events-none"
-                style={{ background: 'linear-gradient(128deg, rgba(255,255,255,0.04) 0%, transparent 55%)' }} />
-              <Icon style={{ width: 18, height: 18, color: 'rgba(255,255,255,0.45)' }} />
-            </motion.button>
-          </div>
-        );
-      })}
+            <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
+              style={{ background: 'linear-gradient(90deg, transparent 10%, rgba(255,255,255,0.18) 50%, transparent 90%)' }} />
+            <div className="absolute inset-0 pointer-events-none"
+              style={{ background: 'linear-gradient(128deg, rgba(255,255,255,0.04) 0%, transparent 55%)' }} />
+            <Icon style={{ width: 18, height: 18, color: 'rgba(255,255,255,0.45)' }} />
+          </motion.button>
+        ))}
+      </div>
 
-      {/* ══ COL 4, ROWS 1-3: Passe Ace ══ */}
-      <div
-        className="z-10"
-        style={{ gridColumn: 4, gridRow: '1 / 4', padding: '16px 12px 8px 12px' }}
-      >
+      {/* ══ COL 4: Passe Ace ══ */}
+      <div className="z-10" style={{ gridColumn: 4, gridRow: 1 }}>
         <div className="relative rounded-[16px] overflow-hidden h-full flex flex-col" style={{
           ...glass, border: '1px solid rgba(237,10,101,0.22)',
           background: 'linear-gradient(155deg, rgba(14,8,12,0.97) 0%, rgba(5,3,5,0.99) 70%, rgba(237,10,101,0.04) 100%)',
@@ -501,8 +486,8 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         </div>
       </div>
 
-      {/* ══ ROW 4, COL 1: LOJA ══ */}
-      <div className="z-10" style={{ gridColumn: 1, gridRow: 4, padding: '0 12px 16px 12px' }}>
+      {/* ══ ROW 2, COL 1: LOJA ══ */}
+      <div className="z-10" style={{ gridColumn: 1, gridRow: 2 }}>
         <motion.button
           onClick={() => onViewChange('store')}
           whileHover={{ x: 4, scale: 1.02 }}
@@ -546,8 +531,8 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         </motion.button>
       </div>
 
-      {/* ══ ROW 4, COL 2-3: JOGAR ══ */}
-      <div className="z-10" style={{ gridColumn: '2 / 4', gridRow: 4, padding: '0 6px 16px 12px' }}>
+      {/* ══ ROW 2, COL 2-3: JOGAR ══ */}
+      <div className="z-10" style={{ gridColumn: '2 / 4', gridRow: 2 }}>
         <AnimatePresence mode="wait">
           <motion.div
             key={selected + '-btn-wrap'}
@@ -598,8 +583,8 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         </AnimatePresence>
       </div>
 
-      {/* ══ ROW 4, COL 4: CAIXA GRÁTIS ══ */}
-      <div className="z-10" style={{ gridColumn: 4, gridRow: 4, padding: '0 12px 16px 12px' }}>
+      {/* ══ ROW 2, COL 4: CAIXA GRÁTIS ══ */}
+      <div className="z-10" style={{ gridColumn: 4, gridRow: 2 }}>
         <div className="relative rounded-[16px] overflow-hidden w-full" style={{ ...glass, height: BOTTOM_H }}>
           <EdgeLayers />
           <div className="relative z-10 px-4 h-full flex items-center gap-3">
