@@ -61,6 +61,19 @@ const BANNER_DATA: Record<string, BannerSlide[]> = {
   ],
 };
 
+const NEWS_SLIDES: BannerSlide[] = [
+  { id: 'news-season',     tag: 'TEMPORADA 1',     title: 'NOVA',    sub: 'TEMPORADA',  desc: 'A Temporada 1 chegou ao Snooker Ace! Compete no ranking global e conquiste recompensas exclusivas de campeão.', flair: 'live' },
+  { id: 'news-tournament', tag: 'EVENTO ESPECIAL',  title: 'TORNEIO', sub: 'SEMANAL',   desc: 'Inscrições abertas para o Torneio Semanal. Prêmio total de 50.000 fichas para os melhores jogadores da semana.' },
+  { id: 'news-store',      tag: 'LOJA',             title: 'NOVOS',   sub: 'TACOS',     desc: 'Coleção exclusiva de tacos profissionais disponível por tempo limitado. Garanta o seu agora!' },
+  { id: 'news-update',     tag: 'ATUALIZAÇÃO',      title: 'PATCH',   sub: 'V2.0',      desc: 'Física de bola melhorada, novos efeitos visuais e sistema de ranking totalmente reformulado.' },
+  { id: 'news-bonus',      tag: 'RECOMPENSA',       title: 'BÔNUS',   sub: 'DIÁRIO',    desc: 'Entre todos os dias para acumular bônus consecutivos. Cada check-in aumenta o valor da sua recompensa!' },
+];
+
+const NEWS_CFG = {
+  accent: '#00e870', glow: 'rgba(0,232,112,0.45)',
+  label: '', sub: '', btnText: '', btnGrad: '', btnColor: '', liveLabel: '',
+};
+
 function Ball({ size = 88, color, label, blackBall = false }: {
   size?: number; color: string; label: string; blackBall?: boolean;
 }) {
@@ -141,6 +154,28 @@ function SlideVisual({ id, accent }: { id: string; accent: string }) {
       </div>
     );
   }
+  if (id.startsWith('news-')) {
+    const INFO: Record<string, { sym: string; bg: string }> = {
+      'news-season':     { sym: '1',  bg: '#00e870' },
+      'news-tournament': { sym: '⚡', bg: '#f5c518' },
+      'news-store':      { sym: '$',  bg: '#fbbf24' },
+      'news-update':     { sym: '↑',  bg: '#3b82f6' },
+      'news-bonus':      { sym: '+',  bg: '#00e870' },
+    };
+    const { sym, bg } = INFO[id] ?? { sym: '!', bg: accent };
+    return (
+      <div style={{
+        width: 80, height: 80, borderRadius: '50%', flexShrink: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: `radial-gradient(circle at 36% 30%, ${bg}22 0%, ${bg}06 100%)`,
+        border: `1.5px solid ${bg}38`,
+        boxShadow: `0 0 36px ${bg}28, inset 0 1px 0 ${bg}30`,
+      }}>
+        <span style={{ fontSize: 36, fontWeight: 900, color: bg, textShadow: `0 0 20px ${bg}90`, lineHeight: 1 }}>{sym}</span>
+      </div>
+    );
+  }
+
   return (
     <div style={{ position: 'relative', width: 80, height: 80, flexShrink: 0 }}>
       <div style={{
@@ -237,14 +272,14 @@ function ChestIcon() {
 }
 
 export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpenBattlePass }: LobbyScreenProps) {
-  const [selected, setSelected] = useState<ModeId>('duel');
+  const [selected, setSelected] = useState<ModeId | null>(null);
   const [slideIdx, setSlideIdx] = useState(0);
   const [prevSlideId, setPrevSlideId] = useState<string | null>(null);
   const [chestSecs, setChestSecs] = useState(5325);
 
-  const slides = BANNER_DATA[selected] ?? BANNER_DATA.training;
+  const slides = selected === null ? NEWS_SLIDES : (BANNER_DATA[selected] ?? BANNER_DATA.training);
   const currentSlide = slides[Math.min(slideIdx, slides.length - 1)];
-  const cfg = MODE_CFG[selected];
+  const cfg = selected ? (MODE_CFG[selected] ?? MODE_CFG.training) : NEWS_CFG;
 
   // Refs so interval/pan callbacks always see latest state without stale closure
   const slideIdxRef = useRef(slideIdx);
@@ -283,6 +318,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
   };
 
   const handlePlay = () => {
+    if (!selected) return;
     if (selected === 'store') { onViewChange('store'); return; }
     const msgs: Record<string, { title: string; desc: string }> = {
       duel:        { title: 'Buscando adversário…',    desc: 'Encontrando o melhor oponente para você.' },
@@ -334,7 +370,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         // bottom button row.
         gridTemplateRows: 'minmax(0, 1fr) auto',
         columnGap: '8px',
-        rowGap: '8px',
+        rowGap: selected !== null ? '8px' : '0',
         padding: 'calc(12px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left))',
       }}
     >
@@ -347,7 +383,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
           return (
             <motion.button
               key={mode.id}
-              onClick={() => { setSelected(mode.id as ModeId); setSlideIdx(0); }}
+              onClick={() => setSelected(mode.id as ModeId)}
               whileHover={{ x: 4, scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               className="relative flex flex-col gap-1.5 px-4 py-4 rounded-[15px] overflow-hidden text-left cursor-pointer w-full flex-1 min-h-0"
@@ -533,118 +569,133 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         </div>
       </div>
 
-      {/* ══ ROW 2, COL 1: LOJA ══ */}
-      <div className="z-10" style={{ gridColumn: 1, gridRow: 2 }}>
-        <motion.button
-          onClick={() => onViewChange('store')}
-          whileHover={{ x: 4, scale: 1.02 }}
-          whileTap={{ scale: 0.97 }}
-          className="relative w-full flex items-center gap-3 px-4 rounded-[15px] overflow-hidden text-left cursor-pointer"
-          style={{
-            height: BOTTOM_H,
-            background: 'linear-gradient(155deg, rgba(20,14,0,0.97) 0%, rgba(8,5,0,0.99) 60%, rgba(251,191,36,0.06) 100%)',
-            backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(251,191,36,0.35)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.85), 0 0 18px rgba(251,191,36,0.22), inset 0 1px 0 rgba(255,255,255,0.14)',
-          }}
-        >
-          <motion.div animate={{ x: ['-100%', '320%'] }}
-            transition={{ repeat: Infinity, duration: 2.4, ease: 'easeInOut', repeatDelay: 2 }}
-            className="absolute inset-y-0 pointer-events-none z-20"
-            style={{ width: '45%', background: 'linear-gradient(90deg, transparent, rgba(251,191,36,0.22), rgba(255,230,100,0.14), transparent)' }} />
-          <motion.div
-            animate={{ opacity: [0.5, 1, 0.5], boxShadow: ['inset 0 0 0px rgba(251,191,36,0)', 'inset 0 0 14px rgba(251,191,36,0.18)', 'inset 0 0 0px rgba(251,191,36,0)'] }}
-            transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
-            className="absolute inset-0 rounded-[15px] pointer-events-none z-10" />
-          <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
-            style={{ background: 'linear-gradient(90deg, transparent 5%, rgba(251,191,36,0.45) 25%, rgba(255,230,100,0.65) 50%, rgba(251,191,36,0.35) 75%, transparent 95%)' }} />
-          <div className="absolute left-0 top-0 bottom-0 w-px pointer-events-none"
-            style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.1) 40%, transparent 80%)' }} />
-          <div className="absolute bottom-0 inset-x-0 h-px pointer-events-none" style={{ background: 'rgba(0,0,0,0.7)' }} />
-          <div className="absolute inset-0 pointer-events-none"
-            style={{ background: 'linear-gradient(128deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.025) 35%, transparent 55%)' }} />
-          <motion.div animate={{ scale: [1, 1.35, 1], opacity: [0.7, 1, 0.7] }}
-            transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
-            className="absolute top-2 right-2.5 px-1.5 py-[3px] rounded-full text-[7px] font-black uppercase tracking-wide z-20"
-            style={{ background: 'rgba(251,191,36,0.18)', border: '1px solid rgba(251,191,36,0.6)', color: '#fbbf24', boxShadow: '0 0 8px rgba(251,191,36,0.5)' }}>
-            HOT
-          </motion.div>
-          <div className="relative z-10">
-            <div className="font-display text-[21px] leading-none tracking-[0.06em]"
-              style={{ color: 'rgba(251,191,36,0.85)', textShadow: '0 0 16px rgba(251,191,36,0.5)' }}>LOJA</div>
-            <div className="text-[10px] font-black uppercase tracking-widest leading-none mt-1"
-              style={{ color: 'rgba(251,191,36,0.55)' }}>ITENS PREMIUM</div>
-          </div>
-        </motion.button>
-      </div>
-
-      {/* ══ ROW 2, COL 2: JOGAR ══ */}
-      <div className="z-10" style={{ gridColumn: 2, gridRow: 2 }}>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={selected + '-btn-wrap'}
-            initial={{ opacity: 0, scale: 0.93 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.93 }}
-            transition={{ duration: 0.28, ease: 'easeOut' }}
-            className="relative w-full"
-            style={{ height: BOTTOM_H }}
-          >
+      {/* ══ ROW 2: action strip — only visible after a mode is selected ══ */}
+      <AnimatePresence>
+        {selected !== null && (
+          <>
+            {/* COL 1: LOJA */}
             <motion.div
-              animate={{ opacity: [0.55, 1, 0.55], scale: [1, 1.04, 1] }}
-              transition={{ repeat: Infinity, duration: 2.6, ease: 'easeInOut' }}
-              className="absolute inset-0 rounded-[18px] pointer-events-none"
-              style={{ boxShadow: `0 0 55px ${cfg.glow}80, 0 0 110px ${cfg.glow}35` }}
-            />
-            <motion.button
-              whileHover={{ scale: 1.03, y: -3 }}
-              whileTap={{ scale: 0.97, y: 0 }}
-              onClick={handlePlay}
-              className="relative overflow-hidden cursor-pointer w-full h-full"
-              style={{
-                borderRadius: '18px',
-                background: cfg.btnGrad,
-                boxShadow: [
-                  '0 20px 55px rgba(0,0,0,0.75)',
-                  'inset 0 2.5px 0 rgba(255,255,255,0.72)',
-                  'inset 0 -2px 0 rgba(0,0,0,0.28)',
-                  'inset 2px 0 0 rgba(255,255,255,0.22)',
-                  'inset -2px 0 0 rgba(255,255,255,0.1)',
-                ].join(', '),
-              }}
+              key="loja-btn"
+              className="z-10"
+              style={{ gridColumn: 1, gridRow: 2 }}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 14 }}
+              transition={{ duration: 0.32, ease: 'easeOut' }}
             >
-              <div className="absolute inset-x-0 top-0 pointer-events-none"
-                style={{ height: '54%', borderRadius: '18px 18px 0 0', background: 'linear-gradient(180deg, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.2) 40%, transparent 100%)' }} />
-              <div className="absolute top-0 inset-x-6 h-[2px] pointer-events-none rounded-full"
-                style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.95), transparent)' }} />
-              <div className="absolute left-0 top-3 bottom-3 w-[2.5px] pointer-events-none rounded-r-full"
-                style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.06) 100%)' }} />
-              <div className="absolute right-0 top-3 bottom-3 w-[1.5px] pointer-events-none rounded-l-full"
-                style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%)' }} />
-              <div className="absolute inset-x-8 bottom-0 pointer-events-none"
-                style={{ height: '38%', background: `linear-gradient(0deg, ${cfg.glow}38 0%, transparent 100%)` }} />
-              <span className="relative z-10 block text-center font-display leading-none tracking-[0.18em]"
-                style={{ fontSize: '38px', color: cfg.btnColor }}>{cfg.btnText}</span>
-            </motion.button>
-          </motion.div>
-        </AnimatePresence>
-      </div>
+              <motion.button
+                onClick={() => onViewChange('store')}
+                whileHover={{ x: 4, scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                className="relative w-full flex items-center gap-3 px-4 rounded-[15px] overflow-hidden text-left cursor-pointer"
+                style={{
+                  height: BOTTOM_H,
+                  background: 'linear-gradient(155deg, rgba(20,14,0,0.97) 0%, rgba(8,5,0,0.99) 60%, rgba(251,191,36,0.06) 100%)',
+                  backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(251,191,36,0.35)',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.85), 0 0 18px rgba(251,191,36,0.22), inset 0 1px 0 rgba(255,255,255,0.14)',
+                }}
+              >
+                <motion.div animate={{ x: ['-100%', '320%'] }}
+                  transition={{ repeat: Infinity, duration: 2.4, ease: 'easeInOut', repeatDelay: 2 }}
+                  className="absolute inset-y-0 pointer-events-none z-20"
+                  style={{ width: '45%', background: 'linear-gradient(90deg, transparent, rgba(251,191,36,0.22), rgba(255,230,100,0.14), transparent)' }} />
+                <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
+                  style={{ background: 'linear-gradient(90deg, transparent 5%, rgba(251,191,36,0.45) 25%, rgba(255,230,100,0.65) 50%, rgba(251,191,36,0.35) 75%, transparent 95%)' }} />
+                <div className="absolute left-0 top-0 bottom-0 w-px pointer-events-none"
+                  style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.1) 40%, transparent 80%)' }} />
+                <div className="absolute bottom-0 inset-x-0 h-px pointer-events-none" style={{ background: 'rgba(0,0,0,0.7)' }} />
+                <div className="absolute inset-0 pointer-events-none"
+                  style={{ background: 'linear-gradient(128deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.025) 35%, transparent 55%)' }} />
+                <motion.div animate={{ scale: [1, 1.35, 1], opacity: [0.7, 1, 0.7] }}
+                  transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
+                  className="absolute top-2 right-2.5 px-1.5 py-[3px] rounded-full text-[7px] font-black uppercase tracking-wide z-20"
+                  style={{ background: 'rgba(251,191,36,0.18)', border: '1px solid rgba(251,191,36,0.6)', color: '#fbbf24', boxShadow: '0 0 8px rgba(251,191,36,0.5)' }}>
+                  HOT
+                </motion.div>
+                <div className="relative z-10">
+                  <div className="font-display text-[21px] leading-none tracking-[0.06em]"
+                    style={{ color: 'rgba(251,191,36,0.85)', textShadow: '0 0 16px rgba(251,191,36,0.5)' }}>LOJA</div>
+                  <div className="text-[10px] font-black uppercase tracking-widest leading-none mt-1"
+                    style={{ color: 'rgba(251,191,36,0.55)' }}>ITENS PREMIUM</div>
+                </div>
+              </motion.button>
+            </motion.div>
 
-      {/* ══ ROW 2, COL 3: CAIXA GRÁTIS ══ */}
-      <div className="z-10" style={{ gridColumn: 3, gridRow: 2 }}>
-        <div className="relative rounded-[16px] overflow-hidden w-full" style={{ ...glass, height: BOTTOM_H }}>
-          <EdgeLayers />
-          <div className="relative z-10 px-4 h-full flex items-center gap-3">
-            <ChestIcon />
-            <div className="flex flex-col gap-1 min-w-0">
-              <span className="font-display text-[14px] leading-none tracking-[0.06em]" style={{ color: 'rgba(255,255,255,0.82)' }}>CAIXA GRÁTIS</span>
-              <span className="text-[9px] font-semibold leading-none" style={{ color: 'rgba(255,255,255,0.3)' }}>Próxima em</span>
-              <span className="font-display text-[20px] leading-none tracking-[0.03em]"
-                style={{ color: '#f5c518', textShadow: '0 0 16px rgba(245,197,24,0.65)' }}>{fmt(chestSecs)}</span>
-            </div>
-          </div>
-        </div>
-      </div>
+            {/* COL 2: JOGAR */}
+            <motion.div
+              key={selected + '-jogar'}
+              className="z-10 relative"
+              style={{ gridColumn: 2, gridRow: 2, height: BOTTOM_H }}
+              initial={{ opacity: 0, scale: 0.92, y: 14 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 14 }}
+              transition={{ duration: 0.32, ease: 'easeOut' }}
+            >
+              <motion.div
+                animate={{ opacity: [0.55, 1, 0.55], scale: [1, 1.04, 1] }}
+                transition={{ repeat: Infinity, duration: 2.6, ease: 'easeInOut' }}
+                className="absolute inset-0 rounded-[18px] pointer-events-none"
+                style={{ boxShadow: `0 0 55px ${cfg.glow}80, 0 0 110px ${cfg.glow}35` }}
+              />
+              <motion.button
+                whileHover={{ scale: 1.03, y: -3 }}
+                whileTap={{ scale: 0.97, y: 0 }}
+                onClick={handlePlay}
+                className="relative overflow-hidden cursor-pointer w-full h-full"
+                style={{
+                  borderRadius: '18px',
+                  background: cfg.btnGrad,
+                  boxShadow: [
+                    '0 20px 55px rgba(0,0,0,0.75)',
+                    'inset 0 2.5px 0 rgba(255,255,255,0.72)',
+                    'inset 0 -2px 0 rgba(0,0,0,0.28)',
+                    'inset 2px 0 0 rgba(255,255,255,0.22)',
+                    'inset -2px 0 0 rgba(255,255,255,0.1)',
+                  ].join(', '),
+                }}
+              >
+                <div className="absolute inset-x-0 top-0 pointer-events-none"
+                  style={{ height: '54%', borderRadius: '18px 18px 0 0', background: 'linear-gradient(180deg, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.2) 40%, transparent 100%)' }} />
+                <div className="absolute top-0 inset-x-6 h-[2px] pointer-events-none rounded-full"
+                  style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.95), transparent)' }} />
+                <div className="absolute left-0 top-3 bottom-3 w-[2.5px] pointer-events-none rounded-r-full"
+                  style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.06) 100%)' }} />
+                <div className="absolute right-0 top-3 bottom-3 w-[1.5px] pointer-events-none rounded-l-full"
+                  style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%)' }} />
+                <div className="absolute inset-x-8 bottom-0 pointer-events-none"
+                  style={{ height: '38%', background: `linear-gradient(0deg, ${cfg.glow}38 0%, transparent 100%)` }} />
+                <span className="relative z-10 block text-center font-display leading-none tracking-[0.18em]"
+                  style={{ fontSize: '38px', color: cfg.btnColor }}>{cfg.btnText}</span>
+              </motion.button>
+            </motion.div>
+
+            {/* COL 3: CAIXA GRÁTIS */}
+            <motion.div
+              key="caixa-btn"
+              className="z-10"
+              style={{ gridColumn: 3, gridRow: 2 }}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 14 }}
+              transition={{ duration: 0.32, ease: 'easeOut' }}
+            >
+              <div className="relative rounded-[16px] overflow-hidden w-full" style={{ ...glass, height: BOTTOM_H }}>
+                <EdgeLayers />
+                <div className="relative z-10 px-4 h-full flex items-center gap-3">
+                  <ChestIcon />
+                  <div className="flex flex-col gap-1 min-w-0">
+                    <span className="font-display text-[14px] leading-none tracking-[0.06em]" style={{ color: 'rgba(255,255,255,0.82)' }}>CAIXA GRÁTIS</span>
+                    <span className="text-[9px] font-semibold leading-none" style={{ color: 'rgba(255,255,255,0.3)' }}>Próxima em</span>
+                    <span className="font-display text-[20px] leading-none tracking-[0.03em]"
+                      style={{ color: '#f5c518', textShadow: '0 0 16px rgba(245,197,24,0.65)' }}>{fmt(chestSecs)}</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
     </div>
   );
