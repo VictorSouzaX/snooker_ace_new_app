@@ -39,6 +39,7 @@ function AppContent() {
   const [showFriends,    setShowFriends]    = useState(false);
   const [showBattlePass, setShowBattlePass] = useState(false);
   const [activeView, setActiveView] = useState<'lobby' | 'history' | 'store'>('lobby');
+  const [lobbyResetKey, setLobbyResetKey] = useState(0);
 
   const GAME_MODES: GameMode[] = [
     {
@@ -105,7 +106,7 @@ function AppContent() {
 
           {isAuthenticated && (
             <>
-              <Header onOpenSettings={() => setShowSettings(true)} />
+              <Header onOpenSettings={() => setShowSettings(true)} onLogoClick={() => setLobbyResetKey(k => k + 1)} />
 
               {/* Lobby — always the base content */}
               <main className="flex-1 overflow-hidden relative">
@@ -114,6 +115,7 @@ function AppContent() {
                   onOpenFriends={() => setShowFriends(true)}
                   onViewChange={setActiveView}
                   onOpenBattlePass={() => setShowBattlePass(true)}
+                  resetKey={lobbyResetKey}
                 />
               </main>
 

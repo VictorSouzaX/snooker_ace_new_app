@@ -7,9 +7,10 @@ import { useLanguage } from '../i18n';
 
 interface HeaderProps {
   onOpenSettings: () => void;
+  onLogoClick?: () => void;
 }
 
-export default function Header({ onOpenSettings }: HeaderProps) {
+export default function Header({ onOpenSettings, onLogoClick }: HeaderProps) {
   const { t } = useLanguage();
   const [showBalanceInfo, setShowBalanceInfo] = useState(false);
   return (
@@ -112,14 +113,18 @@ export default function Header({ onOpenSettings }: HeaderProps) {
         </div>
 
         {/* ── CENTER: Logo ── */}
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center">
+        <button
+          onClick={onLogoClick}
+          className="absolute left-1/2 -translate-x-1/2 flex items-center cursor-pointer"
+          style={{ background: 'none', border: 'none', padding: 0 }}
+        >
           <img
             src="/snooker ace - Escrita vetor.svg"
             alt="Snooker Ace"
             className="h-8"
             style={{ filter: 'drop-shadow(0 0 14px rgba(0,210,106,0.2)) drop-shadow(0 2px 18px rgba(0,0,0,0.7))' }}
           />
-        </div>
+        </button>
 
         {/* ── RIGHT: Balance + actions ── */}
         <div className="flex items-center gap-3 relative">

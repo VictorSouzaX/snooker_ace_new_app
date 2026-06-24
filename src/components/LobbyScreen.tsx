@@ -9,6 +9,7 @@ interface LobbyScreenProps {
   onOpenFriends: () => void;
   onViewChange: (view: 'store' | 'history') => void;
   onOpenBattlePass: () => void;
+  resetKey?: number;
 }
 
 type ModeId = 'duel' | 'tournaments' | 'training' | 'store';
@@ -271,7 +272,7 @@ function ChestIcon() {
   );
 }
 
-export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpenBattlePass }: LobbyScreenProps) {
+export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpenBattlePass, resetKey }: LobbyScreenProps) {
   const [selected, setSelected] = useState<ModeId | null>(null);
   const [slideIdx, setSlideIdx] = useState(0);
   const [prevSlideId, setPrevSlideId] = useState<string | null>(null);
@@ -301,6 +302,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
   }, []);
 
   useEffect(() => { setPrevSlideId(null); setSlideIdx(0); }, [selected]);
+  useEffect(() => { if (resetKey) setSelected(null); }, [resetKey]);
 
   useEffect(() => {
     if (slides.length <= 1) return;
@@ -370,7 +372,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         // bottom button row.
         gridTemplateRows: 'minmax(0, 1fr) auto',
         columnGap: '8px',
-        rowGap: selected !== null ? '8px' : '0',
+        rowGap: '8px',
         padding: 'calc(12px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left))',
       }}
     >
@@ -383,7 +385,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
           return (
             <motion.button
               key={mode.id}
-              onClick={() => setSelected(mode.id as ModeId)}
+              onClick={() => setSelected(prev => prev === mode.id ? null : mode.id as ModeId)}
               whileHover={{ x: 4, scale: 1.02 }}
               whileTap={{ scale: 0.97 }}
               className="relative flex flex-col gap-1.5 px-4 py-4 rounded-[15px] overflow-hidden text-left cursor-pointer w-full flex-1 min-h-0"
@@ -569,64 +571,54 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         </div>
       </div>
 
-      {/* ══ ROW 2: action strip — only visible after a mode is selected ══ */}
-      <AnimatePresence>
-        {selected !== null && (
-          <>
-            {/* COL 1: LOJA */}
-            <motion.div
-              key="loja-btn"
-              className="z-10"
-              style={{ gridColumn: 1, gridRow: 2 }}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 14 }}
-              transition={{ duration: 0.32, ease: 'easeOut' }}
-            >
-              <motion.button
-                onClick={() => onViewChange('store')}
-                whileHover={{ x: 4, scale: 1.02 }}
-                whileTap={{ scale: 0.97 }}
-                className="relative w-full flex items-center gap-3 px-4 rounded-[15px] overflow-hidden text-left cursor-pointer"
-                style={{
-                  height: BOTTOM_H,
-                  background: 'linear-gradient(155deg, rgba(20,14,0,0.97) 0%, rgba(8,5,0,0.99) 60%, rgba(251,191,36,0.06) 100%)',
-                  backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(251,191,36,0.35)',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.85), 0 0 18px rgba(251,191,36,0.22), inset 0 1px 0 rgba(255,255,255,0.14)',
-                }}
-              >
-                <motion.div animate={{ x: ['-100%', '320%'] }}
-                  transition={{ repeat: Infinity, duration: 2.4, ease: 'easeInOut', repeatDelay: 2 }}
-                  className="absolute inset-y-0 pointer-events-none z-20"
-                  style={{ width: '45%', background: 'linear-gradient(90deg, transparent, rgba(251,191,36,0.22), rgba(255,230,100,0.14), transparent)' }} />
-                <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
-                  style={{ background: 'linear-gradient(90deg, transparent 5%, rgba(251,191,36,0.45) 25%, rgba(255,230,100,0.65) 50%, rgba(251,191,36,0.35) 75%, transparent 95%)' }} />
-                <div className="absolute left-0 top-0 bottom-0 w-px pointer-events-none"
-                  style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.1) 40%, transparent 80%)' }} />
-                <div className="absolute bottom-0 inset-x-0 h-px pointer-events-none" style={{ background: 'rgba(0,0,0,0.7)' }} />
-                <div className="absolute inset-0 pointer-events-none"
-                  style={{ background: 'linear-gradient(128deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.025) 35%, transparent 55%)' }} />
-                <motion.div animate={{ scale: [1, 1.35, 1], opacity: [0.7, 1, 0.7] }}
-                  transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
-                  className="absolute top-2 right-2.5 px-1.5 py-[3px] rounded-full text-[7px] font-black uppercase tracking-wide z-20"
-                  style={{ background: 'rgba(251,191,36,0.18)', border: '1px solid rgba(251,191,36,0.6)', color: '#fbbf24', boxShadow: '0 0 8px rgba(251,191,36,0.5)' }}>
-                  HOT
-                </motion.div>
-                <div className="relative z-10">
-                  <div className="font-display text-[21px] leading-none tracking-[0.06em]"
-                    style={{ color: 'rgba(251,191,36,0.85)', textShadow: '0 0 16px rgba(251,191,36,0.5)' }}>LOJA</div>
-                  <div className="text-[10px] font-black uppercase tracking-widest leading-none mt-1"
-                    style={{ color: 'rgba(251,191,36,0.55)' }}>ITENS PREMIUM</div>
-                </div>
-              </motion.button>
-            </motion.div>
+      {/* ══ ROW 2, COL 1: LOJA — always visible ══ */}
+      <div className="z-10" style={{ gridColumn: 1, gridRow: 2 }}>
+        <motion.button
+          onClick={() => onViewChange('store')}
+          whileHover={{ x: 4, scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
+          className="relative w-full flex items-center gap-3 px-4 rounded-[15px] overflow-hidden text-left cursor-pointer"
+          style={{
+            height: BOTTOM_H,
+            background: 'linear-gradient(155deg, rgba(20,14,0,0.97) 0%, rgba(8,5,0,0.99) 60%, rgba(251,191,36,0.06) 100%)',
+            backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(251,191,36,0.35)',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.85), 0 0 18px rgba(251,191,36,0.22), inset 0 1px 0 rgba(255,255,255,0.14)',
+          }}
+        >
+          <motion.div animate={{ x: ['-100%', '320%'] }}
+            transition={{ repeat: Infinity, duration: 2.4, ease: 'easeInOut', repeatDelay: 2 }}
+            className="absolute inset-y-0 pointer-events-none z-20"
+            style={{ width: '45%', background: 'linear-gradient(90deg, transparent, rgba(251,191,36,0.22), rgba(255,230,100,0.14), transparent)' }} />
+          <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
+            style={{ background: 'linear-gradient(90deg, transparent 5%, rgba(251,191,36,0.45) 25%, rgba(255,230,100,0.65) 50%, rgba(251,191,36,0.35) 75%, transparent 95%)' }} />
+          <div className="absolute left-0 top-0 bottom-0 w-px pointer-events-none"
+            style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.1) 40%, transparent 80%)' }} />
+          <div className="absolute bottom-0 inset-x-0 h-px pointer-events-none" style={{ background: 'rgba(0,0,0,0.7)' }} />
+          <div className="absolute inset-0 pointer-events-none"
+            style={{ background: 'linear-gradient(128deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.025) 35%, transparent 55%)' }} />
+          <motion.div animate={{ scale: [1, 1.35, 1], opacity: [0.7, 1, 0.7] }}
+            transition={{ repeat: Infinity, duration: 1.6, ease: 'easeInOut' }}
+            className="absolute top-2 right-2.5 px-1.5 py-[3px] rounded-full text-[7px] font-black uppercase tracking-wide z-20"
+            style={{ background: 'rgba(251,191,36,0.18)', border: '1px solid rgba(251,191,36,0.6)', color: '#fbbf24', boxShadow: '0 0 8px rgba(251,191,36,0.5)' }}>
+            HOT
+          </motion.div>
+          <div className="relative z-10">
+            <div className="font-display text-[21px] leading-none tracking-[0.06em]"
+              style={{ color: 'rgba(251,191,36,0.85)', textShadow: '0 0 16px rgba(251,191,36,0.5)' }}>LOJA</div>
+            <div className="text-[10px] font-black uppercase tracking-widest leading-none mt-1"
+              style={{ color: 'rgba(251,191,36,0.55)' }}>ITENS PREMIUM</div>
+          </div>
+        </motion.button>
+      </div>
 
-            {/* COL 2: JOGAR */}
+      {/* ══ ROW 2, COL 2: JOGAR — only when a mode is selected ══ */}
+      <div className="z-10 relative" style={{ gridColumn: 2, gridRow: 2, height: BOTTOM_H }}>
+        <AnimatePresence>
+          {selected !== null && (
             <motion.div
               key={selected + '-jogar'}
-              className="z-10 relative"
-              style={{ gridColumn: 2, gridRow: 2, height: BOTTOM_H }}
+              className="absolute inset-0"
               initial={{ opacity: 0, scale: 0.92, y: 14 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.92, y: 14 }}
@@ -669,33 +661,25 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
                   style={{ fontSize: '38px', color: cfg.btnColor }}>{cfg.btnText}</span>
               </motion.button>
             </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
-            {/* COL 3: CAIXA GRÁTIS */}
-            <motion.div
-              key="caixa-btn"
-              className="z-10"
-              style={{ gridColumn: 3, gridRow: 2 }}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 14 }}
-              transition={{ duration: 0.32, ease: 'easeOut' }}
-            >
-              <div className="relative rounded-[16px] overflow-hidden w-full" style={{ ...glass, height: BOTTOM_H }}>
-                <EdgeLayers />
-                <div className="relative z-10 px-4 h-full flex items-center gap-3">
-                  <ChestIcon />
-                  <div className="flex flex-col gap-1 min-w-0">
-                    <span className="font-display text-[14px] leading-none tracking-[0.06em]" style={{ color: 'rgba(255,255,255,0.82)' }}>CAIXA GRÁTIS</span>
-                    <span className="text-[9px] font-semibold leading-none" style={{ color: 'rgba(255,255,255,0.3)' }}>Próxima em</span>
-                    <span className="font-display text-[20px] leading-none tracking-[0.03em]"
-                      style={{ color: '#f5c518', textShadow: '0 0 16px rgba(245,197,24,0.65)' }}>{fmt(chestSecs)}</span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      {/* ══ ROW 2, COL 3: CAIXA GRÁTIS — always visible ══ */}
+      <div className="z-10" style={{ gridColumn: 3, gridRow: 2 }}>
+        <div className="relative rounded-[16px] overflow-hidden w-full" style={{ ...glass, height: BOTTOM_H }}>
+          <EdgeLayers />
+          <div className="relative z-10 px-4 h-full flex items-center gap-3">
+            <ChestIcon />
+            <div className="flex flex-col gap-1 min-w-0">
+              <span className="font-display text-[14px] leading-none tracking-[0.06em]" style={{ color: 'rgba(255,255,255,0.82)' }}>CAIXA GRÁTIS</span>
+              <span className="text-[9px] font-semibold leading-none" style={{ color: 'rgba(255,255,255,0.3)' }}>Próxima em</span>
+              <span className="font-display text-[20px] leading-none tracking-[0.03em]"
+                style={{ color: '#f5c518', textShadow: '0 0 16px rgba(245,197,24,0.65)' }}>{fmt(chestSecs)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
     </div>
   );
