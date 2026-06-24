@@ -525,7 +525,7 @@ export default function Store() {
         display: 'grid',
         gridTemplateColumns: '155px 1fr',
         columnGap: '8px',
-        padding: '12px',
+        padding: '12px 12px calc(12px + env(safe-area-inset-bottom)) 12px',
       }}
     >
       {/* ══ LEFT: Category sidebar ══ */}

@@ -315,7 +315,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         gridTemplateRows: '1fr auto',
         columnGap: '8px',
         rowGap: '8px',
-        padding: '12px',
+        padding: '12px 12px calc(12px + env(safe-area-inset-bottom)) 12px',
       }}
     >
 
