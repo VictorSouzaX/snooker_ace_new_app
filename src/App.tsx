@@ -87,14 +87,8 @@ function AppContent() {
 
   return (
     <div
-      className="w-screen bg-[#050505] relative overflow-hidden flex flex-col select-none font-sans"
-      style={{
-        height: '100dvh',
-        backgroundImage: "url('/wallpaper%20snooke%20ace.png')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center bottom',
-        backgroundRepeat: 'no-repeat',
-      }}
+      className="w-screen relative overflow-hidden flex flex-col select-none font-sans"
+      style={{ height: '100dvh' }}
     >
 
         {showSplash && <IntroSplash onComplete={() => setShowSplash(false)} />}

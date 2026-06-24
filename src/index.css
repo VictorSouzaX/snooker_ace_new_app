@@ -32,9 +32,14 @@
 }
 
 @layer base {
-  body {
-    @apply bg-black text-white antialiased overflow-hidden;
-    background: #020508;
+  html, body {
+    @apply text-white antialiased overflow-hidden;
+    background-color: #020508;
+    background-image: url('/wallpaper-snooker-ace.png');
+    background-size: cover;
+    background-position: center bottom;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
   }
 }
 
