@@ -21,11 +21,11 @@ export default function Header({ onOpenSettings }: HeaderProps) {
           paddingBottom: '12px',
           paddingLeft: 'calc(24px + env(safe-area-inset-left))',
           paddingRight: 'calc(24px + env(safe-area-inset-right))',
-          background: 'rgba(2,5,8,0.55)',
-          backdropFilter: 'blur(28px)',
-          WebkitBackdropFilter: 'blur(28px)',
-          borderBottom: '1px solid rgba(255,255,255,0.07)',
-          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 4px 30px rgba(0,0,0,0.5)',
+          background: 'linear-gradient(180deg, rgba(8,10,12,0.97) 0%, rgba(4,6,8,0.94) 100%)',
+          backdropFilter: 'blur(32px)',
+          WebkitBackdropFilter: 'blur(32px)',
+          borderBottom: '1px solid rgba(255,255,255,0.10)',
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -1px 0 rgba(0,0,0,0.5), 0 4px 30px rgba(0,0,0,0.75)',
         }}
       >
         {/* ── LEFT: Avatar + player info ── */}
@@ -112,16 +112,13 @@ export default function Header({ onOpenSettings }: HeaderProps) {
         </div>
 
         {/* ── CENTER: Logo ── */}
-        <div className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center gap-0">
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center">
           <img
             src="/snooker ace - Escrita vetor.svg"
             alt="Snooker Ace"
             className="h-8"
             style={{ filter: 'drop-shadow(0 0 14px rgba(0,210,106,0.2)) drop-shadow(0 2px 18px rgba(0,0,0,0.7))' }}
           />
-          {/* Underline accent */}
-          <div className="h-px w-14 mt-0.5 rounded-full"
-            style={{ background: 'linear-gradient(90deg, transparent, rgba(0,210,106,0.55), transparent)' }} />
         </div>
 
         {/* ── RIGHT: Balance + actions ── */}

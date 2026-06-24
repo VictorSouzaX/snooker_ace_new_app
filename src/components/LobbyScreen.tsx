@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useState, useEffect, useRef } from 'react';
+import { motion } from 'motion/react';
 import { Trophy, Package, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { GameMode } from '../types';
@@ -239,22 +239,39 @@ function ChestIcon() {
 export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpenBattlePass }: LobbyScreenProps) {
   const [selected, setSelected] = useState<ModeId>('duel');
   const [slideIdx, setSlideIdx] = useState(0);
+  const [prevSlideId, setPrevSlideId] = useState<string | null>(null);
   const [chestSecs, setChestSecs] = useState(5325);
 
   const slides = BANNER_DATA[selected] ?? BANNER_DATA.training;
   const currentSlide = slides[Math.min(slideIdx, slides.length - 1)];
   const cfg = MODE_CFG[selected];
 
+  // Refs so interval/pan callbacks always see latest state without stale closure
+  const slideIdxRef = useRef(slideIdx);
+  slideIdxRef.current = slideIdx;
+  const slidesRef = useRef(slides);
+  slidesRef.current = slides;
+
+  const goToRef = useRef((_: number) => {});
+  goToRef.current = (newIdx: number) => {
+    const prev = slideIdxRef.current;
+    if (prev === newIdx) return;
+    setPrevSlideId(slidesRef.current[prev]?.id ?? null);
+    setSlideIdx(newIdx);
+  };
+
   useEffect(() => {
     const id = setInterval(() => setChestSecs(s => Math.max(0, s - 1)), 1000);
     return () => clearInterval(id);
   }, []);
 
-  useEffect(() => { setSlideIdx(0); }, [selected]);
+  useEffect(() => { setPrevSlideId(null); setSlideIdx(0); }, [selected]);
 
   useEffect(() => {
     if (slides.length <= 1) return;
-    const id = setInterval(() => setSlideIdx(i => (i + 1) % slides.length), 7500);
+    const id = setInterval(() => {
+      goToRef.current((slideIdxRef.current + 1) % slidesRef.current.length);
+    }, 7500);
     return () => clearInterval(id);
   }, [selected, slides.length]);
 
@@ -385,21 +402,47 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
 
       {/* ══ COL 2: Banner ══ */}
       <div className="flex items-stretch z-10 min-h-0 min-w-0 relative" style={{ gridColumn: 2, gridRow: 1 }}>
-        <AnimatePresence initial={false}>
+        <motion.div
+          className="absolute inset-0"
+          style={{ touchAction: 'pan-y' }}
+          onPanEnd={(_, info) => {
+            if (slides.length <= 1) return;
+            if (Math.abs(info.offset.x) > 40 || Math.abs(info.velocity.x) > 300) {
+              const next = info.offset.x < 0
+                ? (slideIdxRef.current + 1) % slides.length
+                : (slideIdxRef.current - 1 + slides.length) % slides.length;
+              goToRef.current(next);
+            }
+          }}
+        >
+          {/* Previous slide stays fully opaque underneath while new one fades in */}
+          {prevSlideId !== null && (() => {
+            const prev = slides.find(s => s.id === prevSlideId);
+            return prev ? (
+              <div className="absolute inset-0" style={{ zIndex: 1 }}>
+                <BannerCard slide={prev} accent={cfg.accent} glow={cfg.glow}
+                  slideCount={slides.length} slideIdx={slideIdx}
+                  onDot={(i) => goToRef.current(i)} />
+              </div>
+            ) : null;
+          })()}
+          {/* Current slide fades in on top of the previous */}
           <motion.div
             key={currentSlide.id}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.1, ease: 'easeInOut' }}
             className="absolute inset-0"
+            style={{ zIndex: 2 }}
+            initial={{ opacity: prevSlideId !== null ? 0 : 1 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: prevSlideId !== null ? 1.1 : 0.4, ease: 'easeInOut' }}
+            onAnimationComplete={() => setPrevSlideId(null)}
           >
             <BannerCard
               slide={currentSlide} accent={cfg.accent} glow={cfg.glow}
-              slideCount={slides.length} slideIdx={Math.min(slideIdx, slides.length - 1)} onDot={setSlideIdx}
+              slideCount={slides.length} slideIdx={Math.min(slideIdx, slides.length - 1)}
+              onDot={(i) => goToRef.current(i)}
             />
           </motion.div>
-        </AnimatePresence>
+        </motion.div>
       </div>
 
       {/* ══ COL 3: Icon buttons row (top) + Passe Ace (fills rest) ══ */}
