@@ -94,7 +94,7 @@ function AppContent() {
 
         {/* Main layer — hidden behind overlays so only the wallpaper shows through */}
         <div className={`flex-1 flex flex-col relative overflow-hidden${activeView !== 'lobby' ? ' invisible' : ''}`}>
-          {!isAuthenticated && !showSplash && (
+          {!isAuthenticated && (
             <LoginScreen onLogin={() => {
               setIsAuthenticated(true);
               setTimeout(() => toast.success('Bem-vindo de volta, João! 🎱', {
