@@ -163,41 +163,70 @@ function AppContent() {
                   transition={overlayTransition}
                   className="absolute inset-0 z-[150] flex flex-col overflow-hidden"
                 >
-                  {/* Animated background — same as home screen, covers lobby content */}
+                  {/* Animated background — same as home screen */}
                   <SvgFluidLinesBackground />
 
-                  <div className="flex items-center px-8 py-5 shrink-0 relative z-10" style={OVERLAY_HEADER_STYLE}>
-                    {/* Voltar */}
+                  {/* ── Refined header ── */}
+                  <div
+                    className="relative flex items-center px-5 py-3 shrink-0 z-10"
+                    style={{
+                      background: 'rgba(2,5,8,0.6)',
+                      backdropFilter: 'blur(28px)',
+                      WebkitBackdropFilter: 'blur(28px)',
+                      borderBottom: '1px solid rgba(255,255,255,0.07)',
+                      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06), 0 6px 30px rgba(0,0,0,0.55)',
+                    }}
+                  >
+                    {/* Subtle top edge highlight */}
+                    <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
+                      style={{ background: 'linear-gradient(90deg, transparent 5%, rgba(245,158,11,0.28) 30%, rgba(255,255,255,0.18) 50%, rgba(245,158,11,0.22) 70%, transparent 95%)' }} />
+
+                    {/* Voltar — pill */}
                     <motion.button
-                      whileTap={{ scale: 0.93 }}
-                      whileHover={{ x: -3 }}
+                      whileTap={{ scale: 0.94 }}
+                      whileHover={{ x: -2 }}
                       onClick={() => setActiveView('lobby')}
-                      className="flex items-center gap-1.5 pl-3 pr-4 py-2 rounded-[13px] shrink-0 relative overflow-hidden"
+                      className="relative flex items-center gap-1.5 pl-2.5 pr-3.5 py-2 rounded-full overflow-hidden shrink-0"
                       style={{
-                        background: 'rgba(255,255,255,0.07)',
-                        border: '1px solid rgba(255,255,255,0.14)',
-                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.22), 0 4px 14px rgba(0,0,0,0.3)',
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.12)',
+                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), 0 4px 14px rgba(0,0,0,0.3)',
                       }}
                     >
                       <div className="absolute inset-0 pointer-events-none"
-                        style={{ background: 'linear-gradient(135deg,rgba(255,255,255,0.09) 0%,transparent 55%)' }} />
-                      <ChevronLeft className="w-[18px] h-[18px] relative z-10" style={{ color: '#00e870' }} />
-                      <span className="text-[12px] font-bold tracking-widest uppercase relative z-10"
-                        style={{ color: 'rgba(255,255,255,0.72)' }}>Voltar</span>
+                        style={{ background: 'linear-gradient(135deg,rgba(255,255,255,0.08) 0%,transparent 55%)' }} />
+                      <ChevronLeft className="w-[15px] h-[15px] relative z-10" style={{ color: 'rgba(255,255,255,0.7)' }} />
+                      <span className="text-[10px] font-black tracking-[0.16em] uppercase relative z-10"
+                        style={{ color: 'rgba(255,255,255,0.65)' }}>Voltar</span>
                     </motion.button>
 
-                    {/* Título centralizado */}
-                    <div className="flex-1 flex flex-col items-center gap-0.5">
-                      <h1 className="font-display text-white leading-none" style={{ fontSize: '28px', letterSpacing: '0.2em' }}>LOJA</h1>
-                      <div className="h-px w-10 rounded-full" style={{ background: 'linear-gradient(90deg,transparent,rgba(0,210,106,0.7),transparent)' }} />
+                    {/* Center — LOJA + tagline */}
+                    <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2.5">
+                      {/* Coin badge */}
+                      <div className="relative w-7 h-7 rounded-full flex items-center justify-center"
+                        style={{
+                          background: 'linear-gradient(145deg,#fbbf24 0%,#d97706 100%)',
+                          boxShadow: '0 0 14px rgba(245,158,11,0.6), inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -1px 0 rgba(0,0,0,0.25)',
+                        }}>
+                        <span className="text-[12px] font-black text-black leading-none">$</span>
+                      </div>
+                      <div className="flex flex-col items-start gap-0.5">
+                        <h1 className="font-display leading-none"
+                          style={{
+                            fontSize: '22px', letterSpacing: '0.22em', color: '#fbbf24',
+                            textShadow: '0 0 22px rgba(245,158,11,0.55), 0 2px 8px rgba(0,0,0,0.7)',
+                          }}>LOJA</h1>
+                        <span className="text-[8px] font-black uppercase tracking-[0.28em]"
+                          style={{ color: 'rgba(255,255,255,0.32)' }}>Itens Premium</span>
+                      </div>
                     </div>
 
-                    {/* Saldo — direita */}
-                    <div className="relative flex items-center gap-2.5 px-4 py-2.5 rounded-[16px] overflow-hidden shrink-0"
+                    {/* Saldo — direita, mesmo estilo do home */}
+                    <div className="ml-auto relative flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-full overflow-hidden shrink-0"
                       style={{
-                        background: 'linear-gradient(135deg,rgba(0,210,106,0.1),rgba(0,150,70,0.05))',
+                        background: 'linear-gradient(135deg,rgba(0,210,106,0.1),rgba(0,150,60,0.05))',
                         border: '1px solid rgba(0,210,106,0.22)',
-                        boxShadow: '0 0 22px rgba(0,210,106,0.1), inset 0 1px 0 rgba(255,255,255,0.08)',
+                        boxShadow: '0 0 18px rgba(0,210,106,0.1), inset 0 1px 0 rgba(255,255,255,0.08)',
                       }}>
                       <div className="absolute inset-0 pointer-events-none"
                         style={{ background: 'linear-gradient(130deg,rgba(255,255,255,0.06) 0%,transparent 55%)' }} />
@@ -208,14 +237,15 @@ function AppContent() {
                           background: 'linear-gradient(145deg,#00e870,#00a84a)',
                           boxShadow: '0 0 10px rgba(0,210,106,0.6), inset 0 1px 0 rgba(255,255,255,0.3)',
                         }}>
-                        <span className="text-[10px] font-black text-black leading-none">$</span>
+                        <div className="w-3 h-3 rounded-full border-2 border-black/20" />
                       </div>
-                      <span className="relative z-10 text-[16px] font-black leading-none tracking-tight"
-                        style={{ color: '#00e870', textShadow: '0 0 16px rgba(0,210,106,0.5)' }}>
+                      <span className="relative z-10 text-[13px] font-black leading-none tracking-tight"
+                        style={{ color: '#00e870', textShadow: '0 0 14px rgba(0,210,106,0.45)' }}>
                         12.450
                       </span>
                     </div>
                   </div>
+
                   <div className="flex-1 overflow-hidden relative z-10">
                     <Store />
                   </div>

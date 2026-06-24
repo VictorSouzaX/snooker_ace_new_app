@@ -273,7 +273,7 @@ function StoreCard({ item, index, onBuy }: { item: StoreItem; index: number; onB
 
       {/* Visual area */}
       <div className="relative overflow-hidden shrink-0"
-        style={{ height: '150px', background: `linear-gradient(145deg, ${item.accent}22 0%, rgba(8,8,12,0.9) 100%)` }}>
+        style={{ height: '130px', background: `linear-gradient(145deg, ${item.accent}22 0%, rgba(8,8,12,0.9) 100%)` }}>
         {item.image && (
           <>
             <img src={item.image} alt="" className="w-full h-full object-cover opacity-55"
@@ -539,8 +539,22 @@ export default function Store() {
         ))}
       </div>
 
-      {/* ══ RIGHT: Category header + horizontal card scroll ══ */}
-      <div className="flex flex-col gap-2 min-w-0 z-10">
+      {/* ══ RIGHT: Glass frame containing header + horizontal card scroll ══ */}
+      <div
+        className="relative flex flex-col min-w-0 z-10 rounded-[18px] overflow-hidden"
+        style={{
+          background: 'linear-gradient(155deg, rgba(12,12,18,0.78) 0%, rgba(5,5,8,0.92) 100%)',
+          backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '0 12px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.4)',
+        }}
+      >
+        {/* Top edge highlight on the frame */}
+        <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
+          style={{ background: `linear-gradient(90deg, transparent 5%, ${activeCat.color}45 30%, rgba(255,255,255,0.32) 50%, ${activeCat.color}30 70%, transparent 95%)` }} />
+        {/* Soft accent glow following selected category */}
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: `radial-gradient(ellipse at 20% -10%, ${activeCat.color}14 0%, transparent 55%)` }} />
 
         {/* Category header */}
         <AnimatePresence mode="wait">
@@ -550,22 +564,32 @@ export default function Store() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="shrink-0 px-1"
+            className="shrink-0 flex items-center justify-between px-4 pt-3 pb-2 relative z-10"
           >
-            <div className="flex items-baseline gap-2.5">
-              <h2 className="font-display leading-none"
-                style={{ fontSize: '28px', letterSpacing: '0.08em', color: activeCat.color, textShadow: `0 0 30px ${activeCat.color}55, 0 2px 8px rgba(0,0,0,0.8)` }}>
+            <div className="flex items-baseline gap-2.5 min-w-0">
+              <h2 className="font-display leading-none shrink-0"
+                style={{ fontSize: '24px', letterSpacing: '0.08em', color: activeCat.color,
+                  textShadow: `0 0 26px ${activeCat.color}55, 0 2px 8px rgba(0,0,0,0.8)` }}>
                 {activeCat.label}
               </h2>
-              <span className="text-[10px] font-bold uppercase tracking-[0.18em]"
-                style={{ color: 'rgba(255,255,255,0.22)' }}>
+              <span className="text-[10px] font-bold uppercase tracking-[0.18em] truncate"
+                style={{ color: 'rgba(255,255,255,0.32)' }}>
                 {activeCat.description}
               </span>
             </div>
-            <div className="mt-1.5 h-[2px] rounded-full"
-              style={{ width: '38%', background: `linear-gradient(90deg, ${activeCat.color}80, ${activeCat.color}18, transparent)` }} />
+            {/* Item count pill */}
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full shrink-0"
+              style={{ background: `${activeCat.color}14`, border: `1px solid ${activeCat.color}38` }}>
+              <span className="font-display text-[11px] leading-none" style={{ color: activeCat.color }}>{activeCat.count}</span>
+              <span className="text-[8px] font-black uppercase tracking-[0.18em] leading-none"
+                style={{ color: activeCat.color + 'bb' }}>itens</span>
+            </div>
           </motion.div>
         </AnimatePresence>
+
+        {/* Divider */}
+        <div className="shrink-0 mx-4 h-px"
+          style={{ background: `linear-gradient(90deg, ${activeCat.color}38 0%, transparent 70%)` }} />
 
         {/* Horizontal card scroll */}
         <AnimatePresence mode="wait">
@@ -575,16 +599,15 @@ export default function Store() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="flex-1 overflow-x-auto no-scrollbar flex gap-3 items-stretch pb-1 min-h-0"
+            className="flex-1 overflow-x-auto no-scrollbar flex gap-3 items-stretch p-3 min-h-0"
           >
             {items.map((item, i) => (
-              <div key={item.id} style={{ width: '190px', flexShrink: 0, height: '100%' }}>
+              <div key={item.id} style={{ width: '180px', flexShrink: 0, height: '100%' }}>
                 <StoreCard item={item} index={i} onBuy={setConfirmItem} />
               </div>
             ))}
           </motion.div>
         </AnimatePresence>
-
       </div>
 
       {/* Purchase confirmation overlay */}
