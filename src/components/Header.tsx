@@ -19,8 +19,8 @@ export default function Header({ onOpenSettings }: HeaderProps) {
         style={{
           paddingTop: 'calc(12px + env(safe-area-inset-top))',
           paddingBottom: '12px',
-          paddingLeft: 'max(24px, env(safe-area-inset-left))',
-          paddingRight: 'max(24px, env(safe-area-inset-right))',
+          paddingLeft: 'calc(24px + env(safe-area-inset-left))',
+          paddingRight: 'calc(24px + env(safe-area-inset-right))',
           background: 'rgba(2,5,8,0.55)',
           backdropFilter: 'blur(28px)',
           WebkitBackdropFilter: 'blur(28px)',
