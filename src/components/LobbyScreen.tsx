@@ -254,7 +254,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
 
   useEffect(() => {
     if (slides.length <= 1) return;
-    const id = setInterval(() => setSlideIdx(i => (i + 1) % slides.length), 4500);
+    const id = setInterval(() => setSlideIdx(i => (i + 1) % slides.length), 7500);
     return () => clearInterval(id);
   }, [selected, slides.length]);
 
@@ -384,15 +384,15 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
       </div>
 
       {/* ══ COL 2: Banner ══ */}
-      <div className="flex items-stretch z-10 min-h-0 min-w-0" style={{ gridColumn: 2, gridRow: 1 }}>
-        <AnimatePresence mode="wait">
+      <div className="flex items-stretch z-10 min-h-0 min-w-0 relative" style={{ gridColumn: 2, gridRow: 1 }}>
+        <AnimatePresence initial={false}>
           <motion.div
             key={currentSlide.id}
-            initial={{ opacity: 0, y: 14, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.97 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
-            className="w-full h-full"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.1, ease: 'easeInOut' }}
+            className="absolute inset-0"
           >
             <BannerCard
               slide={currentSlide} accent={cfg.accent} glow={cfg.glow}
