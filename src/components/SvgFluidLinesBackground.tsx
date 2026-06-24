@@ -37,18 +37,20 @@ export const SvgFluidLinesBackground = () => {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  // Hue locked to green/teal arena range: 128°–155° (breathes slowly)
-  const hue = 138 + Math.sin(time * 0.38) * 13;
-  const numLines = 24;
+  // Hue drifts through blue-indigo: 210°–240°
+  const hue  = 220 + Math.sin(time * 0.34) * 16;
+  const hue2 = 252 + Math.sin(time * 0.21 + 1.4) * 12;
+  const numLines = 28;
 
   const lines = Array.from({ length: numLines }).map((_, i) => {
     const mX = mouseRef.current.currentX;
     const mY = mouseRef.current.currentY;
     const isAccent = i % 5 === 0;
     const distFromCenter = Math.abs(i - numLines / 2) / (numLines / 2);
-    const baseOpacity = 0.04 + (1 - distFromCenter) * 0.08;
-    const opacity = isAccent ? Math.min(0.22, baseOpacity + 0.1) : baseOpacity;
-    const strokeWidth = isAccent ? 1.1 : 0.55;
+    const baseOpacity = 0.14 + (1 - distFromCenter) * 0.22;
+    const opacity = isAccent ? Math.min(0.52, baseOpacity + 0.18) : baseOpacity;
+    const strokeWidth = isAccent ? 1.2 : 0.65;
+    const lineHue = i % 7 === 3 ? hue2 : hue;
 
     let path = "";
     for (let x = 0; x <= 100; x += 1) {
@@ -70,84 +72,92 @@ export const SvgFluidLinesBackground = () => {
 
     return (
       <path key={i} d={path} fill="none"
-        stroke={`hsla(${hue.toFixed(1)}, 78%, 58%, ${opacity.toFixed(3)})`}
+        stroke={`hsla(${lineHue.toFixed(1)}, 90%, 75%, ${opacity.toFixed(3)})`}
         strokeWidth={strokeWidth} vectorEffect="non-scaling-stroke" />
     );
   });
 
   return (
     <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
-      {/* ── Deep arena base ── */}
-      <div className="absolute inset-0" style={{ background: '#020508' }} />
 
-      {/* ── Overhead arena lamp — green cone from top-center ── */}
+      {/* ── Base — mid-blue, clearly lit ── */}
+      <div className="absolute inset-0" style={{ background: '#0d1e4a' }} />
+
+      {/* ── Large blue radial fill — most of the visible color ── */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 80% 55% at 50% -5%, rgba(0,55,22,0.62) 0%, rgba(0,28,10,0.22) 45%, transparent 72%)',
+        background: 'radial-gradient(ellipse 120% 100% at 50% 50%, rgba(25,65,200,0.88) 0%, rgba(14,32,110,0.55) 55%, transparent 80%)',
       }} />
 
-      {/* ── Felt table reflection — warm green glow from below ── */}
+      {/* ── Overhead blue-white cone ── */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 90% 50% at 50% 115%, rgba(0,90,32,0.42) 0%, rgba(0,45,16,0.16) 38%, transparent 62%)',
+        background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(80,130,255,0.75) 0%, rgba(40,80,220,0.45) 42%, transparent 65%)',
       }} />
 
-      {/* ── Subtle side atmosphere — pinched darkness left & right ── */}
+      {/* ── Left violet/indigo bloom ── */}
       <div className="absolute inset-0" style={{
-        background: 'linear-gradient(to right, rgba(0,0,0,0.38) 0%, transparent 22%, transparent 78%, rgba(0,0,0,0.38) 100%)',
+        background: 'radial-gradient(ellipse 65% 85% at -5% 50%, rgba(110,45,230,0.42) 0%, rgba(60,20,140,0.18) 52%, transparent 70%)',
       }} />
 
-      {/* ── Particle field — tiny floating dust motes ── */}
+      {/* ── Right sky-blue accent ── */}
+      <div className="absolute inset-0" style={{
+        background: 'radial-gradient(ellipse 60% 75% at 108% 42%, rgba(50,130,255,0.40) 0%, rgba(25,75,200,0.16) 52%, transparent 70%)',
+      }} />
+
+      {/* ── Bottom blue reflection ── */}
+      <div className="absolute inset-0" style={{
+        background: 'radial-gradient(ellipse 95% 55% at 50% 115%, rgba(50,100,240,0.62) 0%, rgba(25,55,170,0.28) 38%, transparent 58%)',
+      }} />
+
+      {/* ── Particle dust motes ── */}
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
         {[
-          { cx: 18, cy: 32, r: 0.35, o: 0.18 }, { cx: 42, cy: 18, r: 0.28, o: 0.14 },
-          { cx: 67, cy: 41, r: 0.4,  o: 0.12 }, { cx: 83, cy: 22, r: 0.3,  o: 0.16 },
-          { cx: 29, cy: 58, r: 0.32, o: 0.13 }, { cx: 54, cy: 72, r: 0.38, o: 0.1 },
-          { cx: 76, cy: 64, r: 0.25, o: 0.15 }, { cx: 11, cy: 75, r: 0.35, o: 0.11 },
-          { cx: 92, cy: 48, r: 0.3,  o: 0.13 }, { cx: 35, cy: 85, r: 0.4,  o: 0.09 },
+          { cx: 18, cy: 32, r: 0.4,  o: 0.35 }, { cx: 42, cy: 18, r: 0.32, o: 0.28 },
+          { cx: 67, cy: 41, r: 0.45, o: 0.24 }, { cx: 83, cy: 22, r: 0.35, o: 0.30 },
+          { cx: 29, cy: 58, r: 0.38, o: 0.26 }, { cx: 54, cy: 72, r: 0.42, o: 0.22 },
+          { cx: 76, cy: 64, r: 0.30, o: 0.28 }, { cx: 11, cy: 75, r: 0.40, o: 0.22 },
+          { cx: 92, cy: 48, r: 0.35, o: 0.25 }, { cx: 35, cy: 85, r: 0.45, o: 0.18 },
+          { cx: 58, cy: 28, r: 0.32, o: 0.28 }, { cx: 88, cy: 70, r: 0.36, o: 0.22 },
         ].map((p, i) => {
-          const pulse = 0.6 + 0.4 * Math.sin(time * 0.8 + i * 1.3);
+          const pulse = 0.65 + 0.35 * Math.sin(time * 0.8 + i * 1.3);
+          const ph = i % 3 === 0 ? hue2 : hue;
           return (
             <circle key={i} cx={p.cx} cy={p.cy} r={p.r}
-              fill={`hsla(${hue.toFixed(0)}, 75%, 70%, ${(p.o * pulse).toFixed(3)})`} />
+              fill={`hsla(${ph.toFixed(0)}, 85%, 75%, ${(p.o * pulse).toFixed(3)})`} />
           );
         })}
       </svg>
 
-      {/* ── Fluid lines SVG ── */}
+      {/* ── Fluid lines ── */}
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
         <defs>
-          <radialGradient id="arenaSpot" cx="50%" cy="110%" r="65%">
-            <stop offset="0%" stopColor="rgba(0,55,20,0.25)" />
-            <stop offset="55%" stopColor="rgba(0,22,8,0.08)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0)" />
+          {/* Light vignette only at the very edges — no heavy darkening */}
+          <radialGradient id="bgVig" cx="50%" cy="50%" r="72%">
+            <stop offset="35%" stopColor="rgba(0,0,0,0)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.42)" />
           </radialGradient>
-          <radialGradient id="arenaVig" cx="50%" cy="50%" r="72%">
-            <stop offset="20%" stopColor="rgba(0,0,0,0)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.68)" />
-          </radialGradient>
-          <linearGradient id="arenaTip" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(0,0,0,0.6)" />
-            <stop offset="30%" stopColor="rgba(0,0,0,0)" />
+          <linearGradient id="bgTop" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"  stopColor="rgba(0,0,0,0.40)" />
+            <stop offset="22%" stopColor="rgba(0,0,0,0)" />
           </linearGradient>
-          <linearGradient id="arenaFloor" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="70%" stopColor="rgba(0,0,0,0)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.55)" />
+          <linearGradient id="bgFloor" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="78%" stopColor="rgba(0,0,0,0)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.38)" />
           </linearGradient>
         </defs>
-        <rect width="100" height="100" fill="url(#arenaSpot)" />
         {lines}
-        <rect width="100" height="100" fill="url(#arenaVig)" />
-        <rect width="100" height="100" fill="url(#arenaTip)" />
-        <rect width="100" height="100" fill="url(#arenaFloor)" />
+        <rect width="100" height="100" fill="url(#bgVig)" />
+        <rect width="100" height="100" fill="url(#bgTop)" />
+        <rect width="100" height="100" fill="url(#bgFloor)" />
       </svg>
 
-      {/* ── Subtle green aiming line geometry ── */}
-      <svg className="absolute inset-0 w-full h-full opacity-[0.06]" viewBox="0 0 1080 540" preserveAspectRatio="none">
-        {/* Trajectory lines emanating from center */}
-        <line x1="540" y1="270" x2="0" y2="140" stroke="#00d26a" strokeWidth="0.5" strokeDasharray="4 8" />
-        <line x1="540" y1="270" x2="1080" y2="400" stroke="#00d26a" strokeWidth="0.5" strokeDasharray="4 8" />
-        <line x1="540" y1="270" x2="280" y2="540" stroke="#00d26a" strokeWidth="0.4" strokeDasharray="3 10" />
-        <circle cx="540" cy="270" r="1.5" fill="#00d26a" opacity="0.5" />
+      {/* ── Subtle geometry guide lines ── */}
+      <svg className="absolute inset-0 w-full h-full opacity-[0.09]" viewBox="0 0 1080 540" preserveAspectRatio="none">
+        <line x1="540" y1="270" x2="0"    y2="140" stroke="#6699ff" strokeWidth="0.6" strokeDasharray="4 8" />
+        <line x1="540" y1="270" x2="1080" y2="400" stroke="#6699ff" strokeWidth="0.6" strokeDasharray="4 8" />
+        <line x1="540" y1="270" x2="280"  y2="540" stroke="#8866ff" strokeWidth="0.5" strokeDasharray="3 10" />
+        <circle cx="540" cy="270" r="2" fill="#6699ff" opacity="0.6" />
       </svg>
+
     </div>
   );
 };
