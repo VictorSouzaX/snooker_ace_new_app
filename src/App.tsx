@@ -87,7 +87,7 @@ function AppContent() {
   const overlayTransition = { type: 'spring', stiffness: 380, damping: 42 } as const;
 
   return (
-    <div className="w-screen h-screen bg-[#050505] relative overflow-hidden flex flex-col select-none font-sans">
+    <div className="w-screen bg-[#050505] relative overflow-hidden flex flex-col select-none font-sans" style={{ height: '100dvh' }}>
 
         {showSplash && <IntroSplash onComplete={() => setShowSplash(false)} />}
 
