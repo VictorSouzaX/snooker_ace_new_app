@@ -551,7 +551,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
       </div>
 
       {/* ── RIGHT PANEL ── */}
-      <div className="flex flex-col gap-2.5 px-3 py-4 w-[220px] shrink-0 z-10">
+      <div className="flex flex-col gap-2.5 px-3 py-4 w-[220px] shrink-0 z-10 justify-center">
         {(() => {
           const glass = {
             background: 'linear-gradient(155deg, rgba(12,12,18,0.95) 0%, rgba(5,5,8,0.98) 100%)',
@@ -573,6 +573,30 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
           );
           return (
             <>
+              {/* Quick-access icon buttons: Ranking / Inventory / Friends */}
+              <div className="flex gap-2">
+                {([
+                  { icon: Trophy,  onClick: () => toast('Em breve', { description: 'Rankings chegando em breve.' }) },
+                  { icon: Package, onClick: () => toast('Em breve', { description: 'Inventário chegando em breve.' }) },
+                  { icon: Users,   onClick: onOpenFriends },
+                ] as const).map(({ icon: Icon, onClick }, i) => (
+                  <motion.button
+                    key={i}
+                    onClick={onClick}
+                    whileHover={{ scale: 1.08, y: -2 }}
+                    whileTap={{ scale: 0.93 }}
+                    className="relative flex-1 flex items-center justify-center py-3 rounded-[14px] overflow-hidden cursor-pointer"
+                    style={{ ...glass, border: '1px solid rgba(255,255,255,0.08)' }}
+                  >
+                    <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
+                      style={{ background: 'linear-gradient(90deg, transparent 10%, rgba(255,255,255,0.18) 50%, transparent 90%)' }} />
+                    <div className="absolute inset-0 pointer-events-none"
+                      style={{ background: 'linear-gradient(128deg, rgba(255,255,255,0.04) 0%, transparent 55%)' }} />
+                    <Icon style={{ width: 18, height: 18, color: 'rgba(255,255,255,0.45)' }} />
+                  </motion.button>
+                ))}
+              </div>
+
               {/* Passe Ace */}
               <div className="relative rounded-[16px] overflow-hidden" style={{
                 ...glass, border: '1px solid rgba(237,10,101,0.22)',
@@ -627,37 +651,6 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
                     </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Quick-access icon buttons: Ranking / Inventory / Friends */}
-              <div className="flex gap-2">
-                {([
-                  { icon: Trophy,  label: 'RANKING',    onClick: () => toast('Em breve', { description: 'Rankings chegando em breve.' }),    accent: '#f5c518' },
-                  { icon: Package, label: 'MOCHILA',    onClick: () => toast('Em breve', { description: 'Inventário chegando em breve.' }),   accent: '#60a5fa' },
-                  { icon: Users,   label: 'AMIGOS',     onClick: onOpenFriends,                                                               accent: '#34d399' },
-                ] as const).map(({ icon: Icon, label, onClick, accent }) => (
-                  <motion.button
-                    key={label}
-                    onClick={onClick}
-                    whileHover={{ scale: 1.07, y: -2 }}
-                    whileTap={{ scale: 0.94 }}
-                    className="relative flex-1 flex flex-col items-center justify-center gap-1.5 py-3 rounded-[14px] overflow-hidden cursor-pointer"
-                    style={{
-                      ...glass,
-                      border: `1px solid ${accent}22`,
-                    }}
-                  >
-                    <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
-                      style={{ background: `linear-gradient(90deg, transparent 10%, ${accent}44 50%, transparent 90%)` }} />
-                    <div className="absolute inset-0 pointer-events-none"
-                      style={{ background: 'linear-gradient(128deg, rgba(255,255,255,0.055) 0%, transparent 55%)' }} />
-                    <Icon style={{ width: 20, height: 20, color: accent, filter: `drop-shadow(0 0 5px ${accent}88)` }} />
-                    <span className="text-[7.5px] font-black uppercase tracking-widest leading-none"
-                      style={{ color: `${accent}cc` }}>
-                      {label}
-                    </span>
-                  </motion.button>
-                ))}
               </div>
 
               {/* Caixa Grátis */}
