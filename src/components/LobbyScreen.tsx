@@ -391,7 +391,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
   );
 
   // Shared bottom-row height so LOJA / JOGAR / CAIXA align perfectly
-  const BOTTOM_H = 80;
+  const BOTTOM_H = 76;
 
   // Mode buttons that live in the top section (all except store)
   const topModes = modes.filter(m => m.id !== 'store');
@@ -400,11 +400,11 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
     // CSS grid: 3 columns × 2 rows — bottom row is shared, so all three elements align
     <div
       className="h-full w-full overflow-hidden"
-      style={{ display: 'grid', gridTemplateColumns: '178px 1fr 220px', gridTemplateRows: '1fr auto' }}
+      style={{ display: 'grid', gridTemplateColumns: '200px 1fr 200px', gridTemplateRows: '1fr auto' }}
     >
 
       {/* ══ ROW 1 — LEFT: Duelo / Torneios / Treino ══ */}
-      <div className="flex flex-col gap-3 px-3 pt-5 pb-2 justify-center z-10">
+      <div className="flex flex-col gap-3 px-3 pt-4 pb-2 justify-center z-10">
         {topModes.map((mode) => {
           const mc = MODE_CFG[mode.id] ?? MODE_CFG.training;
           const isActive = mode.id === selected;
@@ -465,7 +465,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
       </div>
 
       {/* ══ ROW 1 — CENTER: Banner ══ */}
-      <div className="flex items-center justify-center px-2 pt-4 pb-2 z-10">
+      <div className="flex items-center justify-center px-3 pt-4 pb-2 z-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide.id}
@@ -488,7 +488,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
       </div>
 
       {/* ══ ROW 1 — RIGHT: Icon buttons + Passe Ace ══ */}
-      <div className="flex flex-col gap-2.5 px-3 pt-4 pb-2 justify-center z-10">
+      <div className="flex flex-col gap-3 px-3 pt-4 pb-2 justify-center z-10">
         {/* Icon buttons */}
         <div className="flex gap-2">
           {([
@@ -571,7 +571,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
       </div>
 
       {/* ══ ROW 2 — LEFT: LOJA (aligned with JOGAR & CAIXA) ══ */}
-      <div className="px-3 pb-5 pt-1.5 z-10">
+      <div className="px-3 pt-2 pb-4 z-10">
         <motion.button
           onClick={() => onViewChange('store')}
           whileHover={{ x: 4, scale: 1.02 }}
@@ -620,7 +620,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
       </div>
 
       {/* ══ ROW 2 — CENTER: JOGAR (full width, same height as LOJA & CAIXA) ══ */}
-      <div className="px-2 pb-5 pt-1.5 z-10">
+      <div className="px-3 pt-2 pb-4 z-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={selected + '-btn-wrap'}
@@ -672,7 +672,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
       </div>
 
       {/* ══ ROW 2 — RIGHT: CAIXA GRÁTIS (same height as LOJA & JOGAR) ══ */}
-      <div className="px-3 pb-5 pt-1.5 z-10">
+      <div className="px-3 pt-2 pb-4 z-10">
         <div className="relative rounded-[16px] overflow-hidden w-full" style={{ ...glass, height: BOTTOM_H }}>
           <EdgeLayers />
           <div className="relative z-10 px-4 h-full flex items-center gap-3">
