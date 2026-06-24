@@ -15,8 +15,12 @@ export default function Header({ onOpenSettings }: HeaderProps) {
   return (
     <Tooltip.Provider delayDuration={400}>
       <header
-        className="flex items-center justify-between px-6 py-3 w-full relative z-50"
+        className="flex items-center justify-between w-full relative z-50"
         style={{
+          paddingTop: 'calc(12px + env(safe-area-inset-top))',
+          paddingBottom: '12px',
+          paddingLeft: 'calc(24px + env(safe-area-inset-left))',
+          paddingRight: 'calc(24px + env(safe-area-inset-right))',
           background: 'rgba(2,5,8,0.55)',
           backdropFilter: 'blur(28px)',
           WebkitBackdropFilter: 'blur(28px)',

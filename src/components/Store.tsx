@@ -522,7 +522,7 @@ export default function Store() {
         gridTemplateColumns: '155px 1fr',
         gridTemplateRows: 'minmax(0, 1fr)',
         columnGap: '8px',
-        padding: '12px 12px calc(12px + env(safe-area-inset-bottom)) 12px',
+        padding: 'calc(12px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left))',
       }}
     >
       {/* ══ LEFT: Category sidebar ══ */}
