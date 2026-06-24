@@ -92,8 +92,8 @@ function AppContent() {
 
         {showSplash && <IntroSplash onComplete={() => setShowSplash(false)} />}
 
-        {/* Main layer */}
-        <div className="flex-1 flex flex-col relative overflow-hidden">
+        {/* Main layer — hidden behind overlays so only the wallpaper shows through */}
+        <div className={`flex-1 flex flex-col relative overflow-hidden${activeView !== 'lobby' ? ' invisible' : ''}`}>
           {!isAuthenticated && !showSplash && (
             <LoginScreen onLogin={() => {
               setIsAuthenticated(true);
