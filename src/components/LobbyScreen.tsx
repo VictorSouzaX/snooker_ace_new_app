@@ -233,8 +233,7 @@ function BannerCard({ slide, accent, glow, slideCount, slideIdx, onDot }: {
   slideCount: number; slideIdx: number; onDot: (i: number) => void;
 }) {
   return (
-    <div className="relative w-full rounded-[22px] overflow-hidden" style={{
-      height: '212px',
+    <div className="relative w-full h-full rounded-[22px] overflow-hidden" style={{
       background: 'linear-gradient(155deg, rgba(8,8,14,0.98) 0%, rgba(3,3,6,0.99) 100%)',
       border: `1px solid ${accent}28`,
       boxShadow: `0 22px 64px rgba(0,0,0,0.92), inset 0 1px 0 rgba(255,255,255,0.07)`,
@@ -404,7 +403,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
     >
 
       {/* ══ ROW 1 — LEFT: Duelo / Torneios / Treino ══ */}
-      <div className="flex flex-col gap-3 px-3 pt-4 pb-2 justify-end z-10">
+      <div className="flex flex-col px-3 pt-4 pb-2 justify-between z-10">
         {topModes.map((mode) => {
           const mc = MODE_CFG[mode.id] ?? MODE_CFG.training;
           const isActive = mode.id === selected;
@@ -465,7 +464,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
       </div>
 
       {/* ══ ROW 1 — CENTER: Banner ══ */}
-      <div className="flex items-end justify-center px-3 pt-4 pb-2 z-10">
+      <div className="flex items-stretch justify-center px-3 pt-4 pb-2 z-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentSlide.id}
@@ -473,7 +472,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.97 }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
-            className="w-full"
+            className="w-full h-full"
           >
             <BannerCard
               slide={currentSlide}
@@ -488,7 +487,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
       </div>
 
       {/* ══ ROW 1 — RIGHT: Icon buttons + Passe Ace ══ */}
-      <div className="flex flex-col gap-3 px-3 pt-4 pb-2 justify-end z-10">
+      <div className="flex flex-col px-3 pt-4 pb-2 justify-between z-10">
         {/* Icon buttons */}
         <div className="flex gap-2">
           {([
@@ -501,7 +500,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
               onClick={onClick}
               whileHover={{ scale: 1.08, y: -2 }}
               whileTap={{ scale: 0.93 }}
-              className="relative flex-1 flex items-center justify-center py-3 rounded-[14px] overflow-hidden cursor-pointer"
+              className="relative flex-1 flex items-center justify-center py-4 rounded-[14px] overflow-hidden cursor-pointer"
               style={{ ...glass, border: '1px solid rgba(255,255,255,0.08)' }}
             >
               <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
