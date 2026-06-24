@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Trophy, Package, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { GameMode } from '../types';
