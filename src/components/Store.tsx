@@ -176,15 +176,11 @@ function CategorySideButton({ cat, isActive, onClick }: { cat: Category; isActiv
       {/* Icon */}
       <Icon size={17} strokeWidth={2} color={isActive ? cat.color : 'rgba(255,255,255,0.3)'} className="relative z-10 shrink-0" />
 
-      {/* Label + count */}
+      {/* Label */}
       <div className="relative z-10">
         <div className="font-display leading-none tracking-[0.06em]"
           style={{ fontSize: '14px', color: isActive ? cat.color : 'rgba(255,255,255,0.38)', textShadow: isActive ? `0 0 20px ${cat.color}60` : 'none' }}>
           {cat.label}
-        </div>
-        <div className="text-[9px] font-black uppercase tracking-widest leading-none mt-1"
-          style={{ color: isActive ? cat.color + 'bb' : 'rgba(255,255,255,0.22)' }}>
-          {cat.count} itens
         </div>
       </div>
 
@@ -524,12 +520,13 @@ export default function Store() {
       style={{
         display: 'grid',
         gridTemplateColumns: '155px 1fr',
+        gridTemplateRows: 'minmax(0, 1fr)',
         columnGap: '8px',
         padding: '12px 12px calc(12px + env(safe-area-inset-bottom)) 12px',
       }}
     >
       {/* ══ LEFT: Category sidebar ══ */}
-      <div className="flex flex-col gap-2 z-10">
+      <div className="flex flex-col gap-2 z-10 min-h-0">
         {CATEGORIES.map(cat => (
           <CategorySideButton
             key={cat.id} cat={cat}
