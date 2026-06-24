@@ -363,7 +363,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
   return (
     // 3-column grid: [modes | banner | (icons + passe-ace)], bottom row shared
     <div
-      className="h-full w-full overflow-hidden"
+      className="h-full w-full overflow-hidden no-shadow"
       style={{
         display: 'grid',
         gridTemplateColumns: '155px 1fr 200px',

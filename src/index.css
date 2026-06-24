@@ -83,6 +83,8 @@
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+  .no-shadow, .no-shadow * { box-shadow: none !important; }
+
   .text-glow-green {
     text-shadow: 0 0 20px rgba(0,210,106,0.55), 0 0 40px rgba(0,210,106,0.25);
   }
