@@ -363,7 +363,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
   return (
     // 3-column grid: [modes | banner | (icons + passe-ace)], bottom row shared
     <div
-      className="h-full w-full overflow-hidden no-shadow"
+      className="h-full w-full overflow-hidden"
       style={{
         display: 'grid',
         gridTemplateColumns: '155px 1fr 200px',
@@ -420,11 +420,11 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
                   style={{ background: `radial-gradient(ellipse at 20% 50%, ${mc.accent}12 0%, transparent 65%)` }} />
               )}
               <span className="font-display text-[21px] leading-none tracking-[0.06em] relative z-10"
-                style={{ color: isActive ? mc.accent : 'rgba(255,255,255,0.38)', textShadow: isActive ? `0 0 20px ${mc.accent}60` : 'none' }}>
+                style={{ color: isActive ? mc.accent : '#fff', textShadow: isActive ? `0 0 20px ${mc.accent}60` : '0 1px 2px rgba(0,0,0,0.6)' }}>
                 {mc.label}
               </span>
               <span className="text-[10px] font-black uppercase tracking-widest leading-none relative z-10"
-                style={{ color: isActive ? mc.accent + 'bb' : 'rgba(255,255,255,0.22)' }}>
+                style={{ color: isActive ? mc.accent + 'bb' : 'rgba(255,255,255,0.75)' }}>
                 {mc.sub}
               </span>
               {(mode.id === 'duel' || mode.id === 'tournaments') && (
