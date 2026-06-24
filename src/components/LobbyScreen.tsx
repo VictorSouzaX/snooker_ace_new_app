@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Star } from 'lucide-react';
+import { Trophy, Package, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { GameMode } from '../types';
 
@@ -629,6 +629,37 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
                 </div>
               </div>
 
+              {/* Quick-access icon buttons: Ranking / Inventory / Friends */}
+              <div className="flex gap-2">
+                {([
+                  { icon: Trophy,  label: 'RANKING',    onClick: () => toast('Em breve', { description: 'Rankings chegando em breve.' }),    accent: '#f5c518' },
+                  { icon: Package, label: 'MOCHILA',    onClick: () => toast('Em breve', { description: 'Inventário chegando em breve.' }),   accent: '#60a5fa' },
+                  { icon: Users,   label: 'AMIGOS',     onClick: onOpenFriends,                                                               accent: '#34d399' },
+                ] as const).map(({ icon: Icon, label, onClick, accent }) => (
+                  <motion.button
+                    key={label}
+                    onClick={onClick}
+                    whileHover={{ scale: 1.07, y: -2 }}
+                    whileTap={{ scale: 0.94 }}
+                    className="relative flex-1 flex flex-col items-center justify-center gap-1.5 py-3 rounded-[14px] overflow-hidden cursor-pointer"
+                    style={{
+                      ...glass,
+                      border: `1px solid ${accent}22`,
+                    }}
+                  >
+                    <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
+                      style={{ background: `linear-gradient(90deg, transparent 10%, ${accent}44 50%, transparent 90%)` }} />
+                    <div className="absolute inset-0 pointer-events-none"
+                      style={{ background: 'linear-gradient(128deg, rgba(255,255,255,0.055) 0%, transparent 55%)' }} />
+                    <Icon style={{ width: 20, height: 20, color: accent, filter: `drop-shadow(0 0 5px ${accent}88)` }} />
+                    <span className="text-[7.5px] font-black uppercase tracking-widest leading-none"
+                      style={{ color: `${accent}cc` }}>
+                      {label}
+                    </span>
+                  </motion.button>
+                ))}
+              </div>
+
               {/* Caixa Grátis */}
               <div className="relative rounded-[16px] overflow-hidden" style={glass}>
                 <EdgeLayers />
@@ -642,58 +673,6 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
                   </div>
                 </div>
               </div>
-
-              {/* Ranking */}
-              <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.98 }}
-                onClick={() => toast('Em breve', { description: 'Rankings chegando em breve.' })}
-                className="relative rounded-[16px] overflow-hidden flex-1 flex flex-col cursor-pointer"
-                style={{
-                  ...glass, border: '1px solid rgba(245,197,24,0.28)',
-                  background: 'linear-gradient(155deg, rgba(16,12,0,0.97) 0%, rgba(6,4,0,0.99) 65%, rgba(245,197,24,0.05) 100%)',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.85), 0 0 20px rgba(245,197,24,0.1), inset 0 1px 0 rgba(255,255,255,0.1)',
-                }}>
-                <EdgeLayers accent="#f5c518" />
-                <div className="absolute inset-0 pointer-events-none"
-                  style={{ background: 'radial-gradient(ellipse at 20% 50%, rgba(245,197,24,0.07) 0%, transparent 60%)' }} />
-                <div className="relative z-10 px-4 pt-3.5 pb-0 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Star className="w-[14px] h-[14px]" style={{ color: '#f5c518', filter: 'drop-shadow(0 0 4px rgba(245,197,24,0.7))' }} />
-                    <span className="font-display text-[16px] leading-none tracking-[0.08em]"
-                      style={{ color: '#f5c518', textShadow: '0 0 18px rgba(245,197,24,0.5)' }}>RANKING</span>
-                  </div>
-                  <span className="text-[7px] font-black uppercase tracking-wider px-2 py-[3px] rounded-full"
-                    style={{ background: 'rgba(245,197,24,0.1)', border: '1px solid rgba(245,197,24,0.3)', color: 'rgba(245,197,24,0.75)' }}>
-                    GLOBAL
-                  </span>
-                </div>
-                <div className="relative z-10 px-4 pt-3 pb-0 flex flex-col gap-2">
-                  {[
-                    { pos: 1, name: 'LegendAce',  pts: '14.820', medal: '#f5c518', img: 'rank1' },
-                    { pos: 2, name: 'SnookerPro', pts: '12.340', medal: '#b8c4cc', img: 'rank2' },
-                    { pos: 3, name: 'CueMaster',  pts: '10.990', medal: '#c47c3a', img: 'rank3' },
-                  ].map(({ pos, name, pts, medal, img }) => (
-                    <div key={pos} className="flex items-center gap-2.5">
-                      <span className="font-display text-[14px] w-4 text-center leading-none shrink-0"
-                        style={{ color: medal, textShadow: `0 0 8px ${medal}80` }}>{pos}</span>
-                      <img src={`https://i.pravatar.cc/40?u=${img}`} className="w-6 h-6 rounded-full object-cover shrink-0"
-                        style={{ border: `1.5px solid ${medal}55`, boxShadow: `0 0 6px ${medal}30` }} />
-                      <span className="flex-1 text-[9px] font-black uppercase tracking-wide leading-none min-w-0 truncate"
-                        style={{ color: 'rgba(255,255,255,0.62)' }}>{name}</span>
-                      <span className="text-[9px] font-black leading-none shrink-0" style={{ color: medal }}>{pts}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="mx-4 mt-3 mb-2 h-px"
-                  style={{ background: 'linear-gradient(90deg, transparent, rgba(245,197,24,0.18), transparent)' }} />
-                <div className="relative z-10 px-4 pb-3.5 flex items-center gap-2.5">
-                  <span className="font-display text-[12px] w-4 text-center leading-none shrink-0"
-                    style={{ color: 'rgba(255,255,255,0.3)' }}>47</span>
-                  <img src="https://i.pravatar.cc/40?u=me" className="w-6 h-6 rounded-full object-cover shrink-0"
-                    style={{ border: '1.5px solid rgba(0,210,106,0.45)', boxShadow: '0 0 6px rgba(0,210,106,0.3)' }} />
-                  <span className="flex-1 text-[9px] font-black uppercase tracking-wide leading-none" style={{ color: '#00e870' }}>Você</span>
-                  <span className="text-[9px] font-black leading-none shrink-0" style={{ color: 'rgba(255,255,255,0.38)' }}>3.210</span>
-                </div>
-              </motion.div>
             </>
           );
         })()}

@@ -38,17 +38,17 @@ export const SvgFluidLinesBackground = () => {
   }, []);
 
   // Hue drifts through blue-indigo: 210°–240°
-  const hue  = 222 + Math.sin(time * 0.34) * 14;
-  const hue2 = 250 + Math.sin(time * 0.21 + 1.4) * 10;
-  const numLines = 26;
+  const hue  = 220 + Math.sin(time * 0.34) * 16;
+  const hue2 = 252 + Math.sin(time * 0.21 + 1.4) * 12;
+  const numLines = 28;
 
   const lines = Array.from({ length: numLines }).map((_, i) => {
     const mX = mouseRef.current.currentX;
     const mY = mouseRef.current.currentY;
     const isAccent = i % 5 === 0;
     const distFromCenter = Math.abs(i - numLines / 2) / (numLines / 2);
-    const baseOpacity = 0.10 + (1 - distFromCenter) * 0.16;
-    const opacity = isAccent ? Math.min(0.38, baseOpacity + 0.14) : baseOpacity;
+    const baseOpacity = 0.14 + (1 - distFromCenter) * 0.22;
+    const opacity = isAccent ? Math.min(0.52, baseOpacity + 0.18) : baseOpacity;
     const strokeWidth = isAccent ? 1.2 : 0.65;
     const lineHue = i % 7 === 3 ? hue2 : hue;
 
@@ -72,7 +72,7 @@ export const SvgFluidLinesBackground = () => {
 
     return (
       <path key={i} d={path} fill="none"
-        stroke={`hsla(${lineHue.toFixed(1)}, 80%, 68%, ${opacity.toFixed(3)})`}
+        stroke={`hsla(${lineHue.toFixed(1)}, 90%, 75%, ${opacity.toFixed(3)})`}
         strokeWidth={strokeWidth} vectorEffect="non-scaling-stroke" />
     );
   });
@@ -80,32 +80,32 @@ export const SvgFluidLinesBackground = () => {
   return (
     <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
 
-      {/* ── Base — dark navy, clearly blue ── */}
-      <div className="absolute inset-0" style={{ background: '#070e24' }} />
+      {/* ── Base — mid-blue, clearly lit ── */}
+      <div className="absolute inset-0" style={{ background: '#0d1e4a' }} />
 
       {/* ── Large blue radial fill — most of the visible color ── */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 120% 100% at 50% 50%, rgba(15,35,130,0.72) 0%, rgba(8,18,70,0.38) 55%, transparent 80%)',
+        background: 'radial-gradient(ellipse 120% 100% at 50% 50%, rgba(25,65,200,0.88) 0%, rgba(14,32,110,0.55) 55%, transparent 80%)',
       }} />
 
       {/* ── Overhead blue-white cone ── */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 75% 55% at 50% -10%, rgba(60,100,255,0.55) 0%, rgba(25,55,180,0.28) 42%, transparent 65%)',
+        background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(80,130,255,0.75) 0%, rgba(40,80,220,0.45) 42%, transparent 65%)',
       }} />
 
       {/* ── Left violet/indigo bloom ── */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 60% 80% at -5% 50%, rgba(90,30,200,0.32) 0%, rgba(45,15,110,0.12) 52%, transparent 70%)',
+        background: 'radial-gradient(ellipse 65% 85% at -5% 50%, rgba(110,45,230,0.42) 0%, rgba(60,20,140,0.18) 52%, transparent 70%)',
       }} />
 
       {/* ── Right sky-blue accent ── */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 55% 70% at 108% 42%, rgba(30,100,240,0.28) 0%, rgba(15,55,160,0.10) 52%, transparent 70%)',
+        background: 'radial-gradient(ellipse 60% 75% at 108% 42%, rgba(50,130,255,0.40) 0%, rgba(25,75,200,0.16) 52%, transparent 70%)',
       }} />
 
       {/* ── Bottom blue reflection ── */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 90% 50% at 50% 115%, rgba(35,70,210,0.48) 0%, rgba(18,38,130,0.20) 38%, transparent 58%)',
+        background: 'radial-gradient(ellipse 95% 55% at 50% 115%, rgba(50,100,240,0.62) 0%, rgba(25,55,170,0.28) 38%, transparent 58%)',
       }} />
 
       {/* ── Particle dust motes ── */}
