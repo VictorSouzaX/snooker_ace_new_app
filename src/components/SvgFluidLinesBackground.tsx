@@ -40,21 +40,21 @@ export const SvgFluidLinesBackground = () => {
   // Vibrant green: hue drifts 132°–152°
   const hue  = 140 + Math.sin(time * 0.34) * 10;
   const hue2 = 155 + Math.sin(time * 0.21 + 1.4) * 8;
-  const numLines = 38;
+  const numLines = 42;
 
   const lines = Array.from({ length: numLines }).map((_, i) => {
     const mX = mouseRef.current.currentX;
     const mY = mouseRef.current.currentY;
     const isBright  = i % 4 === 0;
-    const isAccent  = i % 9 === 3;
+    const isAccent  = i % 7 === 3;
     const distFromCenter = Math.abs(i - numLines / 2) / (numLines / 2);
-    const baseOpacity = 0.28 + (1 - distFromCenter) * 0.38;
+    const baseOpacity = 0.42 + (1 - distFromCenter) * 0.40;
     const opacity = isAccent
-      ? Math.min(0.95, baseOpacity + 0.30)
+      ? Math.min(1.0, baseOpacity + 0.35)
       : isBright
-      ? Math.min(0.72, baseOpacity + 0.18)
+      ? Math.min(0.88, baseOpacity + 0.22)
       : baseOpacity;
-    const strokeWidth = isAccent ? 1.8 : isBright ? 1.1 : 0.72;
+    const strokeWidth = isAccent ? 2.2 : isBright ? 1.4 : 0.85;
     const lineHue = i % 6 === 2 ? hue2 : hue;
 
     let path = "";
@@ -77,7 +77,7 @@ export const SvgFluidLinesBackground = () => {
 
     return (
       <path key={i} d={path} fill="none"
-        stroke={`hsla(${lineHue.toFixed(1)}, 95%, 60%, ${opacity.toFixed(3)})`}
+        stroke={`hsla(${lineHue.toFixed(1)}, 100%, 65%, ${opacity.toFixed(3)})`}
         strokeWidth={strokeWidth} vectorEffect="non-scaling-stroke" />
     );
   });
@@ -103,39 +103,49 @@ export const SvgFluidLinesBackground = () => {
       {/* Base deep green */}
       <div className="absolute inset-0" style={{ background: '#020e05' }} />
 
-      {/* Main center glow */}
+      {/* Main center glow — brighter */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 110% 90% at 50% 50%, rgba(0,100,38,0.80) 0%, rgba(0,50,16,0.50) 55%, transparent 78%)',
+        background: 'radial-gradient(ellipse 110% 90% at 50% 50%, rgba(0,160,55,0.85) 0%, rgba(0,80,24,0.55) 55%, transparent 78%)',
       }} />
 
       {/* Bright top-center cone */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 70% 55% at 50% -5%, rgba(0,220,88,0.55) 0%, rgba(0,140,52,0.28) 45%, transparent 68%)',
+        background: 'radial-gradient(ellipse 70% 55% at 50% -5%, rgba(0,240,96,0.70) 0%, rgba(0,160,60,0.38) 45%, transparent 68%)',
       }} />
 
-      {/* Left edge bloom */}
+      {/* Left edge bloom — strong */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 55% 90% at -2% 50%, rgba(0,200,72,0.50) 0%, rgba(0,100,32,0.22) 48%, transparent 68%)',
+        background: 'radial-gradient(ellipse 60% 100% at -2% 50%, rgba(0,230,88,0.70) 0%, rgba(0,130,44,0.35) 48%, transparent 70%)',
       }} />
 
-      {/* Right edge bloom */}
+      {/* Right edge bloom — strong */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 55% 90% at 102% 50%, rgba(0,210,80,0.48) 0%, rgba(0,110,36,0.20) 48%, transparent 68%)',
+        background: 'radial-gradient(ellipse 60% 100% at 102% 50%, rgba(0,230,88,0.68) 0%, rgba(0,130,44,0.32) 48%, transparent 70%)',
       }} />
 
       {/* Bottom reflection */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 90% 50% at 50% 108%, rgba(0,180,68,0.52) 0%, rgba(0,90,28,0.24) 40%, transparent 60%)',
+        background: 'radial-gradient(ellipse 90% 50% at 50% 108%, rgba(0,210,78,0.65) 0%, rgba(0,110,34,0.30) 40%, transparent 62%)',
       }} />
 
       {/* Top-left corner accent */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 40% 40% at 0% 0%, rgba(0,230,90,0.28) 0%, transparent 65%)',
+        background: 'radial-gradient(ellipse 45% 45% at 0% 0%, rgba(0,240,96,0.50) 0%, transparent 65%)',
+      }} />
+
+      {/* Top-right corner accent */}
+      <div className="absolute inset-0" style={{
+        background: 'radial-gradient(ellipse 45% 45% at 100% 0%, rgba(0,240,96,0.45) 0%, transparent 65%)',
+      }} />
+
+      {/* Bottom-left corner accent */}
+      <div className="absolute inset-0" style={{
+        background: 'radial-gradient(ellipse 45% 45% at 0% 100%, rgba(0,240,96,0.42) 0%, transparent 65%)',
       }} />
 
       {/* Bottom-right corner accent */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 40% 40% at 100% 100%, rgba(0,230,90,0.24) 0%, transparent 65%)',
+        background: 'radial-gradient(ellipse 45% 45% at 100% 100%, rgba(0,240,96,0.45) 0%, transparent 65%)',
       }} />
 
       {/* Particles */}
