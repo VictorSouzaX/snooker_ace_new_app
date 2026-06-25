@@ -41,14 +41,10 @@
     touch-action: manipulation;
   }
   html {
-    background-color: #020508;
+    background-color: #020e05;
   }
   body {
-    background-color: #020508;
-    background-image: url('/wallpaper-snooker-ace-2.png');
-    background-size: cover;
-    background-position: center bottom;
-    background-repeat: no-repeat;
+    background-color: #020e05;
     width: 100vw;
     height: 100dvh;
   }

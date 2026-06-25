@@ -199,9 +199,10 @@ function BannerCard({ slide, accent, glow, slideCount, slideIdx, onDot }: {
 }) {
   return (
     <div className="relative w-full h-full rounded-[22px] overflow-hidden" style={{
-      background: 'linear-gradient(155deg, rgba(8,8,14,0.98) 0%, rgba(3,3,6,0.99) 100%)',
+      background: 'linear-gradient(155deg, rgba(2,10,4,0.74) 0%, rgba(1,6,2,0.80) 100%)',
+      backdropFilter: 'blur(26px)', WebkitBackdropFilter: 'blur(26px)',
       border: `1px solid ${accent}28`,
-      boxShadow: `0 22px 64px rgba(0,0,0,0.92), inset 0 1px 0 rgba(255,255,255,0.07)`,
+      boxShadow: `0 22px 64px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.07)`,
     }}>
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: `radial-gradient(ellipse at 78% 52%, ${glow}50 0%, transparent 58%)` }} />
@@ -332,10 +333,10 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
   };
 
   const glass = {
-    background: 'linear-gradient(155deg, rgba(12,12,18,0.95) 0%, rgba(5,5,8,0.98) 100%)',
-    backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+    background: 'linear-gradient(155deg, rgba(2,10,4,0.72) 0%, rgba(1,6,2,0.78) 100%)',
+    backdropFilter: 'blur(22px)', WebkitBackdropFilter: 'blur(22px)',
     border: '1px solid rgba(255,255,255,0.1)',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4)',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.3)',
   } as const;
 
   const EdgeLayers = ({ accent }: { accent?: string }) => (

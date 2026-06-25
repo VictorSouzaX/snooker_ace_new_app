@@ -18,6 +18,7 @@ import FriendsPanel from './components/FriendsPanel';
 import BattlePass from './components/BattlePass';
 import { GameMode } from './types';
 import { LanguageProvider, useLanguage } from './i18n';
+import SvgFluidLinesBackground from './components/SvgFluidLinesBackground';
 
 export { toast };
 
@@ -90,6 +91,7 @@ function AppContent() {
     <div
       className="w-full h-full relative overflow-hidden flex flex-col select-none font-sans"
     >
+        <SvgFluidLinesBackground />
 
         {showSplash && <IntroSplash onComplete={() => setShowSplash(false)} />}
 

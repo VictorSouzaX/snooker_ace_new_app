@@ -37,20 +37,25 @@ export const SvgFluidLinesBackground = () => {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  // Hue drifts through blue-indigo: 210°–240°
-  const hue  = 220 + Math.sin(time * 0.34) * 16;
-  const hue2 = 252 + Math.sin(time * 0.21 + 1.4) * 12;
-  const numLines = 28;
+  // Vibrant green: hue drifts 132°–152°
+  const hue  = 140 + Math.sin(time * 0.34) * 10;
+  const hue2 = 155 + Math.sin(time * 0.21 + 1.4) * 8;
+  const numLines = 38;
 
   const lines = Array.from({ length: numLines }).map((_, i) => {
     const mX = mouseRef.current.currentX;
     const mY = mouseRef.current.currentY;
-    const isAccent = i % 5 === 0;
+    const isBright  = i % 4 === 0;
+    const isAccent  = i % 9 === 3;
     const distFromCenter = Math.abs(i - numLines / 2) / (numLines / 2);
-    const baseOpacity = 0.14 + (1 - distFromCenter) * 0.22;
-    const opacity = isAccent ? Math.min(0.52, baseOpacity + 0.18) : baseOpacity;
-    const strokeWidth = isAccent ? 1.2 : 0.65;
-    const lineHue = i % 7 === 3 ? hue2 : hue;
+    const baseOpacity = 0.28 + (1 - distFromCenter) * 0.38;
+    const opacity = isAccent
+      ? Math.min(0.95, baseOpacity + 0.30)
+      : isBright
+      ? Math.min(0.72, baseOpacity + 0.18)
+      : baseOpacity;
+    const strokeWidth = isAccent ? 1.8 : isBright ? 1.1 : 0.72;
+    const lineHue = i % 6 === 2 ? hue2 : hue;
 
     let path = "";
     for (let x = 0; x <= 100; x += 1) {
@@ -63,85 +68,103 @@ export const SvgFluidLinesBackground = () => {
       const dx = x - mX;
       const dy = cy - mY;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 28) {
-        const inf = Math.pow(1 - dist / 28, 2);
-        cy += (dy / 28) * inf * 10;
+      if (dist < 30) {
+        const inf = Math.pow(1 - dist / 30, 2);
+        cy += (dy / 30) * inf * 14;
       }
       path += x === 0 ? `M ${x} ${cy.toFixed(2)} ` : `L ${x} ${cy.toFixed(2)} `;
     }
 
     return (
       <path key={i} d={path} fill="none"
-        stroke={`hsla(${lineHue.toFixed(1)}, 90%, 75%, ${opacity.toFixed(3)})`}
+        stroke={`hsla(${lineHue.toFixed(1)}, 95%, 60%, ${opacity.toFixed(3)})`}
         strokeWidth={strokeWidth} vectorEffect="non-scaling-stroke" />
     );
   });
 
+  const particles = [
+    { cx: 8,  cy: 22, r: 0.9,  o: 0.70 }, { cx: 92, cy: 18, r: 0.75, o: 0.65 },
+    { cx: 3,  cy: 55, r: 1.0,  o: 0.60 }, { cx: 97, cy: 62, r: 0.85, o: 0.62 },
+    { cx: 14, cy: 82, r: 0.80, o: 0.55 }, { cx: 88, cy: 78, r: 0.90, o: 0.58 },
+    { cx: 25, cy: 12, r: 0.65, o: 0.60 }, { cx: 75, cy: 8,  r: 0.70, o: 0.58 },
+    { cx: 50, cy: 5,  r: 0.85, o: 0.65 }, { cx: 50, cy: 95, r: 0.80, o: 0.55 },
+    { cx: 35, cy: 45, r: 0.55, o: 0.50 }, { cx: 65, cy: 52, r: 0.60, o: 0.48 },
+    { cx: 18, cy: 38, r: 0.70, o: 0.58 }, { cx: 82, cy: 42, r: 0.65, o: 0.55 },
+    { cx: 42, cy: 72, r: 0.60, o: 0.52 }, { cx: 62, cy: 28, r: 0.55, o: 0.54 },
+    { cx: 6,  cy: 88, r: 0.75, o: 0.48 }, { cx: 94, cy: 85, r: 0.70, o: 0.50 },
+    { cx: 30, cy: 92, r: 0.65, o: 0.45 }, { cx: 70, cy: 88, r: 0.68, o: 0.47 },
+    { cx: 22, cy: 65, r: 0.50, o: 0.45 }, { cx: 78, cy: 30, r: 0.52, o: 0.46 },
+    { cx: 45, cy: 18, r: 0.58, o: 0.52 }, { cx: 55, cy: 80, r: 0.62, o: 0.50 },
+  ];
+
   return (
     <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
 
-      {/* ── Base — mid-blue, clearly lit ── */}
-      <div className="absolute inset-0" style={{ background: '#0d1e4a' }} />
+      {/* Base deep green */}
+      <div className="absolute inset-0" style={{ background: '#020e05' }} />
 
-      {/* ── Large blue radial fill — most of the visible color ── */}
+      {/* Main center glow */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 120% 100% at 50% 50%, rgba(25,65,200,0.88) 0%, rgba(14,32,110,0.55) 55%, transparent 80%)',
+        background: 'radial-gradient(ellipse 110% 90% at 50% 50%, rgba(0,100,38,0.80) 0%, rgba(0,50,16,0.50) 55%, transparent 78%)',
       }} />
 
-      {/* ── Overhead blue-white cone ── */}
+      {/* Bright top-center cone */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(80,130,255,0.75) 0%, rgba(40,80,220,0.45) 42%, transparent 65%)',
+        background: 'radial-gradient(ellipse 70% 55% at 50% -5%, rgba(0,220,88,0.55) 0%, rgba(0,140,52,0.28) 45%, transparent 68%)',
       }} />
 
-      {/* ── Left violet/indigo bloom ── */}
+      {/* Left edge bloom */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 65% 85% at -5% 50%, rgba(110,45,230,0.42) 0%, rgba(60,20,140,0.18) 52%, transparent 70%)',
+        background: 'radial-gradient(ellipse 55% 90% at -2% 50%, rgba(0,200,72,0.50) 0%, rgba(0,100,32,0.22) 48%, transparent 68%)',
       }} />
 
-      {/* ── Right sky-blue accent ── */}
+      {/* Right edge bloom */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 60% 75% at 108% 42%, rgba(50,130,255,0.40) 0%, rgba(25,75,200,0.16) 52%, transparent 70%)',
+        background: 'radial-gradient(ellipse 55% 90% at 102% 50%, rgba(0,210,80,0.48) 0%, rgba(0,110,36,0.20) 48%, transparent 68%)',
       }} />
 
-      {/* ── Bottom blue reflection ── */}
+      {/* Bottom reflection */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 95% 55% at 50% 115%, rgba(50,100,240,0.62) 0%, rgba(25,55,170,0.28) 38%, transparent 58%)',
+        background: 'radial-gradient(ellipse 90% 50% at 50% 108%, rgba(0,180,68,0.52) 0%, rgba(0,90,28,0.24) 40%, transparent 60%)',
       }} />
 
-      {/* ── Particle dust motes ── */}
+      {/* Top-left corner accent */}
+      <div className="absolute inset-0" style={{
+        background: 'radial-gradient(ellipse 40% 40% at 0% 0%, rgba(0,230,90,0.28) 0%, transparent 65%)',
+      }} />
+
+      {/* Bottom-right corner accent */}
+      <div className="absolute inset-0" style={{
+        background: 'radial-gradient(ellipse 40% 40% at 100% 100%, rgba(0,230,90,0.24) 0%, transparent 65%)',
+      }} />
+
+      {/* Particles */}
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-        {[
-          { cx: 18, cy: 32, r: 0.4,  o: 0.35 }, { cx: 42, cy: 18, r: 0.32, o: 0.28 },
-          { cx: 67, cy: 41, r: 0.45, o: 0.24 }, { cx: 83, cy: 22, r: 0.35, o: 0.30 },
-          { cx: 29, cy: 58, r: 0.38, o: 0.26 }, { cx: 54, cy: 72, r: 0.42, o: 0.22 },
-          { cx: 76, cy: 64, r: 0.30, o: 0.28 }, { cx: 11, cy: 75, r: 0.40, o: 0.22 },
-          { cx: 92, cy: 48, r: 0.35, o: 0.25 }, { cx: 35, cy: 85, r: 0.45, o: 0.18 },
-          { cx: 58, cy: 28, r: 0.32, o: 0.28 }, { cx: 88, cy: 70, r: 0.36, o: 0.22 },
-        ].map((p, i) => {
-          const pulse = 0.65 + 0.35 * Math.sin(time * 0.8 + i * 1.3);
+        {particles.map((p, i) => {
+          const pulse = 0.50 + 0.50 * Math.sin(time * 1.1 + i * 0.85);
+          const sizeP = 0.75 + 0.25 * Math.sin(time * 0.7 + i * 1.3);
           const ph = i % 3 === 0 ? hue2 : hue;
           return (
-            <circle key={i} cx={p.cx} cy={p.cy} r={p.r}
-              fill={`hsla(${ph.toFixed(0)}, 85%, 75%, ${(p.o * pulse).toFixed(3)})`} />
+            <circle key={i} cx={p.cx} cy={p.cy} r={p.r * sizeP}
+              fill={`hsla(${ph.toFixed(0)}, 90%, 65%, ${(p.o * pulse).toFixed(3)})`} />
           );
         })}
       </svg>
 
-      {/* ── Fluid lines ── */}
+      {/* Fluid lines */}
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
         <defs>
-          {/* Light vignette only at the very edges — no heavy darkening */}
-          <radialGradient id="bgVig" cx="50%" cy="50%" r="72%">
-            <stop offset="35%" stopColor="rgba(0,0,0,0)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.42)" />
+          <radialGradient id="bgVig" cx="50%" cy="50%" r="70%">
+            <stop offset="30%" stopColor="rgba(0,0,0,0)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.35)" />
           </radialGradient>
           <linearGradient id="bgTop" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"  stopColor="rgba(0,0,0,0.40)" />
-            <stop offset="22%" stopColor="rgba(0,0,0,0)" />
+            <stop offset="0%"  stopColor="rgba(0,0,0,0.30)" />
+            <stop offset="20%" stopColor="rgba(0,0,0,0)" />
           </linearGradient>
           <linearGradient id="bgFloor" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="78%" stopColor="rgba(0,0,0,0)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.38)" />
+            <stop offset="80%" stopColor="rgba(0,0,0,0)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.30)" />
           </linearGradient>
         </defs>
         {lines}
@@ -150,12 +173,12 @@ export const SvgFluidLinesBackground = () => {
         <rect width="100" height="100" fill="url(#bgFloor)" />
       </svg>
 
-      {/* ── Subtle geometry guide lines ── */}
-      <svg className="absolute inset-0 w-full h-full opacity-[0.09]" viewBox="0 0 1080 540" preserveAspectRatio="none">
-        <line x1="540" y1="270" x2="0"    y2="140" stroke="#6699ff" strokeWidth="0.6" strokeDasharray="4 8" />
-        <line x1="540" y1="270" x2="1080" y2="400" stroke="#6699ff" strokeWidth="0.6" strokeDasharray="4 8" />
-        <line x1="540" y1="270" x2="280"  y2="540" stroke="#8866ff" strokeWidth="0.5" strokeDasharray="3 10" />
-        <circle cx="540" cy="270" r="2" fill="#6699ff" opacity="0.6" />
+      {/* Geometry guide lines in green */}
+      <svg className="absolute inset-0 w-full h-full opacity-[0.12]" viewBox="0 0 1080 540" preserveAspectRatio="none">
+        <line x1="540" y1="270" x2="0"    y2="140" stroke="#00e870" strokeWidth="0.6" strokeDasharray="4 8" />
+        <line x1="540" y1="270" x2="1080" y2="400" stroke="#00e870" strokeWidth="0.6" strokeDasharray="4 8" />
+        <line x1="540" y1="270" x2="280"  y2="540" stroke="#00d26a" strokeWidth="0.5" strokeDasharray="3 10" />
+        <circle cx="540" cy="270" r="2.5" fill="#00e870" opacity="0.7" />
       </svg>
 
     </div>
