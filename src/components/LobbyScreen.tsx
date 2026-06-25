@@ -203,7 +203,6 @@ function BannerCard({ slide, accent, glow, slideCount, slideIdx, onDot }: {
       backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)',
       border: `1px solid rgba(255,255,255,0.13)`,
       boxShadow: [
-        `0 22px 64px rgba(0,0,0,0.75)`,
         'inset 0 1px 0 rgba(255,255,255,0.20)',
         'inset 0 -1px 0 rgba(0,0,0,0.50)',
         `0 0 0 0.5px rgba(255,255,255,0.04)`,
@@ -342,7 +341,6 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
     backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
     border: '1px solid rgba(255,255,255,0.13)',
     boxShadow: [
-      '0 8px 28px rgba(0,0,0,0.70)',           // drop shadow
       'inset 0 1px 0 rgba(255,255,255,0.22)',  // top metallic highlight
       'inset 0 -1px 0 rgba(0,0,0,0.55)',       // bottom dark edge
       'inset 1px 0 0 rgba(255,255,255,0.06)',  // left subtle sheen
@@ -407,8 +405,8 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
                 backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
                 border: `1px solid ${isActive ? mc.accent + '55' : 'rgba(255,255,255,0.1)'}`,
                 boxShadow: isActive
-                  ? `0 12px 40px rgba(0,0,0,0.9), 0 0 0 1px ${mc.accent}22, inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.5)`
-                  : '0 8px 32px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4)',
+                  ? `0 0 0 1px ${mc.accent}22, inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.5)`
+                  : 'inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4)',
               }}
             >
               {isActive && (
@@ -520,7 +518,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         <div className="relative rounded-[16px] overflow-hidden flex-1 min-h-0 flex flex-col" style={{
           ...glass, border: '1px solid rgba(237,10,101,0.22)',
           background: 'linear-gradient(155deg, rgba(14,8,12,0.97) 0%, rgba(5,3,5,0.99) 70%, rgba(237,10,101,0.04) 100%)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4)',
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4)',
         }}>
           <EdgeLayers accent="#ED0A65" />
           <div className="absolute inset-0 pointer-events-none"
@@ -594,7 +592,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
             background: 'linear-gradient(155deg, rgba(20,14,0,0.97) 0%, rgba(8,5,0,0.99) 60%, rgba(251,191,36,0.06) 100%)',
             backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
             border: '1px solid rgba(251,191,36,0.35)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.85), 0 0 18px rgba(251,191,36,0.22), inset 0 1px 0 rgba(255,255,255,0.14)',
+            boxShadow: '0 0 18px rgba(251,191,36,0.22), inset 0 1px 0 rgba(255,255,255,0.14)',
           }}
         >
           <motion.div animate={{ x: ['-100%', '320%'] }}
@@ -650,7 +648,6 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
                   borderRadius: '18px',
                   background: cfg.btnGrad,
                   boxShadow: [
-                    '0 20px 55px rgba(0,0,0,0.75)',
                     'inset 0 2.5px 0 rgba(255,255,255,0.72)',
                     'inset 0 -2px 0 rgba(0,0,0,0.28)',
                     'inset 2px 0 0 rgba(255,255,255,0.22)',
