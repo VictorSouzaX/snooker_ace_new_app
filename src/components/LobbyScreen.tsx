@@ -633,40 +633,55 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
               exit={{ opacity: 0, scale: 0.92, y: 14 }}
               transition={{ duration: 0.32, ease: 'easeOut' }}
             >
+              {/* Outer pulse glow */}
               <motion.div
-                animate={{ opacity: [0.55, 1, 0.55], scale: [1, 1.04, 1] }}
-                transition={{ repeat: Infinity, duration: 2.6, ease: 'easeInOut' }}
+                animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.06, 1] }}
+                transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
                 className="absolute inset-0 rounded-[18px] pointer-events-none"
-                style={{ boxShadow: `0 0 55px ${cfg.glow}80, 0 0 110px ${cfg.glow}35` }}
+                style={{ boxShadow: `0 0 48px ${cfg.glow}90, 0 0 90px ${cfg.glow}45, 0 0 140px ${cfg.glow}20` }}
               />
               <motion.button
-                whileHover={{ scale: 1.03, y: -3 }}
-                whileTap={{ scale: 0.97, y: 0 }}
+                whileHover={{ scale: 1.04, y: -4 }}
+                whileTap={{ scale: 0.96, y: 0 }}
                 onClick={handlePlay}
                 className="relative overflow-hidden cursor-pointer w-full h-full"
                 style={{
                   borderRadius: '18px',
                   background: cfg.btnGrad,
+                  border: `1px solid rgba(255,255,255,0.28)`,
                   boxShadow: [
-                    'inset 0 2.5px 0 rgba(255,255,255,0.72)',
-                    'inset 0 -2px 0 rgba(0,0,0,0.28)',
-                    'inset 2px 0 0 rgba(255,255,255,0.22)',
-                    'inset -2px 0 0 rgba(255,255,255,0.1)',
+                    `0 0 32px ${cfg.glow}70`,
+                    'inset 0 3px 0 rgba(255,255,255,0.80)',
+                    'inset 0 -2px 0 rgba(0,0,0,0.30)',
+                    'inset 2px 0 0 rgba(255,255,255,0.28)',
+                    'inset -2px 0 0 rgba(255,255,255,0.12)',
                   ].join(', '),
                 }}
               >
+                {/* Main gloss — large top reflection */}
                 <div className="absolute inset-x-0 top-0 pointer-events-none"
-                  style={{ height: '54%', borderRadius: '18px 18px 0 0', background: 'linear-gradient(180deg, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.2) 40%, transparent 100%)' }} />
-                <div className="absolute top-0 inset-x-6 h-[2px] pointer-events-none rounded-full"
-                  style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.95), transparent)' }} />
-                <div className="absolute left-0 top-3 bottom-3 w-[2.5px] pointer-events-none rounded-r-full"
-                  style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.06) 100%)' }} />
-                <div className="absolute right-0 top-3 bottom-3 w-[1.5px] pointer-events-none rounded-l-full"
-                  style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%)' }} />
-                <div className="absolute inset-x-8 bottom-0 pointer-events-none"
-                  style={{ height: '38%', background: `linear-gradient(0deg, ${cfg.glow}38 0%, transparent 100%)` }} />
-                <span className="relative z-10 block text-center font-display leading-none tracking-[0.18em]"
-                  style={{ fontSize: '38px', color: cfg.btnColor }}>{cfg.btnText}</span>
+                  style={{ height: '52%', borderRadius: '18px 18px 0 0', background: 'linear-gradient(180deg, rgba(255,255,255,0.68) 0%, rgba(255,255,255,0.26) 45%, transparent 100%)' }} />
+                {/* Bright top edge line */}
+                <div className="absolute top-0 inset-x-4 h-[2px] pointer-events-none rounded-full"
+                  style={{ background: 'linear-gradient(90deg, transparent 5%, rgba(255,255,255,0.98) 50%, transparent 95%)' }} />
+                {/* Left edge sheen */}
+                <div className="absolute left-0 top-2 bottom-2 w-[3px] pointer-events-none rounded-r-full"
+                  style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.08) 100%)' }} />
+                {/* Sweeping shine animation */}
+                <motion.div
+                  animate={{ x: ['-120%', '220%'] }}
+                  transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut', repeatDelay: 1.4 }}
+                  className="absolute inset-y-0 pointer-events-none"
+                  style={{ width: '40%', background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.30), rgba(255,255,255,0.18), transparent)', transform: 'skewX(-18deg)' }}
+                />
+                {/* Bottom glow reflection */}
+                <div className="absolute inset-x-6 bottom-0 pointer-events-none"
+                  style={{ height: '40%', background: `linear-gradient(0deg, ${cfg.glow}50 0%, transparent 100%)` }} />
+                {/* Label */}
+                <span className="relative z-10 block text-center font-display leading-none tracking-[0.22em]"
+                  style={{ fontSize: '40px', color: cfg.btnColor, textShadow: cfg.btnColor === '#000' ? '0 1px 0 rgba(255,255,255,0.35)' : `0 0 24px ${cfg.glow}, 0 2px 4px rgba(0,0,0,0.4)` }}>
+                  {cfg.btnText}
+                </span>
               </motion.button>
             </motion.div>
           )}
