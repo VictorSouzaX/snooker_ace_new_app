@@ -37,7 +37,6 @@ export const SvgFluidLinesBackground = () => {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  // Vibrant green: hue drifts 132°–152°
   const hue  = 140 + Math.sin(time * 0.34) * 10;
   const hue2 = 155 + Math.sin(time * 0.21 + 1.4) * 8;
   const numLines = 42;
@@ -48,13 +47,14 @@ export const SvgFluidLinesBackground = () => {
     const isBright  = i % 4 === 0;
     const isAccent  = i % 7 === 3;
     const distFromCenter = Math.abs(i - numLines / 2) / (numLines / 2);
-    const baseOpacity = 0.42 + (1 - distFromCenter) * 0.40;
+    // Lower base opacity and reduce accent boosts for subtler lines
+    const baseOpacity = 0.22 + (1 - distFromCenter) * 0.22;
     const opacity = isAccent
-      ? Math.min(1.0, baseOpacity + 0.35)
+      ? Math.min(0.60, baseOpacity + 0.20)
       : isBright
-      ? Math.min(0.88, baseOpacity + 0.22)
+      ? Math.min(0.48, baseOpacity + 0.12)
       : baseOpacity;
-    const strokeWidth = isAccent ? 2.2 : isBright ? 1.4 : 0.85;
+    const strokeWidth = isAccent ? 1.6 : isBright ? 1.0 : 0.65;
     const lineHue = i % 6 === 2 ? hue2 : hue;
 
     let path = "";
@@ -77,38 +77,23 @@ export const SvgFluidLinesBackground = () => {
 
     return (
       <path key={i} d={path} fill="none"
-        stroke={`hsla(${lineHue.toFixed(1)}, 100%, 72%, ${opacity.toFixed(3)})`}
+        stroke={`hsla(${lineHue.toFixed(1)}, 80%, 62%, ${opacity.toFixed(3)})`}
         strokeWidth={strokeWidth} vectorEffect="non-scaling-stroke" />
     );
   });
 
-  const particles = [
-    { cx: 8,  cy: 22, r: 0.9,  o: 0.70 }, { cx: 92, cy: 18, r: 0.75, o: 0.65 },
-    { cx: 3,  cy: 55, r: 1.0,  o: 0.60 }, { cx: 97, cy: 62, r: 0.85, o: 0.62 },
-    { cx: 14, cy: 82, r: 0.80, o: 0.55 }, { cx: 88, cy: 78, r: 0.90, o: 0.58 },
-    { cx: 25, cy: 12, r: 0.65, o: 0.60 }, { cx: 75, cy: 8,  r: 0.70, o: 0.58 },
-    { cx: 50, cy: 5,  r: 0.85, o: 0.65 }, { cx: 50, cy: 95, r: 0.80, o: 0.55 },
-    { cx: 35, cy: 45, r: 0.55, o: 0.50 }, { cx: 65, cy: 52, r: 0.60, o: 0.48 },
-    { cx: 18, cy: 38, r: 0.70, o: 0.58 }, { cx: 82, cy: 42, r: 0.65, o: 0.55 },
-    { cx: 42, cy: 72, r: 0.60, o: 0.52 }, { cx: 62, cy: 28, r: 0.55, o: 0.54 },
-    { cx: 6,  cy: 88, r: 0.75, o: 0.48 }, { cx: 94, cy: 85, r: 0.70, o: 0.50 },
-    { cx: 30, cy: 92, r: 0.65, o: 0.45 }, { cx: 70, cy: 88, r: 0.68, o: 0.47 },
-    { cx: 22, cy: 65, r: 0.50, o: 0.45 }, { cx: 78, cy: 30, r: 0.52, o: 0.46 },
-    { cx: 45, cy: 18, r: 0.58, o: 0.52 }, { cx: 55, cy: 80, r: 0.62, o: 0.50 },
-  ];
-
   return (
     <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
 
-      {/* Lighter green base — softens the contrast with the bright lines */}
+      {/* Green base */}
       <div className="absolute inset-0" style={{ background: '#0a2614' }} />
 
-      {/* Soft center depth — fills the field with a brighter green */}
+      {/* Soft center depth */}
       <div className="absolute inset-0" style={{
         background: 'radial-gradient(ellipse 110% 95% at 50% 45%, rgba(0,120,56,0.50) 0%, rgba(0,72,34,0.34) 55%, rgba(0,42,20,0.18) 80%)',
       }} />
 
-      {/* Gentle edge glows — give the borders a green halo */}
+      {/* Gentle edge glows */}
       <div className="absolute inset-0" style={{
         background: 'radial-gradient(ellipse 50% 95% at 0% 50%, rgba(0,210,84,0.30) 0%, transparent 62%)',
       }} />
@@ -122,47 +107,26 @@ export const SvgFluidLinesBackground = () => {
         background: 'radial-gradient(ellipse 75% 40% at 50% -5%, rgba(0,215,88,0.28) 0%, transparent 62%)',
       }} />
 
-      {/* Particles */}
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-        {particles.map((p, i) => {
-          const pulse = 0.50 + 0.50 * Math.sin(time * 1.1 + i * 0.85);
-          const sizeP = 0.75 + 0.25 * Math.sin(time * 0.7 + i * 1.3);
-          const ph = i % 3 === 0 ? hue2 : hue;
-          return (
-            <circle key={i} cx={p.cx} cy={p.cy} r={p.r * sizeP}
-              fill={`hsla(${ph.toFixed(0)}, 90%, 65%, ${(p.o * pulse).toFixed(3)})`} />
-          );
-        })}
-      </svg>
-
       {/* Fluid lines */}
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
         <defs>
           <radialGradient id="bgVig" cx="50%" cy="50%" r="75%">
             <stop offset="45%" stopColor="rgba(0,0,0,0)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.18)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.14)" />
           </radialGradient>
           <linearGradient id="bgTop" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"  stopColor="rgba(0,0,0,0.15)" />
+            <stop offset="0%"  stopColor="rgba(0,0,0,0.12)" />
             <stop offset="18%" stopColor="rgba(0,0,0,0)" />
           </linearGradient>
           <linearGradient id="bgFloor" x1="0" y1="0" x2="0" y2="1">
             <stop offset="82%" stopColor="rgba(0,0,0,0)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.15)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.12)" />
           </linearGradient>
         </defs>
         {lines}
         <rect width="100" height="100" fill="url(#bgVig)" />
         <rect width="100" height="100" fill="url(#bgTop)" />
         <rect width="100" height="100" fill="url(#bgFloor)" />
-      </svg>
-
-      {/* Geometry guide lines in green */}
-      <svg className="absolute inset-0 w-full h-full opacity-[0.12]" viewBox="0 0 1080 540" preserveAspectRatio="none">
-        <line x1="540" y1="270" x2="0"    y2="140" stroke="#00e870" strokeWidth="0.6" strokeDasharray="4 8" />
-        <line x1="540" y1="270" x2="1080" y2="400" stroke="#00e870" strokeWidth="0.6" strokeDasharray="4 8" />
-        <line x1="540" y1="270" x2="280"  y2="540" stroke="#00d26a" strokeWidth="0.5" strokeDasharray="3 10" />
-        <circle cx="540" cy="270" r="2.5" fill="#00e870" opacity="0.7" />
       </svg>
 
     </div>
