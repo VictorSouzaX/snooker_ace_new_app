@@ -77,7 +77,7 @@ export const SvgFluidLinesBackground = () => {
 
     return (
       <path key={i} d={path} fill="none"
-        stroke={`hsla(${lineHue.toFixed(1)}, 100%, 65%, ${opacity.toFixed(3)})`}
+        stroke={`hsla(${lineHue.toFixed(1)}, 100%, 72%, ${opacity.toFixed(3)})`}
         strokeWidth={strokeWidth} vectorEffect="non-scaling-stroke" />
     );
   });
@@ -100,52 +100,26 @@ export const SvgFluidLinesBackground = () => {
   return (
     <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
 
-      {/* Base deep green */}
-      <div className="absolute inset-0" style={{ background: '#020e05' }} />
+      {/* Dark green-black base — lets the bright lines stand out */}
+      <div className="absolute inset-0" style={{ background: '#020a04' }} />
 
-      {/* Main center glow — brighter */}
+      {/* Soft center depth — subtle, does NOT flood the lines */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 110% 90% at 50% 50%, rgba(0,160,55,0.85) 0%, rgba(0,80,24,0.55) 55%, transparent 78%)',
+        background: 'radial-gradient(ellipse 100% 85% at 50% 45%, rgba(0,70,30,0.35) 0%, rgba(0,30,12,0.18) 55%, transparent 80%)',
       }} />
 
-      {/* Bright top-center cone */}
+      {/* Gentle edge glows — give the borders a green halo without washing out the field */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 70% 55% at 50% -5%, rgba(0,240,96,0.70) 0%, rgba(0,160,60,0.38) 45%, transparent 68%)',
+        background: 'radial-gradient(ellipse 45% 90% at 0% 50%, rgba(0,200,76,0.22) 0%, transparent 60%)',
       }} />
-
-      {/* Left edge bloom — strong */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 60% 100% at -2% 50%, rgba(0,230,88,0.70) 0%, rgba(0,130,44,0.35) 48%, transparent 70%)',
+        background: 'radial-gradient(ellipse 45% 90% at 100% 50%, rgba(0,200,76,0.22) 0%, transparent 60%)',
       }} />
-
-      {/* Right edge bloom — strong */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 60% 100% at 102% 50%, rgba(0,230,88,0.68) 0%, rgba(0,130,44,0.32) 48%, transparent 70%)',
+        background: 'radial-gradient(ellipse 80% 40% at 50% 105%, rgba(0,190,72,0.20) 0%, transparent 60%)',
       }} />
-
-      {/* Bottom reflection */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 90% 50% at 50% 108%, rgba(0,210,78,0.65) 0%, rgba(0,110,34,0.30) 40%, transparent 62%)',
-      }} />
-
-      {/* Top-left corner accent */}
-      <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 45% 45% at 0% 0%, rgba(0,240,96,0.50) 0%, transparent 65%)',
-      }} />
-
-      {/* Top-right corner accent */}
-      <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 45% 45% at 100% 0%, rgba(0,240,96,0.45) 0%, transparent 65%)',
-      }} />
-
-      {/* Bottom-left corner accent */}
-      <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 45% 45% at 0% 100%, rgba(0,240,96,0.42) 0%, transparent 65%)',
-      }} />
-
-      {/* Bottom-right corner accent */}
-      <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 45% 45% at 100% 100%, rgba(0,240,96,0.45) 0%, transparent 65%)',
+        background: 'radial-gradient(ellipse 70% 35% at 50% -5%, rgba(0,210,84,0.20) 0%, transparent 60%)',
       }} />
 
       {/* Particles */}
@@ -164,17 +138,17 @@ export const SvgFluidLinesBackground = () => {
       {/* Fluid lines */}
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
         <defs>
-          <radialGradient id="bgVig" cx="50%" cy="50%" r="70%">
-            <stop offset="30%" stopColor="rgba(0,0,0,0)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.35)" />
+          <radialGradient id="bgVig" cx="50%" cy="50%" r="75%">
+            <stop offset="45%" stopColor="rgba(0,0,0,0)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.18)" />
           </radialGradient>
           <linearGradient id="bgTop" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"  stopColor="rgba(0,0,0,0.30)" />
-            <stop offset="20%" stopColor="rgba(0,0,0,0)" />
+            <stop offset="0%"  stopColor="rgba(0,0,0,0.15)" />
+            <stop offset="18%" stopColor="rgba(0,0,0,0)" />
           </linearGradient>
           <linearGradient id="bgFloor" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="80%" stopColor="rgba(0,0,0,0)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.30)" />
+            <stop offset="82%" stopColor="rgba(0,0,0,0)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.15)" />
           </linearGradient>
         </defs>
         {lines}
