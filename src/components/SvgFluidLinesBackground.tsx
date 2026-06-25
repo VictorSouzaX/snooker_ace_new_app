@@ -100,26 +100,26 @@ export const SvgFluidLinesBackground = () => {
   return (
     <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
 
-      {/* Dark green-black base — lets the bright lines stand out */}
-      <div className="absolute inset-0" style={{ background: '#020a04' }} />
+      {/* Lighter green base — softens the contrast with the bright lines */}
+      <div className="absolute inset-0" style={{ background: '#0a2614' }} />
 
-      {/* Soft center depth — subtle, does NOT flood the lines */}
+      {/* Soft center depth — fills the field with a brighter green */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 100% 85% at 50% 45%, rgba(0,70,30,0.35) 0%, rgba(0,30,12,0.18) 55%, transparent 80%)',
+        background: 'radial-gradient(ellipse 110% 95% at 50% 45%, rgba(0,120,56,0.50) 0%, rgba(0,72,34,0.34) 55%, rgba(0,42,20,0.18) 80%)',
       }} />
 
-      {/* Gentle edge glows — give the borders a green halo without washing out the field */}
+      {/* Gentle edge glows — give the borders a green halo */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 45% 90% at 0% 50%, rgba(0,200,76,0.22) 0%, transparent 60%)',
+        background: 'radial-gradient(ellipse 50% 95% at 0% 50%, rgba(0,210,84,0.30) 0%, transparent 62%)',
       }} />
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 45% 90% at 100% 50%, rgba(0,200,76,0.22) 0%, transparent 60%)',
+        background: 'radial-gradient(ellipse 50% 95% at 100% 50%, rgba(0,210,84,0.30) 0%, transparent 62%)',
       }} />
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 80% 40% at 50% 105%, rgba(0,190,72,0.20) 0%, transparent 60%)',
+        background: 'radial-gradient(ellipse 85% 45% at 50% 105%, rgba(0,200,80,0.28) 0%, transparent 62%)',
       }} />
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 70% 35% at 50% -5%, rgba(0,210,84,0.20) 0%, transparent 60%)',
+        background: 'radial-gradient(ellipse 75% 40% at 50% -5%, rgba(0,215,88,0.28) 0%, transparent 62%)',
       }} />
 
       {/* Particles */}
