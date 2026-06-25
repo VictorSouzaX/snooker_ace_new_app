@@ -199,10 +199,15 @@ function BannerCard({ slide, accent, glow, slideCount, slideIdx, onDot }: {
 }) {
   return (
     <div className="relative w-full h-full rounded-[22px] overflow-hidden" style={{
-      background: 'linear-gradient(155deg, rgba(2,14,5,0.50) 0%, rgba(1,8,3,0.55) 100%)',
+      background: 'linear-gradient(160deg, rgba(18,18,20,0.97) 0%, rgba(8,8,10,0.99) 100%)',
       backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)',
-      border: `1px solid ${accent}30`,
-      boxShadow: `0 22px 64px rgba(0,0,0,0.50), inset 0 1px 0 rgba(255,255,255,0.07)`,
+      border: `1px solid rgba(255,255,255,0.13)`,
+      boxShadow: [
+        `0 22px 64px rgba(0,0,0,0.75)`,
+        'inset 0 1px 0 rgba(255,255,255,0.20)',
+        'inset 0 -1px 0 rgba(0,0,0,0.50)',
+        `0 0 0 0.5px rgba(255,255,255,0.04)`,
+      ].join(', '),
     }}>
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: `radial-gradient(ellipse at 78% 52%, ${glow}50 0%, transparent 58%)` }} />
@@ -333,10 +338,15 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
   };
 
   const glass = {
-    background: 'linear-gradient(155deg, rgba(2,14,5,0.48) 0%, rgba(1,8,3,0.52) 100%)',
-    backdropFilter: 'blur(22px)', WebkitBackdropFilter: 'blur(22px)',
-    border: '1px solid rgba(0,232,112,0.14)',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.2)',
+    background: 'linear-gradient(160deg, rgba(22,22,24,0.97) 0%, rgba(10,10,12,0.99) 100%)',
+    backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+    border: '1px solid rgba(255,255,255,0.13)',
+    boxShadow: [
+      '0 8px 28px rgba(0,0,0,0.70)',           // drop shadow
+      'inset 0 1px 0 rgba(255,255,255,0.22)',  // top metallic highlight
+      'inset 0 -1px 0 rgba(0,0,0,0.55)',       // bottom dark edge
+      'inset 1px 0 0 rgba(255,255,255,0.06)',  // left subtle sheen
+    ].join(', '),
   } as const;
 
   const EdgeLayers = ({ accent }: { accent?: string }) => (
