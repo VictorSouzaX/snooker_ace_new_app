@@ -36,6 +36,9 @@
     @apply text-white antialiased overflow-hidden;
     margin: 0;
     padding: 0;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    touch-action: manipulation;
   }
   html {
     background-color: #020508;
@@ -52,6 +55,10 @@
   #root {
     width: 100%;
     height: 100%;
+  }
+  /* Prevent iOS auto-zoom on input focus (requires font-size >= 16px) */
+  input, select, textarea {
+    font-size: 16px;
   }
 }
 
