@@ -18,7 +18,6 @@ import FriendsPanel from './components/FriendsPanel';
 import BattlePass from './components/BattlePass';
 import { GameMode } from './types';
 import { LanguageProvider, useLanguage } from './i18n';
-import SvgFluidLinesBackground from './components/SvgFluidLinesBackground';
 
 export { toast };
 
@@ -91,7 +90,16 @@ function AppContent() {
     <div
       className="w-full h-full relative overflow-hidden flex flex-col select-none font-sans"
     >
-        <SvgFluidLinesBackground />
+        {/* Static wallpaper — lightweight, replaces the heavy animated lines */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            backgroundImage: 'url(/wallpaper-snooker-ace-2.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
 
         {showSplash && <IntroSplash onComplete={() => setShowSplash(false)} />}
 
