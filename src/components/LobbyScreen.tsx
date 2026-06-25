@@ -16,27 +16,31 @@ type ModeId = 'duel' | 'tournaments' | 'training' | 'store';
 
 const MODE_CFG: Record<string, {
   accent: string; glow: string; label: string; sub: string;
-  btnText: string; btnGrad: string; btnColor: string; liveLabel: string;
+  btnText: string; btnSub: string; btnGrad: string; btnColor: string; liveLabel: string;
 }> = {
   duel: {
     accent: '#00e870', glow: 'rgba(0,232,112,0.45)', label: 'DUELO', sub: '1v1 ONLINE',
-    btnText: 'JOGAR', btnGrad: 'linear-gradient(160deg, #00e870 0%, #00c058 55%, #008a3a 100%)',
+    btnText: 'JOGAR', btnSub: 'Encontre seu adversário',
+    btnGrad: 'linear-gradient(160deg, #00e870 0%, #00c058 55%, #008a3a 100%)',
     btnColor: '#000', liveLabel: 'ENCONTRAR ADVERSÁRIO',
   },
   tournaments: {
     accent: '#f5c518', glow: 'rgba(245,197,24,0.4)', label: 'TORNEIOS', sub: 'AO VIVO',
-    btnText: 'ENTRAR', btnGrad: 'linear-gradient(160deg, #f5c518 0%, #c9952a 55%, #8a6010 100%)',
+    btnText: 'ENTRAR', btnSub: 'Dispute o prêmio agora',
+    btnGrad: 'linear-gradient(160deg, #f5c518 0%, #c9952a 55%, #8a6010 100%)',
     btnColor: '#000', liveLabel: 'PRÓXIMO TORNEIO EM 03:42',
   },
   store: {
     accent: '#fbbf24', glow: 'rgba(251,191,36,0.55)', label: 'LOJA', sub: 'ITENS PREMIUM',
-    btnText: 'EXPLORAR', btnGrad: 'linear-gradient(160deg, #fbbf24 0%, #d97706 55%, #92400e 100%)',
+    btnText: 'EXPLORAR', btnSub: 'Confira as ofertas',
+    btnGrad: 'linear-gradient(160deg, #fbbf24 0%, #d97706 55%, #92400e 100%)',
     btnColor: '#000', liveLabel: 'OFERTAS ESPECIAIS',
   },
   training: {
     accent: 'rgba(255,255,255,0.65)', glow: 'rgba(255,255,255,0.12)', label: 'TREINO', sub: 'PRÁTICA SOLO',
-    btnText: 'TREINAR', btnGrad: 'linear-gradient(160deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 100%)',
-    btnColor: 'rgba(255,255,255,0.75)', liveLabel: 'MODO SOLO',
+    btnText: 'TREINAR', btnSub: 'Pratique sem gastar fichas',
+    btnGrad: 'linear-gradient(160deg, #1b1b1f 0%, #0a0a0c 100%)',
+    btnColor: 'rgba(255,255,255,0.92)', liveLabel: 'MODO SOLO',
   },
 };
 
@@ -677,11 +681,17 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
                 {/* Bottom glow reflection */}
                 <div className="absolute inset-x-6 bottom-0 pointer-events-none"
                   style={{ height: '40%', background: `linear-gradient(0deg, ${cfg.glow}50 0%, transparent 100%)` }} />
-                {/* Label */}
-                <span className="relative z-10 block text-center font-display leading-none tracking-[0.22em]"
-                  style={{ fontSize: '40px', color: cfg.btnColor, textShadow: cfg.btnColor === '#000' ? '0 1px 0 rgba(255,255,255,0.35)' : `0 0 24px ${cfg.glow}, 0 2px 4px rgba(0,0,0,0.4)` }}>
-                  {cfg.btnText}
-                </span>
+                {/* Label + supporting phrase */}
+                <div className="relative z-10 flex flex-col items-center justify-center h-full gap-0.5">
+                  <span className="block text-center font-display leading-none tracking-[0.2em]"
+                    style={{ fontSize: '26px', color: cfg.btnColor, textShadow: cfg.btnColor === '#000' ? '0 1px 0 rgba(255,255,255,0.35)' : `0 0 18px ${cfg.glow}, 0 2px 4px rgba(0,0,0,0.4)` }}>
+                    {cfg.btnText}
+                  </span>
+                  <span className="block text-center font-semibold uppercase leading-none tracking-[0.06em]"
+                    style={{ fontSize: '9px', color: cfg.btnColor === '#000' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.6)' }}>
+                    {cfg.btnSub}
+                  </span>
+                </div>
               </motion.button>
             </motion.div>
           )}
