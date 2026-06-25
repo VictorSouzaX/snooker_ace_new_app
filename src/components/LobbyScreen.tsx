@@ -108,13 +108,15 @@ function Ball({ size = 88, color, label, blackBall = false }: {
 }
 
 const SLIDE_BG_IMAGE: Record<string, string> = {
-  'bola8':   '/bola%208.png',
-  'bolinho': '/bolinho.png',
+  'bola8':     '/bola%208.png',
+  'bolinho':   '/bolinho.png',
+  'par-impar': '/par%20e%20impar.png',
 };
 
 function SlideVisual({ id, accent }: { id: string; accent: string }) {
   if (id === 'bola8') return null;
   if (id === 'bolinho') return null;
+  if (id === 'par-impar') return null;
   if (id === 'par-impar') {
     return (
       <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
