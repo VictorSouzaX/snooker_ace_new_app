@@ -107,8 +107,14 @@ function Ball({ size = 88, color, label, blackBall = false }: {
   );
 }
 
+const SLIDE_BG_IMAGE: Record<string, string> = {
+  'bola8':   '/bola%208.png',
+  'bolinho': '/bolinho.png',
+};
+
 function SlideVisual({ id, accent }: { id: string; accent: string }) {
-  if (id === 'bola8') return <Ball size={90} color="#111" label="8" blackBall />;
+  if (id === 'bola8') return null;
+  if (id === 'bolinho') return null;
   if (id === 'par-impar') {
     return (
       <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
@@ -201,6 +207,9 @@ function BannerCard({ slide, accent, glow, slideCount, slideIdx, onDot }: {
   slide: BannerSlide; accent: string; glow: string;
   slideCount: number; slideIdx: number; onDot: (i: number) => void;
 }) {
+  const bgImage = SLIDE_BG_IMAGE[slide.id];
+  const hasFullBg = !!bgImage;
+
   return (
     <div className="relative w-full h-full rounded-[22px] overflow-hidden" style={{
       background: 'linear-gradient(160deg, rgba(18,18,20,0.97) 0%, rgba(8,8,10,0.99) 100%)',
@@ -212,12 +221,27 @@ function BannerCard({ slide, accent, glow, slideCount, slideIdx, onDot }: {
         `0 0 0 0.5px rgba(255,255,255,0.04)`,
       ].join(', '),
     }}>
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ background: `radial-gradient(ellipse at 78% 52%, ${glow}50 0%, transparent 58%)` }} />
+
+      {/* Full bleed background image (bola8, bolinho) */}
+      {hasFullBg && (
+        <>
+          <div className="absolute inset-0 pointer-events-none"
+            style={{ backgroundImage: `url(${bgImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+          {/* Dark overlay on left so text stays readable */}
+          <div className="absolute inset-0 pointer-events-none"
+            style={{ background: 'linear-gradient(90deg, rgba(4,4,6,0.88) 0%, rgba(4,4,6,0.72) 45%, rgba(4,4,6,0.18) 75%, rgba(4,4,6,0.05) 100%)' }} />
+        </>
+      )}
+
+      {!hasFullBg && (
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: `radial-gradient(ellipse at 78% 52%, ${glow}50 0%, transparent 58%)` }} />
+      )}
       <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
         style={{ background: `linear-gradient(90deg, transparent 5%, ${accent}50 30%, rgba(255,255,255,0.42) 50%, ${accent}32 70%, transparent 95%)` }} />
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: 'linear-gradient(130deg, rgba(255,255,255,0.036) 0%, rgba(255,255,255,0.01) 36%, transparent 56%)' }} />
+
       <div className="absolute inset-0 flex">
         <div className="flex flex-col justify-between px-5 py-4 flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -260,9 +284,11 @@ function BannerCard({ slide, accent, glow, slideCount, slideIdx, onDot }: {
             </div>
           )}
         </div>
-        <div className="flex items-center justify-center shrink-0 pr-4" style={{ width: '132px' }}>
-          <SlideVisual id={slide.id} accent={accent} />
-        </div>
+        {!hasFullBg && (
+          <div className="flex items-center justify-center shrink-0 pr-4" style={{ width: '132px' }}>
+            <SlideVisual id={slide.id} accent={accent} />
+          </div>
+        )}
       </div>
     </div>
   );
