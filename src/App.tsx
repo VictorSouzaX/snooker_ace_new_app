@@ -94,7 +94,7 @@ function AppContent() {
         <div
           className="absolute inset-0 z-0 pointer-events-none"
           style={{
-            backgroundImage: 'url(/wallpaper-snooker-ace-2.png)',
+            backgroundImage: 'url(/nova%20imagem%20de%20fundo.png)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
