@@ -241,13 +241,13 @@ function ClaimModal({ level, onClose }: { level: Level; onClose: () => void }) {
         animate={{ scale: 1,    opacity: 1, rotate: 0,   y: 0   }}
         exit={{    scale: 0.8,  opacity: 0, rotate: 4,   y: -10 }}
         transition={{ type: 'spring', damping: 11, stiffness: 150, delay: 0.08 }}
-        className="relative flex flex-col items-center rounded-3xl border-2 overflow-hidden"
+        className="relative flex flex-col items-center rounded-[24px] border overflow-hidden"
         style={{
           width:       268,
           borderColor: color,
-          background:  `linear-gradient(160deg, #060e08, #030a04)`,
-          backdropFilter: 'blur(24px)',
-          boxShadow:   `0 0 60px ${color}35, 0 0 120px ${color}15, inset 0 1px 0 ${color}30`,
+          background:  'linear-gradient(160deg, rgba(22,22,25,0.98) 0%, rgba(10,10,13,0.99) 100%)',
+          backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)',
+          boxShadow:   `0 0 60px ${color}35, 0 0 120px ${color}15, inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.5)`,
         }}
         onClick={e => e.stopPropagation()}
       >
@@ -291,10 +291,10 @@ function ClaimModal({ level, onClose }: { level: Level; onClose: () => void }) {
 
         {/* Reward info */}
         <div className="relative z-10 flex flex-col items-center px-8 pb-2 gap-1">
-          <p className="text-white font-black text-xl text-center leading-tight">
+          <p className="text-white font-display text-2xl text-center leading-none tracking-[0.02em]">
             {level.reward.label}
           </p>
-          <p className="text-white/40 text-[11px]">{level.reward.sub} · Nível {level.n}</p>
+          <p className="text-white/40 text-[11px] mt-0.5">{level.reward.sub} · Nível {level.n}</p>
           <span
             className="mt-1 text-[8px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full"
             style={{ color, backgroundColor: color + '18', border: `1px solid ${color}40` }}
@@ -327,60 +327,55 @@ function RewardCard({ lv, current, claimed, onClaim }: {
   const unlocked = lv.n <= CURRENT_LEVEL;
   const color    = RARITY_COLOR[lv.reward.rarity];
   const cardW    = lv.milestone ? 'w-[200px]' : 'w-[172px]';
+  const PINK     = '#ED0A65';
 
-  const borderColor = current  ? 'rgba(0,210,106,0.5)'
-    : claimed        ? 'rgba(255,255,255,0.07)'
+  const borderColor = current  ? 'rgba(237,10,101,0.55)'
+    : claimed        ? 'rgba(255,255,255,0.10)'
     : unlocked       ? color + '42'
-    : 'rgba(255,255,255,0.04)';
-
-  const baseBg = current  ? 'rgba(0,210,106,0.06)'
-    : claimed            ? 'rgba(0,210,106,0.03)'
-    : unlocked           ? color + '07'
-    : 'rgba(0,0,0,0.25)';
+    : 'rgba(255,255,255,0.07)';
 
   return (
     <div
-      className={cn('relative flex flex-col rounded-2xl shrink-0 overflow-hidden transition-all duration-300 h-full', cardW)}
+      className={cn('relative flex flex-col rounded-[16px] shrink-0 overflow-hidden transition-all duration-300 h-full', cardW)}
       style={{
         border: `1px solid ${borderColor}`,
+        background: 'linear-gradient(160deg, rgba(22,22,25,0.96) 0%, rgba(10,10,13,0.98) 100%)',
+        backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
         boxShadow: current
-          ? `0 0 28px rgba(0,210,106,0.2), 0 8px 32px rgba(0,0,0,0.5)`
+          ? `0 0 26px rgba(237,10,101,0.22), inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(0,0,0,0.5)`
           : unlocked && !claimed
-            ? `0 0 18px ${color}12, 0 6px 24px rgba(0,0,0,0.45)`
-            : '0 4px 20px rgba(0,0,0,0.35)',
+            ? `0 0 16px ${color}14, inset 0 1px 0 rgba(255,255,255,0.13), inset 0 -1px 0 rgba(0,0,0,0.45)`
+            : 'inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.4)',
       }}
     >
-      {/* Glass base */}
-      <div className="absolute inset-0 backdrop-blur-md" style={{ background: baseBg }} />
+      {/* Current accent tint */}
+      {current && (
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(237,10,101,0.10) 0%, transparent 65%)' }} />
+      )}
 
       {/* Diagonal shine */}
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 55%)' }} />
 
-      {/* Top shimmer line */}
-      {(current || (unlocked && !claimed)) && (
-        <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
-          style={{ background: `linear-gradient(90deg, transparent, ${current ? '#00d26a' : color}88, transparent)` }} />
-      )}
+      {/* Top metallic line */}
+      <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
+        style={{ background: current
+          ? `linear-gradient(90deg, transparent 8%, ${PINK}66 30%, rgba(255,255,255,0.5) 50%, ${PINK}44 70%, transparent 92%)`
+          : (unlocked && !claimed)
+            ? `linear-gradient(90deg, transparent 8%, ${color}55 30%, rgba(255,255,255,0.4) 50%, ${color}38 70%, transparent 92%)`
+            : 'linear-gradient(90deg, transparent 10%, rgba(255,255,255,0.2) 50%, transparent 90%)' }} />
 
-      {/* Milestone shimmer bar */}
-      {lv.milestone && (
-        <div className="absolute top-0 inset-x-0 h-[2px]"
-          style={{ background: `linear-gradient(90deg, transparent, ${color}, transparent)` }} />
-      )}
-
-      {/* Inner edge glow */}
-      <div className="absolute inset-0 rounded-2xl pointer-events-none"
-        style={{ boxShadow: `inset 0 1px 0 rgba(255,255,255,0.08), inset 0 0 20px ${current ? 'rgba(0,210,106,0.05)' : color + '07'}` }} />
+      {/* Left edge sheen */}
+      <div className="absolute left-0 top-0 bottom-0 w-px pointer-events-none"
+        style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 45%, transparent 80%)' }} />
 
       {/* Level + tag */}
       <div className="relative z-10 flex items-center justify-between px-3 pt-3 pb-1">
-        <span className={cn('text-[9px] font-black uppercase tracking-wider',
-          current  ? 'text-brand-green'
-          : claimed  ? 'text-white/25'
-          : unlocked ? 'text-white/45'
-          : 'text-white/15',
-        )}>LV {lv.n}</span>
+        <span className="font-display text-[13px] leading-none tracking-[0.08em]"
+          style={{ color: current ? PINK : claimed ? 'rgba(255,255,255,0.3)' : unlocked ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.2)' }}>
+          LV {lv.n}
+        </span>
         {lv.milestone && (
           <span className="text-[7px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full"
             style={{ color, backgroundColor: color + '18', border: `1px solid ${color}35` }}>
@@ -396,8 +391,8 @@ function RewardCard({ lv, current, claimed, onClaim }: {
 
       {/* Info */}
       <div className={cn('relative z-10 px-3 pb-1', !unlocked && 'opacity-22')}>
-        <p className="text-[12px] font-black text-white leading-tight truncate">{lv.reward.label}</p>
-        <p className="text-[9px] text-white/35 mt-0.5">{lv.reward.sub}</p>
+        <p className="font-display text-[15px] text-white leading-none tracking-[0.02em] truncate">{lv.reward.label}</p>
+        <p className="text-[9px] text-white/35 mt-1">{lv.reward.sub}</p>
         <span className="inline-block mt-1.5 text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full"
           style={{ color, backgroundColor: color + '15', border: `1px solid ${color}30` }}>
           {RARITY_LABEL[lv.reward.rarity]}
@@ -418,23 +413,24 @@ function RewardCard({ lv, current, claimed, onClaim }: {
             <motion.div
               animate={{ scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
               transition={{ repeat: Infinity, duration: 1.5 }}
-              className="w-2 h-2 rounded-full bg-brand-green"
-              style={{ boxShadow: '0 0 6px rgba(0,210,106,0.9)' }}
+              className="w-2 h-2 rounded-full"
+              style={{ background: PINK, boxShadow: '0 0 6px rgba(237,10,101,0.9)' }}
             />
-            <span className="text-[9px] font-black text-brand-green">Em progresso</span>
+            <span className="text-[9px] font-black" style={{ color: PINK }}>Em progresso</span>
           </div>
         ) : unlocked ? (
           <motion.button
             whileTap={{ scale: 0.94 }}
             onClick={() => onClaim(lv.n)}
-            className="relative w-full py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider text-black overflow-hidden transition-opacity hover:opacity-88"
+            className="relative w-full py-2 rounded-[10px] text-[10px] font-black uppercase tracking-wider text-black overflow-hidden cursor-pointer"
             style={{
-              background: `linear-gradient(135deg, ${color}, ${color}bb)`,
-              boxShadow: `0 2px 12px ${color}40, inset 0 1px 0 rgba(255,255,255,0.22)`,
+              background: 'linear-gradient(160deg, #00e870 0%, #00c058 55%, #008a3a 100%)',
+              border: '1px solid rgba(255,255,255,0.25)',
+              boxShadow: '0 0 14px rgba(0,232,112,0.45), inset 0 1.5px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(0,0,0,0.25)',
             }}
           >
-            <div className="absolute inset-0 pointer-events-none"
-              style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.16) 0%, transparent 60%)' }} />
+            <div className="absolute inset-x-0 top-0 pointer-events-none"
+              style={{ height: '50%', borderRadius: '10px 10px 0 0', background: 'linear-gradient(180deg, rgba(255,255,255,0.5) 0%, transparent 100%)' }} />
             <span className="relative z-10">Resgatar</span>
           </motion.button>
         ) : (
@@ -448,8 +444,8 @@ function RewardCard({ lv, current, claimed, onClaim }: {
       {/* Pulsing border for current */}
       {current && (
         <motion.div
-          className="absolute inset-0 rounded-2xl pointer-events-none"
-          style={{ border: '1px solid rgba(0,210,106,0.4)' }}
+          className="absolute inset-0 rounded-[16px] pointer-events-none"
+          style={{ border: '1px solid rgba(237,10,101,0.45)' }}
           animate={{ opacity: [0.3, 0.9, 0.3] }}
           transition={{ repeat: Infinity, duration: 2.5 }}
         />
@@ -517,45 +513,56 @@ export default function BattlePass({ isOpen, onClose }: BattlePassProps) {
           exit={{ opacity: 0, scale: 0.98 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
           className="absolute inset-0 z-[200] flex flex-col overflow-hidden"
-          style={{ background: 'linear-gradient(160deg, #021008 0%, #010904 50%, #020e06 100%)' }}
+          style={{ background: 'rgba(2,5,3,0.42)', backdropFilter: 'blur(3px)', WebkitBackdropFilter: 'blur(3px)' }}
         >
-          {/* Ambient depth */}
+          {/* Ambient depth — passe pink + brand green, felt wallpaper shows through */}
           <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[220px] rounded-full blur-[100px]"
-              style={{ background: 'rgba(0,180,80,0.10)' }} />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[640px] h-[240px] rounded-full blur-[110px]"
+              style={{ background: 'rgba(237,10,101,0.12)' }} />
             <div className="absolute bottom-0 right-0 w-[350px] h-[200px] rounded-full blur-[80px]"
-              style={{ background: 'rgba(248,231,28,0.05)' }} />
+              style={{ background: 'rgba(0,210,106,0.07)' }} />
             <div className="absolute top-1/3 left-0 w-[250px] h-[250px] rounded-full blur-[100px]"
-              style={{ background: 'rgba(0,100,40,0.12)' }} />
+              style={{ background: 'rgba(0,120,48,0.10)' }} />
             <div className="absolute inset-0"
-              style={{ background: 'radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.4) 100%)' }} />
+              style={{ background: 'radial-gradient(ellipse at 50% 50%, transparent 48%, rgba(0,0,0,0.42) 100%)' }} />
           </div>
 
           {/* ── Header ── */}
           <div className="relative z-10 flex items-center px-6 pt-4 pb-3 shrink-0"
             style={{
-              background: 'rgba(0,14,6,0.55)',
-              backdropFilter: 'blur(20px)',
-              borderBottom: '1px solid rgba(255,255,255,0.07)',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
+              background: 'rgba(8,8,12,0.55)',
+              backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)',
+              borderBottom: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
             }}>
-            <button onClick={onClose}
-              className="flex items-center gap-1 text-white/50 hover:text-white/80 transition-colors shrink-0 min-w-[80px]">
-              <ChevronLeft className="w-4 h-4" />
-              <span className="text-[12px] font-bold">Voltar</span>
-            </button>
+            {/* Metallic top accent line — pink */}
+            <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
+              style={{ background: 'linear-gradient(90deg, transparent 5%, rgba(237,10,101,0.4) 30%, rgba(255,255,255,0.28) 50%, rgba(237,10,101,0.32) 70%, transparent 95%)' }} />
+
+            <motion.button
+              onClick={onClose}
+              whileTap={{ scale: 0.94 }} whileHover={{ x: -2 }}
+              className="relative flex items-center gap-1.5 pl-2.5 pr-3.5 py-2 rounded-full overflow-hidden shrink-0 cursor-pointer"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)' }}>
+              <ChevronLeft className="w-4 h-4" style={{ color: 'rgba(255,255,255,0.7)' }} />
+              <span className="text-[12px] font-bold" style={{ color: 'rgba(255,255,255,0.7)' }}>Voltar</span>
+            </motion.button>
+
             <div className="flex-1 flex flex-col items-center">
-              <h1 className="text-white font-black text-lg tracking-tight leading-tight">Passe de Batalha</h1>
-              <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-brand-green/70">Temporada 1</span>
+              <h1 className="font-display leading-none tracking-[0.08em]"
+                style={{ fontSize: '26px', color: '#ED0A65', textShadow: '0 0 20px rgba(237,10,101,0.5)' }}>PASSE ACE</h1>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: 'rgba(237,10,101,0.75)' }}>Temporada 1</span>
                 <span className="w-1 h-1 rounded-full bg-white/20" />
                 <span className="text-[9px] font-bold text-white/30">14 dias restantes</span>
               </div>
             </div>
+
             <div className="flex items-center justify-end shrink-0 min-w-[80px]">
-              <div className="flex items-center gap-1.5 bg-white/[0.04] border border-white/[0.07] rounded-xl px-3 py-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-brand-green shadow-[0_0_6px_rgba(0,210,106,0.8)]" />
-                <span className="text-white font-black text-[12px]">Nível {CURRENT_LEVEL}</span>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full"
+                style={{ background: 'rgba(237,10,101,0.12)', border: '1px solid rgba(237,10,101,0.28)' }}>
+                <span className="font-display text-[11px] leading-none" style={{ color: '#ED0A65' }}>NÍV</span>
+                <span className="font-display text-[14px] leading-none text-white">{CURRENT_LEVEL}</span>
               </div>
             </div>
           </div>
@@ -563,19 +570,19 @@ export default function BattlePass({ isOpen, onClose }: BattlePassProps) {
           {/* ── XP bar ── */}
           <div className="relative z-10 px-12 py-3 shrink-0"
             style={{
-              background: 'rgba(0,10,4,0.4)',
-              backdropFilter: 'blur(12px)',
+              background: 'rgba(6,6,9,0.4)',
+              backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)',
               borderBottom: '1px solid rgba(255,255,255,0.05)',
             }}>
             <div className="flex items-center justify-center gap-3 mb-2">
               <span className="text-[10px] text-white/35 font-medium">Progresso para o Nível {CURRENT_LEVEL + 1}</span>
-              <span className="text-[10px] font-black text-brand-green">
+              <span className="text-[10px] font-black" style={{ color: '#ED0A65' }}>
                 {CURRENT_XP.toLocaleString('pt-BR')} / {NEXT_XP.toLocaleString('pt-BR')} XP
               </span>
             </div>
             <div className="h-2.5 rounded-full overflow-hidden"
               style={{
-                background: 'rgba(255,255,255,0.04)',
+                background: 'rgba(255,255,255,0.05)',
                 boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.5)',
                 border: '1px solid rgba(255,255,255,0.05)',
               }}>
@@ -585,8 +592,8 @@ export default function BattlePass({ isOpen, onClose }: BattlePassProps) {
                 transition={{ duration: 1.2, ease: 'easeOut', delay: 0.3 }}
                 className="h-full rounded-full"
                 style={{
-                  background: 'linear-gradient(90deg, #00b84a, #00e870)',
-                  boxShadow: '0 0 14px rgba(0,210,106,0.6), inset 0 1px 0 rgba(255,255,255,0.25)',
+                  background: 'linear-gradient(90deg, #c00038, #ED0A65)',
+                  boxShadow: '0 0 14px rgba(237,10,101,0.6), inset 0 1px 0 rgba(255,255,255,0.25)',
                 }}
               />
             </div>
@@ -618,15 +625,19 @@ export default function BattlePass({ isOpen, onClose }: BattlePassProps) {
           {/* ── Bottom bar ── */}
           <div className="relative z-10 px-8 py-4 flex items-center justify-between shrink-0"
             style={{
-              background: 'rgba(0,14,6,0.55)',
-              backdropFilter: 'blur(20px)',
-              borderTop: '1px solid rgba(255,255,255,0.07)',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.04)',
+              background: 'rgba(8,8,12,0.55)',
+              backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)',
+              borderTop: '1px solid rgba(255,255,255,0.08)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)',
             }}>
+            {/* Metallic top accent line */}
+            <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
+              style={{ background: 'linear-gradient(90deg, transparent 5%, rgba(0,232,112,0.32) 30%, rgba(255,255,255,0.24) 50%, rgba(0,232,112,0.28) 70%, transparent 95%)' }} />
+
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-8 h-8 rounded-xl"
-                style={{ background: 'rgba(0,210,106,0.10)', border: '1px solid rgba(0,210,106,0.2)' }}>
-                <Zap className="w-4 h-4 text-brand-green" />
+              <div className="flex items-center justify-center w-9 h-9 rounded-xl"
+                style={{ background: 'rgba(0,232,112,0.10)', border: '1px solid rgba(0,232,112,0.22)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.1)' }}>
+                <Zap className="w-4 h-4" style={{ color: '#00e870' }} />
               </div>
               <div>
                 <p className="text-white/75 text-[12px] font-bold">Ganhe XP jogando partidas</p>
@@ -634,18 +645,27 @@ export default function BattlePass({ isOpen, onClose }: BattlePassProps) {
               </div>
             </div>
             <motion.button
-              whileTap={{ scale: 0.96 }}
+              whileTap={{ scale: 0.96 }} whileHover={{ scale: 1.03, y: -2 }}
               onClick={onClose}
-              className="relative flex items-center gap-2 text-black font-black text-[11px] uppercase tracking-widest px-5 py-2.5 rounded-xl overflow-hidden transition-opacity hover:opacity-90"
+              className="group relative flex items-center gap-2 px-6 py-3 rounded-[14px] overflow-hidden cursor-pointer"
               style={{
-                background: 'linear-gradient(150deg, #00e870 0%, #00b848 100%)',
-                boxShadow: '0 4px 20px rgba(0,210,106,0.38), inset 0 1px 0 rgba(255,255,255,0.25)',
+                background: 'linear-gradient(160deg, #00e870 0%, #00c058 55%, #008a3a 100%)',
+                border: '1px solid rgba(255,255,255,0.28)',
+                boxShadow: '0 0 24px rgba(0,232,112,0.5), inset 0 2px 0 rgba(255,255,255,0.7), inset 0 -2px 0 rgba(0,0,0,0.25)',
               }}
             >
-              <div className="absolute inset-0 pointer-events-none rounded-xl"
-                style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.14) 0%, transparent 55%)' }} />
-              <span className="relative z-10">Jogar agora</span>
-              <ChevronRight className="w-4 h-4 relative z-10" />
+              {/* Top gloss */}
+              <div className="absolute inset-x-0 top-0 pointer-events-none"
+                style={{ height: '52%', borderRadius: '14px 14px 0 0', background: 'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, transparent 100%)' }} />
+              {/* Sweeping shine */}
+              <motion.div
+                animate={{ x: ['-130%', '230%'] }}
+                transition={{ repeat: Infinity, duration: 2.0, ease: 'easeInOut', repeatDelay: 1.6 }}
+                className="absolute inset-y-0 pointer-events-none"
+                style={{ width: '40%', background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.32), transparent)', transform: 'skewX(-18deg)' }}
+              />
+              <span className="relative z-10 font-display tracking-[0.14em] text-black" style={{ fontSize: '17px' }}>JOGAR AGORA</span>
+              <ChevronRight className="w-4 h-4 relative z-10 text-black" />
             </motion.button>
           </div>
 
