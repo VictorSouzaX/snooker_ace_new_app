@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Trophy, Package, Users, X, Check } from 'lucide-react';
+import { Trophy, Package, Users, X, Check, Play } from 'lucide-react';
 import { toast } from 'sonner';
 import { GameMode } from '../types';
 
@@ -923,11 +923,9 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
                             transition={{ repeat: Infinity, duration: 1.6 }}
                             className="w-1.5 h-1.5 rounded-full shrink-0"
                             style={{ background: '#00e870', boxShadow: '0 0 5px #00e870' }} />
-                          <span className="text-[9px] font-bold leading-none" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                          <Users style={{ width: 10, height: 10, color: 'rgba(255,255,255,0.4)' }} />
+                          <span className="text-[10px] font-bold leading-none" style={{ color: 'rgba(255,255,255,0.7)' }}>
                             {count}
-                          </span>
-                          <span className="text-[8px] font-semibold leading-none" style={{ color: 'rgba(255,255,255,0.35)' }}>
-                            esperando
                           </span>
                         </div>
                       </motion.button>
@@ -942,23 +940,51 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
               <motion.button
                 whileHover={{ scale: 1.02, y: -2 }} whileTap={{ scale: 0.98 }}
                 onClick={confirmMatch}
-                className="relative w-full overflow-hidden cursor-pointer rounded-[16px] flex items-center justify-center"
+                className="group relative w-full overflow-hidden cursor-pointer rounded-[16px] flex items-center justify-center"
                 style={{
-                  height: 54,
+                  height: 56,
                   background: cfg.btnGrad,
-                  border: '1px solid rgba(255,255,255,0.28)',
+                  border: '1px solid rgba(255,255,255,0.30)',
                   boxShadow: [
-                    `0 0 28px ${cfg.glow}60`,
-                    'inset 0 2.5px 0 rgba(255,255,255,0.7)',
-                    'inset 0 -2px 0 rgba(0,0,0,0.28)',
+                    `0 8px 26px ${cfg.glow}55`,
+                    `0 0 34px ${cfg.glow}40`,
+                    'inset 0 2.5px 0 rgba(255,255,255,0.78)',
+                    'inset 0 -2px 0 rgba(0,0,0,0.30)',
+                    'inset 2px 0 0 rgba(255,255,255,0.22)',
+                    'inset -2px 0 0 rgba(255,255,255,0.12)',
                   ].join(', '),
                 }}
               >
+                {/* Top gloss */}
                 <div className="absolute inset-x-0 top-0 pointer-events-none"
-                  style={{ height: '50%', borderRadius: '16px 16px 0 0', background: 'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, transparent 100%)' }} />
-                <span className="relative z-10 font-display tracking-[0.18em]" style={{ fontSize: '24px', color: cfg.btnColor }}>
-                  {selected === 'tournaments' ? 'CONFIRMAR INSCRIÇÃO' : `JOGAR · ${money(modalBet)}`}
-                </span>
+                  style={{ height: '52%', borderRadius: '16px 16px 0 0', background: 'linear-gradient(180deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.18) 50%, transparent 100%)' }} />
+                {/* Bright top edge line */}
+                <div className="absolute top-0 inset-x-5 h-[2px] pointer-events-none rounded-full"
+                  style={{ background: 'linear-gradient(90deg, transparent 4%, rgba(255,255,255,0.95) 50%, transparent 96%)' }} />
+                {/* Bottom inner glow */}
+                <div className="absolute inset-x-6 bottom-0 pointer-events-none"
+                  style={{ height: '42%', background: `linear-gradient(0deg, ${cfg.glow}55 0%, transparent 100%)` }} />
+                {/* Sweeping shine */}
+                <motion.div
+                  animate={{ x: ['-130%', '230%'] }}
+                  transition={{ repeat: Infinity, duration: 2.0, ease: 'easeInOut', repeatDelay: 1.6 }}
+                  className="absolute inset-y-0 pointer-events-none"
+                  style={{ width: '38%', background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.34), rgba(255,255,255,0.18), transparent)', transform: 'skewX(-18deg)' }}
+                />
+                {/* Label */}
+                <div className="relative z-10 flex items-center gap-2.5">
+                  <Play style={{ width: 17, height: 17, color: cfg.btnColor, fill: cfg.btnColor }} />
+                  <span className="font-display tracking-[0.16em]"
+                    style={{ fontSize: '24px', color: cfg.btnColor, textShadow: cfg.btnColor === '#000' ? '0 1px 0 rgba(255,255,255,0.3)' : 'none' }}>
+                    {selected === 'tournaments' ? 'CONFIRMAR' : 'JOGAR'}
+                  </span>
+                  {selected !== 'tournaments' && (
+                    <span className="font-display tracking-[0.04em] px-2 py-0.5 rounded-md"
+                      style={{ fontSize: '17px', color: cfg.btnColor, background: 'rgba(0,0,0,0.16)', border: '1px solid rgba(0,0,0,0.12)' }}>
+                      {money(modalBet)}
+                    </span>
+                  )}
+                </div>
               </motion.button>
             </div>
           </motion.div>
