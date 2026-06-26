@@ -1,621 +1,759 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
-import { Flame, Swords, LayoutGrid, CircleUser, Package, X, type LucideIcon } from 'lucide-react';
+import {
+  Tag, Box, LayoutGrid, Gift, X, Lock, Sparkles, Ticket,
+  type LucideIcon,
+} from 'lucide-react';
 
-type TabId = 'destaque' | 'tacos' | 'mesas' | 'avatares' | 'baus';
+/* ───────────────────────── Rarity system ───────────────────────── */
+type Rarity = 'comum' | 'raro' | 'super' | 'lendario' | 'elite' | 'passe';
 
-interface Category {
-  id: TabId; label: string; count: number; Icon: LucideIcon;
-  color: string; glow: string; description: string; isNew?: boolean;
-}
-
-const CATEGORIES: Category[] = [
-  { id: 'destaque',  label: 'Destaque', count: 6, Icon: Flame,      color: '#f59e0b', glow: 'rgba(245,158,11,0.3)',  description: 'Ofertas exclusivas da semana' },
-  { id: 'tacos',    label: 'Tacos',    count: 6, Icon: Swords,     color: '#cbd5e1', glow: 'rgba(203,213,225,0.2)', description: 'Tacos personalizados' },
-  { id: 'mesas',    label: 'Mesas',    count: 5, Icon: LayoutGrid, color: '#00d26a', glow: 'rgba(0,210,106,0.3)',   description: 'Panos exclusivos', isNew: true },
-  { id: 'avatares', label: 'Avatares', count: 7, Icon: CircleUser, color: '#818cf8', glow: 'rgba(129,140,248,0.3)', description: 'Perfis únicos' },
-  { id: 'baus',     label: 'Baús',     count: 4, Icon: Package,    color: '#e879f9', glow: 'rgba(232,121,249,0.3)', description: 'Surpresas especiais', isNew: true },
-];
-
-type Rarity = 'LENDÁRIO' | 'ÉPICO' | 'RARO' | 'COMUM' | 'EXCLUSIVO' | 'COPA 3D' | 'ANIMADO' | 'PREMIUM' | 'PADRÃO';
-
-const RARITY_COLOR: Record<Rarity, string> = {
-  'LENDÁRIO': '#f59e0b', 'ÉPICO': '#a855f7', 'RARO': '#3b82f6', 'COMUM': '#9ca3af',
-  'EXCLUSIVO': '#ff004c', 'COPA 3D': '#fde047', 'ANIMADO': '#34d399',
-  'PREMIUM': '#f9a8d4', 'PADRÃO': '#6b7280',
+const RARITY: Record<Rarity, { label: string; color: string; tint: boolean }> = {
+  comum:    { label: 'Comum',      color: '#9ca3af', tint: false }, // sem cor de fundo
+  raro:     { label: 'Raro',       color: '#3b82f6', tint: true  }, // azul
+  super:    { label: 'Super Raro', color: '#a855f7', tint: true  }, // roxo
+  lendario: { label: 'Lendário',   color: '#f5c518', tint: true  }, // dourado
+  passe:    { label: 'Passe',      color: '#10b981', tint: true  }, // verde esmeralda
+  elite:    { label: 'Elite',      color: '#e11d48', tint: true  }, // vermelho escuro
 };
 
 const RARITY_TIER: Record<Rarity, number> = {
-  'LENDÁRIO': 5, 'EXCLUSIVO': 4, 'ÉPICO': 3, 'COPA 3D': 3,
-  'ANIMADO': 2, 'PREMIUM': 2, 'RARO': 2, 'COMUM': 1, 'PADRÃO': 0,
+  comum: 1, raro: 2, super: 3, passe: 4, elite: 4, lendario: 5,
 };
 
-const USER_BALANCE = 12450;
-const parsePrice = (price: string) => parseInt(price.replace('.', ''), 10);
+/* ───────────────────────── Data types ──────────────────────────── */
+type ItemKind = 'taco' | 'mesa' | 'adesivo' | 'emoji' | 'avatar' | 'moldura' | 'consumivel';
 
-interface StoreItem {
-  id: string; name: string; rarity: Rarity; price: string; accent: string;
-  description?: string; badge?: string; image?: string; avatarUrl?: string;
-  tableColor?: string; chestGradient?: string; chestIcon?: string;
+interface Item {
+  id: string; name: string; kind: ItemKind; rarity: Rarity;
+  coins?: number;           // preço em fichas
+  priceBRL?: string;        // preço em reais
+  glyph?: string;           // emoji / adesivo
+  avatarSeed?: string;      // avatar / moldura
+  tableColor?: string;      // mesa
+  note?: string;            // observação (ex: "Apenas em caixas")
+  soon?: boolean;           // em breve
+  discount?: number;        // % de desconto (ofertas)
+  oldCoins?: number;        // preço antigo (ofertas)
 }
 
-const CUES: StoreItem[] = [
-  { id: 'cu1', name: 'Taco de Ouro',   rarity: 'LENDÁRIO', price: '25.000', accent: '#f59e0b', description: 'Forjado em ouro puro, símbolo máximo de supremacia nas mesas.', image: 'https://images.unsplash.com/photo-1595861962325-1e42e47c162f?auto=format&fit=crop&w=400&q=80' },
-  { id: 'cu2', name: 'Predador Negro', rarity: 'ÉPICO',    price: '12.500', accent: '#a855f7', description: 'Acabamento em ébano fosco com precisão letal.', image: 'https://images.unsplash.com/photo-1615671043232-a5d6255776d6?auto=format&fit=crop&w=400&q=80' },
-  { id: 'cu3', name: 'Fibra Carbono',  rarity: 'RARO',     price: '4.800',  accent: '#3b82f6', description: 'Leveza extrema e rigidez máxima para jogadas perfeitas.', image: 'https://images.unsplash.com/photo-1629810817025-b9b58ba0cbac?auto=format&fit=crop&w=400&q=80' },
-  { id: 'cu4', name: 'Cobra de Fogo',  rarity: 'ÉPICO',    price: '9.200',  accent: '#ef4444', description: 'Design flamejante para quem joga com intensidade e paixão.', badge: 'NOVO', image: 'https://images.unsplash.com/photo-1563288600-63f3c9af6af9?auto=format&fit=crop&w=400&q=80' },
-  { id: 'cu5', name: 'Glacial',        rarity: 'LENDÁRIO', price: '32.000', accent: '#67e8f9', description: 'Fria como o ártico, implacável como uma tempestade de gelo.', image: 'https://images.unsplash.com/photo-1615671043232-a5d6255776d6?auto=format&fit=crop&w=400&q=80' },
-  { id: 'cu6', name: 'Iniciante',      rarity: 'COMUM',    price: '1.200',  accent: '#9ca3af', description: 'O começo de uma grande jornada no snooker.', image: 'https://images.unsplash.com/photo-1629810817025-b9b58ba0cbac?auto=format&fit=crop&w=400&q=80' },
-];
-
-const TABLES: StoreItem[] = [
-  { id: 'ta1', name: 'Mesa Real',      rarity: 'LENDÁRIO', price: '28.000', accent: '#f59e0b', description: 'O pano dourado dos campeões mundiais.', tableColor: '#1f6b30', badge: 'DESTAQUE' },
-  { id: 'ta2', name: 'Abismo Azul',    rarity: 'ÉPICO',    price: '15.000', accent: '#3b82f6', description: 'Jogue nas profundezas de um oceano de precisão.', tableColor: '#0f2d5e' },
-  { id: 'ta3', name: 'Veludo Negro',   rarity: 'ÉPICO',    price: '13.000', accent: '#a855f7', description: 'Elegância sombria para partidas épicas.', tableColor: '#1a0a2e' },
-  { id: 'ta4', name: 'Baize Clássico', rarity: 'PADRÃO',   price: '4.500',  accent: '#00d26a', description: 'O verde tradicional que resistiu ao tempo.', tableColor: '#1a5c2e' },
-  { id: 'ta5', name: 'Escarlate',      rarity: 'RARO',     price: '6.000',  accent: '#ef4444', description: 'Desafie seus limites no vermelho do perigo.', tableColor: '#5c1212' },
-];
-
-const AVATARS: StoreItem[] = [
-  { id: 'av1', name: 'O Rei',     rarity: 'LENDÁRIO',  price: '25.000', accent: '#4ade80', description: 'Lenda viva do esporte. Poucos chegam perto de sua majestade.', avatarUrl: 'https://api.dicebear.com/7.x/micah/svg?seed=Pele&backgroundColor=4ade80',    badge: 'LIMITADO' },
-  { id: 'av2', name: 'Canarinho', rarity: 'COPA 3D',   price: '15.000', accent: '#fde047', description: 'O sorriso que conquistou o mundo.', avatarUrl: 'https://api.dicebear.com/7.x/micah/svg?seed=Neymar&backgroundColor=fde047' },
-  { id: 'av3', name: 'El Diez',   rarity: 'COPA 3D',   price: '15.000', accent: '#7dd3fc', description: 'Magia pura em cada tacada.', avatarUrl: 'https://api.dicebear.com/7.x/micah/svg?seed=Messi&backgroundColor=7dd3fc' },
-  { id: 'av4', name: 'Robozão',   rarity: 'COPA 3D',   price: '15.000', accent: '#ef4444', description: 'Eficiência e precisão máxima.', avatarUrl: 'https://api.dicebear.com/7.x/micah/svg?seed=Ronaldo&backgroundColor=ef4444' },
-  { id: 'av5', name: 'Ninja',     rarity: 'EXCLUSIVO', price: '10.000', accent: '#f472b6', description: 'Sombra veloz, golpe certeiro.', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ninja' },
-  { id: 'av6', name: 'Mestre',    rarity: 'PREMIUM',   price: '5.000',  accent: '#f9a8d4', description: 'Décadas de experiência em cada movimento.', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=master' },
-  { id: 'av7', name: 'Shark',     rarity: 'ANIMADO',   price: '8.000',  accent: '#34d399', description: 'Silencioso nas águas, devastador no ataque.', avatarUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=shark' },
-];
-
-const CHESTS: StoreItem[] = [
-  { id: 'ch1', name: 'Baú Lendário', rarity: 'LENDÁRIO',  price: '9.500', accent: '#f59e0b', description: 'Tesouros raros e itens lendários aguardam dentro deste baú.', chestGradient: 'linear-gradient(155deg,#78350f 0%,#b45309 60%,#d97706 100%)', chestIcon: '🏆', badge: 'POPULAR' },
-  { id: 'ch2', name: 'Baú Épico',    rarity: 'ÉPICO',     price: '3.800', accent: '#a855f7', description: 'Poder e glória selados neste baú roxo.', chestGradient: 'linear-gradient(155deg,#3b0764 0%,#6d28d9 60%,#8b5cf6 100%)', chestIcon: '⚡' },
-  { id: 'ch3', name: 'Baú Raro',     rarity: 'RARO',      price: '1.200', accent: '#3b82f6', description: 'Itens raros para colecionadores exigentes.', chestGradient: 'linear-gradient(155deg,#1e3a5f 0%,#1e40af 60%,#3b82f6 100%)', chestIcon: '📦' },
-  { id: 'ch4', name: 'Baú do Passe', rarity: 'EXCLUSIVO', price: 'PASSE', accent: '#ff004c', description: 'Recompensas exclusivas apenas para detentores do Passe Ace.', chestGradient: 'linear-gradient(155deg,#3f0018 0%,#880025 60%,#cc0038 100%)', chestIcon: '🎴', badge: 'EXCLUSIVO' },
-];
-
-const FEATURED: StoreItem[] = [
-  { id: 'fe1', name: 'Taco de Ouro',  rarity: 'LENDÁRIO', price: '20.000', accent: '#f59e0b', description: 'Forjado em ouro puro. Oferta especial com 20% de desconto por tempo limitado.', badge: 'OFERTA -20%', image: CUES[0].image },
-  { id: 'fe2', name: 'Baú Lendário',  rarity: 'LENDÁRIO', price: '9.500',  accent: '#f59e0b', description: 'Tesouros raros e itens lendários aguardam. Recém chegou à loja.', badge: 'NOVO', chestGradient: CHESTS[0].chestGradient, chestIcon: '🏆' },
-  { id: 'fe3', name: 'O Rei',         rarity: 'LENDÁRIO', price: '25.000', accent: '#4ade80', description: 'Disponível por tempo limitado — quando acabar, não volta mais.', badge: 'LIMITADO', avatarUrl: AVATARS[0].avatarUrl },
-  { id: 'fe4', name: 'Mesa Real',     rarity: 'LENDÁRIO', price: '28.000', accent: '#f59e0b', description: 'O pano dourado dos campeões mundiais.', badge: 'DESTAQUE', tableColor: TABLES[0].tableColor },
-  { id: 'fe5', name: 'Cobra de Fogo', rarity: 'ÉPICO',    price: '9.200',  accent: '#ef4444', description: 'Design flamejante para quem joga com intensidade e paixão.', badge: 'NOVO', image: CUES[3].image },
-  { id: 'fe6', name: 'Baú Épico',     rarity: 'ÉPICO',    price: '3.800',  accent: '#a855f7', description: 'Poder e glória selados neste baú roxo.', chestGradient: CHESTS[1].chestGradient, chestIcon: '⚡' },
-];
-
-const TAB_ITEMS: Record<TabId, StoreItem[]> = {
-  destaque: FEATURED, tacos: CUES, mesas: TABLES, avatares: AVATARS, baus: CHESTS,
+const KIND_LABEL: Record<ItemKind, string> = {
+  taco: 'Tacos', mesa: 'Mesas', adesivo: 'Adesivos', emoji: 'Emojis',
+  avatar: 'Avatares', moldura: 'Molduras', consumivel: 'Consumível',
 };
 
-/* ── Shared glass edge highlights ───────────────────────────────── */
+/* ───────────────────────── Catalog data ────────────────────────── */
+const CATALOG: Item[] = [
+  // Tacos
+  { id: 't1', name: 'Taco Iniciante', kind: 'taco', rarity: 'comum',    coins: 1200 },
+  { id: 't2', name: 'Taco Fibra',     kind: 'taco', rarity: 'raro',     coins: 4800 },
+  { id: 't3', name: 'Taco Carbono',   kind: 'taco', rarity: 'super',    coins: 12000 },
+  { id: 't4', name: 'Taco de Ouro',   kind: 'taco', rarity: 'lendario', note: 'Apenas em caixas' },
+  // Mesas
+  { id: 'm1', name: 'Baize Clássico', kind: 'mesa', rarity: 'comum',    coins: 3000,  tableColor: '#1a5c2e' },
+  { id: 'm2', name: 'Abismo Azul',    kind: 'mesa', rarity: 'super',    coins: 15000, tableColor: '#0f2d5e' },
+  { id: 'm3', name: 'Mesa Real',      kind: 'mesa', rarity: 'lendario', note: 'Apenas em caixas', tableColor: '#3a2d0a' },
+  { id: 'm4', name: 'Mesa Esmeralda', kind: 'mesa', rarity: 'passe',    note: 'Passe da Temporada', tableColor: '#064e3b' },
+  // Adesivos de mesa
+  { id: 'a1', name: 'Adesivo Chama',  kind: 'adesivo', rarity: 'raro',     coins: 800,  glyph: '🔥' },
+  { id: 'a2', name: 'Adesivo Caveira',kind: 'adesivo', rarity: 'super',    coins: 2200, glyph: '💀' },
+  { id: 'a3', name: 'Adesivo Coroa',  kind: 'adesivo', rarity: 'lendario', note: 'Apenas em caixas', glyph: '👑' },
+  // Emojis
+  { id: 'e1', name: 'Emoji Risada',   kind: 'emoji', rarity: 'comum', coins: 300,  glyph: '😂' },
+  { id: 'e2', name: 'Emoji Estiloso', kind: 'emoji', rarity: 'raro',  coins: 600,  glyph: '😎' },
+  { id: 'e3', name: 'Emoji Fogo',     kind: 'emoji', rarity: 'super', coins: 1500, glyph: '🔥' },
+  // Avatares
+  { id: 'av1', name: 'Avatar Ninja',  kind: 'avatar', rarity: 'raro',     coins: 5000, avatarSeed: 'ninja' },
+  { id: 'av2', name: 'Avatar Mestre', kind: 'avatar', rarity: 'super',    coins: 8000, avatarSeed: 'master' },
+  { id: 'av3', name: 'Avatar Rei',    kind: 'avatar', rarity: 'lendario', note: 'Apenas em caixas', avatarSeed: 'king' },
+  // Molduras de avatar
+  { id: 'mo1', name: 'Moldura Prata',     kind: 'moldura', rarity: 'raro',     coins: 2000, avatarSeed: 'frame1' },
+  { id: 'mo2', name: 'Moldura Neon',      kind: 'moldura', rarity: 'super',    coins: 6000, avatarSeed: 'frame2' },
+  { id: 'mo3', name: 'Moldura Áurea',     kind: 'moldura', rarity: 'lendario', note: 'Apenas em caixas', avatarSeed: 'frame3' },
+  { id: 'mo4', name: 'Moldura Carnaval',  kind: 'moldura', rarity: 'elite',    coins: 9900, note: 'Edição limitada', avatarSeed: 'frame4' },
+  { id: 'mo5', name: 'Moldura Temporada', kind: 'moldura', rarity: 'passe',    note: 'Passe da Temporada', avatarSeed: 'frame5' },
+];
+
+const CONSUMIVEIS: Item[] = [
+  { id: 'c1', name: 'Troca de Nome', kind: 'consumivel', rarity: 'raro',  coins: 5000, glyph: '✏️', note: 'Altere seu nome de jogador' },
+  { id: 'c2', name: 'Criar Clube',   kind: 'consumivel', rarity: 'super', glyph: '🛡️', note: 'Disponível em breve', soon: true },
+  { id: 'c3', name: 'Ticket Torneio',kind: 'consumivel', rarity: 'raro',  coins: 2500, glyph: '🎟️', note: 'Entrada para torneios especiais' },
+  { id: 'c4', name: 'Chave de Caixa',kind: 'consumivel', rarity: 'comum', coins: 1500, glyph: '🔑', note: 'Abre qualquer caixa' },
+];
+
+const OFFERS: Item[] = [
+  { id: 'of2', name: 'Taco Carbono',     kind: 'taco',    rarity: 'super', coins: 8400,  oldCoins: 12000, discount: 30 },
+  { id: 'of3', name: 'Moldura Carnaval', kind: 'moldura', rarity: 'elite', coins: 6900,  oldCoins: 9900,  discount: 30, avatarSeed: 'frame4', note: 'Edição limitada' },
+  { id: 'of4', name: 'Avatar Mestre',    kind: 'avatar',  rarity: 'super', coins: 5600,  oldCoins: 8000,  discount: 30, avatarSeed: 'master' },
+  { id: 'of5', name: 'Moldura Neon',     kind: 'moldura', rarity: 'super', coins: 4200,  oldCoins: 6000,  discount: 30, avatarSeed: 'frame2' },
+];
+
+interface BoxOdd { r: Rarity; p: number; }
+interface BoxDef {
+  id: string; name: string; priceBRL: string; items: number; color: string;
+  odds: BoxOdd[]; bonus?: string;
+}
+
+const BOXES: BoxDef[] = [
+  { id: 'bronze',   name: 'Bronze Box',   priceBRL: '9,90',   items: 3, color: '#cd7f32',
+    odds: [{ r: 'comum', p: 70 }, { r: 'raro', p: 25 }, { r: 'super', p: 5 }] },
+  { id: 'silver',   name: 'Silver Box',   priceBRL: '24,90',  items: 4, color: '#c4c9d4',
+    odds: [{ r: 'comum', p: 50 }, { r: 'raro', p: 35 }, { r: 'super', p: 15 }] },
+  { id: 'gold',     name: 'Gold Box',     priceBRL: '59,90',  items: 5, color: '#f5c518',
+    odds: [{ r: 'comum', p: 30 }, { r: 'raro', p: 40 }, { r: 'super', p: 29 }, { r: 'lendario', p: 1 }] },
+  { id: 'platinum', name: 'Platinum Box', priceBRL: '149,90', items: 7, color: '#67e8f9',
+    odds: [{ r: 'comum', p: 20 }, { r: 'raro', p: 30 }, { r: 'super', p: 35 }, { r: 'lendario', p: 15 }],
+    bonus: 'Ticket do Torneio Principal Semanal' },
+];
+
+const DAILY_GIFTS = [
+  { glyph: '💵', label: 'R$ 1 em aposta' },
+  { glyph: '🎟️', label: 'Ticket classificatório' },
+  { glyph: '🔑', label: 'Chave de caixa' },
+  { glyph: '🎉', label: 'Item comemorativo' },
+  { glyph: '😎', label: 'Emoji / Adesivo' },
+];
+
+/* ───────────────────────── Main menus ──────────────────────────── */
+type Menu = 'ofertas' | 'caixas' | 'catalogo' | 'presente';
+const MENUS: { id: Menu; label: string; Icon: LucideIcon; color: string }[] = [
+  { id: 'ofertas',  label: 'Ofertas',         Icon: Tag,        color: '#fbbf24' },
+  { id: 'caixas',   label: 'Caixas',          Icon: Box,        color: '#a855f7' },
+  { id: 'catalogo', label: 'Catálogo',        Icon: LayoutGrid, color: '#00e870' },
+  { id: 'presente', label: 'Presente Diário', Icon: Gift,       color: '#ED0A65' },
+];
+
+type CatalogSub = 'nivel' | 'tipo' | 'consumivel';
+
+const USER_BALANCE = 12450;
+const fmtCoins = (n: number) => n.toLocaleString('pt-BR');
+
+/* ───────────────────────── Shared bits ─────────────────────────── */
 const EdgeLayers = ({ accent }: { accent?: string }) => (
   <>
     <div className="absolute top-0 inset-x-0 h-px pointer-events-none" style={{
       background: accent
-        ? `linear-gradient(90deg, transparent 5%, ${accent}55 25%, rgba(255,255,255,0.38) 50%, ${accent}38 75%, transparent 95%)`
-        : 'linear-gradient(90deg, transparent 5%, rgba(255,255,255,0.2) 30%, rgba(255,255,255,0.38) 50%, rgba(255,255,255,0.16) 70%, transparent 95%)',
+        ? `linear-gradient(90deg, transparent 6%, ${accent}55 28%, rgba(255,255,255,0.4) 50%, ${accent}38 72%, transparent 94%)`
+        : 'linear-gradient(90deg, transparent 8%, rgba(255,255,255,0.22) 50%, transparent 92%)',
     }} />
     <div className="absolute left-0 top-0 bottom-0 w-px pointer-events-none"
-      style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.24) 0%, rgba(255,255,255,0.07) 45%, transparent 80%)' }} />
-    <div className="absolute bottom-0 inset-x-0 h-px pointer-events-none" style={{ background: 'rgba(0,0,0,0.6)' }} />
+      style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 45%, transparent 80%)' }} />
     <div className="absolute inset-0 pointer-events-none"
-      style={{ background: 'linear-gradient(128deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.018) 35%, transparent 55%)' }} />
+      style={{ background: 'linear-gradient(128deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.015) 35%, transparent 55%)' }} />
   </>
 );
 
-/* ── Table top-down preview ─────────────────────────────────────── */
+/* glass card style helper following the passe/lobby aesthetic */
+function rarityCardStyle(rarity: Rarity) {
+  const { color, tint } = RARITY[rarity];
+  const tier = RARITY_TIER[rarity];
+  const bg = tint
+    ? `radial-gradient(ellipse at 35% -10%, ${color}26 0%, ${color}0c 42%, rgba(13,13,16,0.97) 70%)`
+    : 'linear-gradient(160deg, rgba(24,24,27,0.96) 0%, rgba(12,12,15,0.98) 100%)';
+  const border = tint ? `1px solid ${color}${tier >= 5 ? '70' : tier >= 3 ? '50' : '38'}` : '1px solid rgba(255,255,255,0.12)';
+  const glow = tier >= 5
+    ? `0 0 26px ${color}30, inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -1px 0 rgba(0,0,0,0.5)`
+    : tier >= 3
+      ? `0 0 16px ${color}18, inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -1px 0 rgba(0,0,0,0.45)`
+      : 'inset 0 1px 0 rgba(255,255,255,0.12), inset 0 -1px 0 rgba(0,0,0,0.45)';
+  return { background: bg, border, boxShadow: glow };
+}
+
+/* ───────────────────────── Visuals ─────────────────────────────── */
 function TablePreview({ color }: { color: string }) {
-  const pockets = [
-    { x: '0%', y: '0%' }, { x: '50%', y: '0%' }, { x: '100%', y: '0%' },
-    { x: '0%', y: '100%' }, { x: '50%', y: '100%' }, { x: '100%', y: '100%' },
-  ];
+  const pockets = [['0%','0%'],['50%','0%'],['100%','0%'],['0%','100%'],['50%','100%'],['100%','100%']];
   return (
     <div className="w-full h-full flex items-center justify-center">
-      <div className="relative" style={{ width: '80%', height: '76%' }}>
+      <div className="relative" style={{ width: '78%', height: '70%' }}>
         <div className="absolute inset-0 rounded-[7px]"
           style={{ background: 'linear-gradient(135deg,#5c3210,#7a4520,#5c3210)', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.6)' }} />
-        <div className="absolute inset-[9px] rounded-[3px]"
-          style={{ background: color, boxShadow: 'inset 0 0 20px rgba(0,0,0,0.4)' }}>
+        <div className="absolute inset-[8px] rounded-[3px]" style={{ background: color, boxShadow: 'inset 0 0 18px rgba(0,0,0,0.4)' }}>
           <div className="absolute top-[8%] bottom-[8%] left-1/2 w-px bg-white/10" />
           <div className="absolute top-1/2 left-1/2 w-2 h-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/15" />
-          <div className="absolute right-[18%] top-[18%] bottom-[18%] w-[18%] rounded-l-full border border-white/10" />
         </div>
         {pockets.map((p, i) => (
-          <div key={i} className="absolute w-4 h-4 rounded-full bg-[#050505]"
-            style={{ left: p.x, top: p.y, transform: 'translate(-50%,-50%)', boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.04)' }} />
+          <div key={i} className="absolute w-3.5 h-3.5 rounded-full bg-[#050505]"
+            style={{ left: p[0], top: p[1], transform: 'translate(-50%,-50%)' }} />
         ))}
       </div>
     </div>
   );
 }
 
-/* ── Chest preview ──────────────────────────────────────────────── */
-function ChestPreview({ gradient, icon }: { gradient: string; icon: string }) {
+function AvatarImg({ seed, color, size }: { seed: string; color: string; size: number }) {
   return (
-    <div className="w-full h-full flex items-center justify-center" style={{ background: gradient }}>
-      <span className="text-[44px] leading-none" style={{ filter: 'drop-shadow(0 0 16px rgba(255,255,255,0.35))' }}>{icon}</span>
+    <img src={`https://api.dicebear.com/7.x/micah/svg?seed=${seed}&backgroundColor=${color.slice(1)}`}
+      alt="" width={size} height={size}
+      style={{ width: size, height: size, borderRadius: '50%', border: `2px solid ${color}70`, boxShadow: `0 0 18px ${color}35` }} />
+  );
+}
+
+function ItemVisual({ item, size = 'card' }: { item: Item; size?: 'card' | 'big' }) {
+  const color = RARITY[item.rarity].color;
+  const big = size === 'big';
+  if (item.kind === 'mesa' && item.tableColor) return <TablePreview color={item.tableColor} />;
+  if (item.kind === 'avatar' && item.avatarSeed)
+    return <div className="w-full h-full flex items-center justify-center"><AvatarImg seed={item.avatarSeed} color={color} size={big ? 120 : 70} /></div>;
+  if (item.kind === 'moldura')
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <div className="relative flex items-center justify-center rounded-full"
+          style={{ width: big ? 128 : 78, height: big ? 128 : 78, padding: big ? 7 : 5,
+            background: `conic-gradient(from 0deg, ${color}, ${color}55, ${color}, ${color}55, ${color})`,
+            boxShadow: `0 0 22px ${color}45` }}>
+          <div className="rounded-full" style={{ width: '100%', height: '100%',
+            background: 'radial-gradient(circle at 40% 35%, #2a2a30, #0c0c10)', border: '2px solid rgba(0,0,0,0.5)' }} />
+        </div>
+      </div>
+    );
+  if (item.kind === 'taco')
+    return (
+      <div className="relative w-full h-full flex items-center justify-center">
+        <div className="absolute rounded-full rotate-[38deg]"
+          style={{ width: big ? 6 : 4, height: big ? '74%' : '70%', background: `linear-gradient(to bottom, ${color}, #4a3520 65%, #2a1d12)` }} />
+        <div className="absolute rounded-full rotate-[38deg]"
+          style={{ width: big ? 8 : 6, height: big ? 8 : 6, background: color, boxShadow: `0 0 8px ${color}`, top: big ? '14%' : '16%', left: '56%' }} />
+      </div>
+    );
+  // emoji / adesivo / consumivel → glyph on a soft tinted disc
+  return (
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="rounded-full flex items-center justify-center"
+        style={{ width: big ? 110 : 64, height: big ? 110 : 64,
+          background: `radial-gradient(circle at 40% 35%, ${color}22, rgba(8,8,12,0.6))`,
+          border: `1.5px solid ${color}40` }}>
+        <span style={{ fontSize: big ? 56 : 32, lineHeight: 1, filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.6))' }}>{item.glyph ?? '🎱'}</span>
+      </div>
     </div>
   );
 }
 
-/* ── Left sidebar category button ──────────────────────────────── */
-function CategorySideButton({ cat, isActive, onClick }: { cat: Category; isActive: boolean; onClick: () => void }) {
-  const { Icon } = cat;
+function ChestVisual({ color, big = false }: { color: string; big?: boolean }) {
   return (
-    <motion.button
-      onClick={onClick}
-      whileHover={{ x: 3, scale: 1.01 }}
-      whileTap={{ scale: 0.97 }}
-      className="relative flex flex-col justify-between px-3.5 py-3 rounded-[15px] overflow-hidden text-left cursor-pointer w-full flex-1 min-h-0"
-      style={{
-        background: isActive
-          ? `linear-gradient(155deg, rgba(14,14,20,0.97) 0%, rgba(6,6,10,0.99) 60%, ${cat.color}0a 100%)`
-          : 'linear-gradient(155deg, rgba(12,12,18,0.95) 0%, rgba(5,5,8,0.98) 100%)',
-        backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-        border: `1px solid ${isActive ? cat.color + '55' : 'rgba(255,255,255,0.1)'}`,
-        boxShadow: isActive
-          ? `0 12px 40px rgba(0,0,0,0.9), 0 0 0 1px ${cat.color}22, inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.5)`
-          : '0 8px 32px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4)',
-      }}
-    >
-      {/* Active left bar */}
-      {isActive && (
-        <motion.div
-          layoutId="store-cat-bar"
-          className="absolute left-0 top-[18%] bottom-[18%] w-[4px] rounded-r-full"
-          style={{ background: cat.color, boxShadow: `0 0 12px ${cat.color}, 0 0 24px ${cat.color}60` }}
-          transition={{ type: 'spring', stiffness: 420, damping: 34 }}
-        />
-      )}
-      <EdgeLayers accent={isActive ? cat.color : undefined} />
-      {isActive && (
-        <div className="absolute inset-0 pointer-events-none"
-          style={{ background: `radial-gradient(ellipse at 20% 50%, ${cat.color}12 0%, transparent 65%)` }} />
-      )}
-
-      {/* Icon */}
-      <Icon size={17} strokeWidth={2} color={isActive ? cat.color : 'rgba(255,255,255,0.3)'} className="relative z-10 shrink-0" />
-
-      {/* Label */}
-      <div className="relative z-10">
-        <div className="font-display leading-none tracking-[0.06em]"
-          style={{ fontSize: '14px', color: isActive ? cat.color : 'rgba(255,255,255,0.38)', textShadow: isActive ? `0 0 20px ${cat.color}60` : 'none' }}>
-          {cat.label}
-        </div>
-      </div>
-
-      {/* New dot */}
-      {cat.isNew && (
-        <motion.div
-          animate={{ opacity: [0.5, 1, 0.5] }}
-          transition={{ repeat: Infinity, duration: 1.8 }}
-          className="absolute top-3 right-3 w-2 h-2 rounded-full"
-          style={{ background: cat.color, boxShadow: `0 0 7px ${cat.color}, 0 0 14px ${cat.color}70` }}
-        />
-      )}
-    </motion.button>
+    <div className="w-full h-full flex items-center justify-center"
+      style={{ background: `radial-gradient(ellipse at 50% 40%, ${color}22 0%, rgba(8,8,12,0.85) 70%)` }}>
+      <svg viewBox="0 0 44 36" style={{ width: big ? '52%' : '60%', height: big ? '52%' : '60%', filter: `drop-shadow(0 0 ${big ? 16 : 9}px ${color}66)` }} fill="none">
+        <rect x="2" y="17" width="40" height="17" rx="2.5" fill={color + '20'} stroke={color} strokeWidth="1.8" />
+        <path d="M2 19 Q2 8 22 8 Q42 8 42 19 L42 21 L2 21 Z" fill={color + '33'} stroke={color} strokeWidth="1.8" />
+        <rect x="2" y="20" width="40" height="4" fill={color + '55'} />
+        <rect x="18.5" y="23" width="7" height="5" rx="1.5" fill={color + '66'} stroke={color} strokeWidth="1" />
+        <path d="M20 23 Q20 19.5 22 19.5 Q24 19.5 24 23" stroke={color} strokeWidth="1.5" fill="none" strokeLinecap="round" />
+        <circle cx="9" cy="13" r="1.5" fill={color + 'aa'} /><circle cx="22" cy="9" r="2" fill={color} /><circle cx="35" cy="13" r="1.5" fill={color + 'aa'} />
+      </svg>
+    </div>
   );
 }
 
-/* ── Store card (horizontal scroll, fixed width) ────────────────── */
-function StoreCard({ item, index, onBuy }: { item: StoreItem; index: number; onBuy: (item: StoreItem) => void }) {
-  const rarityColor = RARITY_COLOR[item.rarity] ?? '#9ca3af';
-  const isPasse = item.price === 'PASSE';
-  const tier = RARITY_TIER[item.rarity] ?? 0;
+/* ───────────────────────── Rarity pill / odds ──────────────────── */
+function RarityPill({ rarity, small }: { rarity: Rarity; small?: boolean }) {
+  const { label, color } = RARITY[rarity];
+  return (
+    <span className={`inline-block font-black uppercase rounded-full ${small ? 'text-[7px] px-1.5 py-0.5 tracking-[0.12em]' : 'text-[8px] px-2 py-0.5 tracking-[0.16em]'}`}
+      style={{ color, background: `${color}1a`, border: `1px solid ${color}45` }}>
+      {label}
+    </span>
+  );
+}
 
-  const cardBg = tier >= 5
-    ? `radial-gradient(ellipse at 30% -10%, ${rarityColor}40 0%, ${rarityColor}14 38%, rgba(8,8,12,0.97) 68%)`
-    : tier >= 4
-      ? `radial-gradient(ellipse at 30% -10%, ${rarityColor}30 0%, ${rarityColor}10 40%, rgba(8,8,12,0.95) 68%)`
-      : tier >= 3
-        ? `radial-gradient(ellipse at 30% -10%, ${rarityColor}22 0%, ${rarityColor}08 42%, rgba(8,8,12,0.92) 68%)`
-        : tier >= 2
-          ? `radial-gradient(ellipse at 30% -10%, ${rarityColor}12 0%, rgba(8,8,12,0.88) 60%)`
-          : 'rgba(9,9,13,0.92)';
+function CoinPrice({ coins, old, size = 'sm' }: { coins?: number; old?: number; size?: 'sm' | 'lg' }) {
+  if (coins == null) return null;
+  const big = size === 'lg';
+  return (
+    <div className="flex items-center gap-1.5">
+      <div className="rounded-full flex items-center justify-center shrink-0"
+        style={{ width: big ? 22 : 15, height: big ? 22 : 15, background: 'linear-gradient(145deg,#00e870,#00a84a)', boxShadow: '0 0 7px rgba(0,210,106,0.55)' }}>
+        <span style={{ fontSize: big ? 10 : 6, fontWeight: 900, color: '#000', lineHeight: 1 }}>$</span>
+      </div>
+      <span className="font-black leading-none" style={{ fontSize: big ? 22 : 14, color: '#00e870', textShadow: '0 0 10px rgba(0,210,106,0.4)' }}>{fmtCoins(coins)}</span>
+      {old != null && <span className="text-[10px] font-bold line-through" style={{ color: 'rgba(255,255,255,0.3)' }}>{fmtCoins(old)}</span>}
+    </div>
+  );
+}
 
-  const cardBorder = tier >= 3
-    ? `1px solid ${rarityColor}${tier >= 5 ? '75' : tier >= 4 ? '60' : '45'}`
-    : tier >= 2 ? `1px solid ${rarityColor}28` : '1px solid rgba(255,255,255,0.08)';
-
-  const metallicInsets = tier >= 5
-    ? 'inset 0 1px 0 rgba(255,255,255,0.62), inset 0 -1px 0 rgba(0,0,0,0.55), inset 1px 0 0 rgba(255,255,255,0.22), inset -1px 0 0 rgba(0,0,0,0.35)'
-    : tier >= 4 ? 'inset 0 1px 0 rgba(255,255,255,0.48), inset 0 -1px 0 rgba(0,0,0,0.45), inset 1px 0 0 rgba(255,255,255,0.16)'
-    : tier >= 3 ? 'inset 0 1px 0 rgba(255,255,255,0.32), inset 0 -1px 0 rgba(0,0,0,0.35)'
-    : tier >= 2 ? 'inset 0 1px 0 rgba(255,255,255,0.14)' : 'inset 0 1px 0 rgba(255,255,255,0.07)';
-
-  const outerGlow = tier >= 5
-    ? `0 0 40px ${rarityColor}35, 0 0 80px ${rarityColor}12, 0 14px 40px rgba(0,0,0,0.72)`
-    : tier >= 4 ? `0 0 24px ${rarityColor}25, 0 10px 36px rgba(0,0,0,0.66)`
-    : tier >= 3 ? `0 0 16px ${rarityColor}18, 0 8px 32px rgba(0,0,0,0.62)`
-    : '0 6px 24px rgba(0,0,0,0.55)';
-
-  const stripH = tier >= 5 ? '4px' : tier >= 3 ? '3px' : '2px';
-  const stripGlow = tier >= 5
-    ? `0 0 14px ${rarityColor}, 0 0 28px ${rarityColor}70`
-    : tier >= 4 ? `0 0 9px ${rarityColor}cc` : tier >= 3 ? `0 0 6px ${rarityColor}99` : 'none';
-
+/* ───────────────────────── Item card ───────────────────────────── */
+function ItemCard({ item, index, onOpen }: { item: Item; index: number; onOpen: (i: Item) => void }) {
+  const { color } = RARITY[item.rarity];
+  const onlyBox = item.note?.toLowerCase().includes('caixa');
   return (
     <motion.div
-      initial={{ opacity: 0, x: 20, scale: 0.97 }}
+      initial={{ opacity: 0, x: 16, scale: 0.97 }}
       animate={{ opacity: 1, x: 0, scale: 1 }}
-      transition={{ delay: index * 0.055, duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-      className="relative rounded-[20px] overflow-hidden flex flex-col cursor-pointer h-full"
-      onClick={() => onBuy(item)}
-      whileTap={{ scale: 0.96, transition: { duration: 0.12 } }}
-      style={{
-        background: cardBg, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-        border: cardBorder, boxShadow: [outerGlow, metallicInsets].join(', '),
-      }}
+      transition={{ delay: index * 0.04, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      whileTap={{ scale: 0.96 }}
+      onClick={() => onOpen(item)}
+      className="relative rounded-[18px] overflow-hidden flex flex-col cursor-pointer h-full"
+      style={rarityCardStyle(item.rarity)}
     >
-      {/* Rarity top strip */}
-      <div className="absolute top-0 inset-x-0 z-20 pointer-events-none rounded-t-[20px]"
-        style={{ height: stripH, background: rarityColor, boxShadow: stripGlow }} />
+      <div className="absolute top-0 inset-x-0 h-[2px] z-20 pointer-events-none" style={{ background: color, boxShadow: RARITY_TIER[item.rarity] >= 4 ? `0 0 8px ${color}` : 'none' }} />
+      <EdgeLayers accent={RARITY_TIER[item.rarity] >= 3 ? color : undefined} />
 
-      {/* Legendary shimmer */}
-      {tier >= 5 && (
-        <motion.div
-          className="absolute inset-0 z-10 pointer-events-none"
-          animate={{ x: ['-120%', '220%'] }}
-          transition={{ duration: 3.5, repeat: Infinity, repeatDelay: 5, ease: 'linear' }}
-          style={{ background: `linear-gradient(105deg, transparent 35%, ${rarityColor}18 50%, transparent 65%)` }}
-        />
-      )}
-
-      {tier >= 3 && (
-        <div className="absolute top-0 right-0 w-20 h-20 pointer-events-none z-10"
-          style={{ background: `radial-gradient(circle at 100% 0%, ${rarityColor}20 0%, transparent 70%)` }} />
-      )}
-      <EdgeLayers accent={tier >= 3 ? rarityColor : undefined} />
-
-      {/* Visual area */}
-      <div className="relative overflow-hidden shrink-0"
-        style={{ height: '130px', background: `linear-gradient(145deg, ${item.accent}22 0%, rgba(8,8,12,0.9) 100%)` }}>
-        {item.image && (
-          <>
-            <img src={item.image} alt="" className="w-full h-full object-cover opacity-55"
-              onError={e => { e.currentTarget.style.display = 'none'; }} />
-            <div className="absolute inset-0"
-              style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.65) 100%)' }} />
-          </>
-        )}
-        {item.avatarUrl && (
-          <div className="w-full h-full flex items-center justify-center"
-            style={{ background: `radial-gradient(circle at 50% 60%, ${item.accent}22 0%, rgba(0,0,0,0) 70%)` }}>
-            <div className="relative">
-              <div className="absolute inset-0 rounded-full scale-110"
-                style={{ background: `radial-gradient(circle, ${item.accent}30, transparent 70%)` }} />
-              <img src={item.avatarUrl} alt={item.name}
-                className="w-[72px] h-[72px] rounded-full relative z-10"
-                style={{ border: `2px solid ${item.accent}60`, boxShadow: `0 0 20px ${item.accent}35` }} />
-            </div>
-          </div>
-        )}
-        {item.tableColor && <TablePreview color={item.tableColor} />}
-        {item.chestGradient && <ChestPreview gradient={item.chestGradient} icon={item.chestIcon!} />}
+      {/* visual */}
+      <div className="relative shrink-0 overflow-hidden" style={{ height: 118 }}>
+        <ItemVisual item={item} />
       </div>
 
-      {/* Info area */}
-      <div className="flex flex-col flex-1 px-3 pt-2.5 pb-3 gap-1 min-h-0">
-        <span className="text-[8px] font-black uppercase tracking-[0.18em] shrink-0" style={{ color: rarityColor }}>
-          {item.rarity}
-        </span>
-        <h3 className="font-display leading-none tracking-wide shrink-0" style={{ fontSize: '17px', color: 'rgba(255,255,255,0.92)' }}>
-          {item.name}
-        </h3>
-        {item.description && (
-          <p className="text-[9px] leading-[1.4] line-clamp-2 mt-0.5 flex-1" style={{ color: 'rgba(255,255,255,0.28)' }}>
-            {item.description}
-          </p>
-        )}
-
-        {/* Price / buy button */}
-        <motion.div
-          whileHover={{ scale: 1.03 }}
-          whileTap={{ scale: 0.96 }}
-          className="mt-auto shrink-0 flex items-center justify-center gap-1.5 rounded-[11px] py-2.5 relative overflow-hidden"
-          style={
-            isPasse
-              ? { background: 'rgba(255,0,76,0.12)', border: '1px solid rgba(255,0,76,0.38)' }
-              : {
-                  background: `linear-gradient(135deg, ${rarityColor}28 0%, ${rarityColor}12 100%)`,
-                  border: `1px solid ${rarityColor}40`,
-                  boxShadow: `inset 0 1px 0 rgba(255,255,255,0.12)`,
-                }
-          }
-        >
-          <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
-            style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent)' }} />
-          {isPasse ? (
-            <span style={{ fontSize: '10px', fontWeight: 900, color: '#ff004c', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-              PASSE ACE
-            </span>
-          ) : (
-            <>
-              <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center shrink-0"
-                style={{ background: 'linear-gradient(145deg,#00e870,#00a84a)', boxShadow: '0 0 6px rgba(0,210,106,0.6)' }}>
-                <span style={{ fontSize: '5px', fontWeight: 900, color: '#000', lineHeight: 1 }}>$</span>
-              </div>
-              <span style={{ fontSize: '14px', fontWeight: 900, color: '#00e870', textShadow: '0 0 10px rgba(0,210,106,0.45)', lineHeight: 1 }}>
-                {item.price}
-              </span>
-            </>
-          )}
-        </motion.div>
-      </div>
-
-      {/* Badge */}
-      {item.badge && (
-        <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-[8px] font-black uppercase tracking-wider z-20"
-          style={{ background: item.accent, color: '#000', boxShadow: `0 2px 10px ${item.accent}55` }}>
-          {item.badge}
+      {/* info */}
+      <div className="flex flex-col flex-1 px-3 pt-2 pb-2.5 gap-1 min-h-0">
+        <div className="flex items-center justify-between gap-1">
+          <RarityPill rarity={item.rarity} small />
+          <span className="text-[7px] font-bold uppercase tracking-[0.14em]" style={{ color: 'rgba(255,255,255,0.3)' }}>{KIND_LABEL[item.kind]}</span>
         </div>
+        <h3 className="font-display leading-none tracking-wide" style={{ fontSize: 16, color: 'rgba(255,255,255,0.94)' }}>{item.name}</h3>
+        {item.note && <p className="text-[8.5px] leading-tight" style={{ color: `${color}cc` }}>{item.note}</p>}
+
+        <div className="mt-auto pt-1.5">
+          {onlyBox ? (
+            <div className="flex items-center justify-center gap-1.5 rounded-[10px] py-2"
+              style={{ background: `${color}14`, border: `1px solid ${color}40` }}>
+              <Lock size={11} style={{ color }} />
+              <span className="text-[9px] font-black uppercase tracking-wider" style={{ color }}>Só em caixas</span>
+            </div>
+          ) : item.coins != null ? (
+            <div className="flex items-center justify-center rounded-[10px] py-2"
+              style={{ background: 'linear-gradient(135deg, rgba(0,232,112,0.18), rgba(0,232,112,0.06))', border: '1px solid rgba(0,232,112,0.3)' }}>
+              <CoinPrice coins={item.coins} old={item.oldCoins} />
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-1.5 rounded-[10px] py-2"
+              style={{ background: 'rgba(16,185,129,0.14)', border: '1px solid rgba(16,185,129,0.4)' }}>
+              <span className="text-[9px] font-black uppercase tracking-wider" style={{ color: '#10b981' }}>Passe da Temporada</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {item.discount && (
+        <div className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[8px] font-black z-20"
+          style={{ background: '#ef4444', color: '#fff', boxShadow: '0 2px 8px rgba(239,68,68,0.5)' }}>-{item.discount}%</div>
       )}
     </motion.div>
   );
 }
 
-/* ── Purchase confirmation — bottom sheet ─────────────────────── */
-function ConfirmModal({ item, onConfirm, onCancel }: { item: StoreItem; onConfirm: () => void; onCancel: () => void }) {
-  const rarityColor = RARITY_COLOR[item.rarity] ?? '#9ca3af';
-  const isPasse = item.price === 'PASSE';
-  const canAfford = isPasse || parsePrice(item.price) <= USER_BALANCE;
+/* ───────────────────────── Box card ────────────────────────────── */
+function BoxCard({ box, index, onOpen }: { box: BoxDef; index: number; onOpen: (b: BoxDef) => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 16, scale: 0.97 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      transition={{ delay: index * 0.05, duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      whileTap={{ scale: 0.96 }}
+      onClick={() => onOpen(box)}
+      className="relative rounded-[18px] overflow-hidden flex flex-col cursor-pointer h-full"
+      style={{
+        background: `radial-gradient(ellipse at 40% -10%, ${box.color}22 0%, ${box.color}08 42%, rgba(13,13,16,0.97) 70%)`,
+        border: `1px solid ${box.color}50`,
+        boxShadow: `0 0 18px ${box.color}1c, inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(0,0,0,0.45)`,
+      }}
+    >
+      <div className="absolute top-0 inset-x-0 h-[2px] z-20" style={{ background: box.color, boxShadow: `0 0 8px ${box.color}` }} />
+      <EdgeLayers accent={box.color} />
+
+      <div className="relative shrink-0" style={{ height: 116 }}>
+        <ChestVisual color={box.color} />
+        {box.bonus && (
+          <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded-full"
+            style={{ background: 'rgba(245,197,24,0.18)', border: '1px solid rgba(245,197,24,0.5)' }}>
+            <Ticket size={9} style={{ color: '#f5c518' }} />
+            <span className="text-[7px] font-black uppercase tracking-wide" style={{ color: '#f5c518' }}>Brinde</span>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-col flex-1 px-3 pt-2 pb-2.5 gap-1.5 min-h-0">
+        <div className="flex items-center justify-between">
+          <h3 className="font-display leading-none tracking-wide" style={{ fontSize: 17, color: '#fff' }}>{box.name}</h3>
+          <span className="text-[8px] font-bold" style={{ color: 'rgba(255,255,255,0.4)' }}>{box.items} itens</span>
+        </div>
+
+        {/* odds bar */}
+        <div className="flex h-[5px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+          {box.odds.map(o => (
+            <div key={o.r} style={{ width: `${o.p}%`, background: RARITY[o.r].color }} />
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-x-2 gap-y-0.5">
+          {box.odds.map(o => (
+            <div key={o.r} className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full" style={{ background: RARITY[o.r].color }} />
+              <span className="text-[7.5px] font-bold" style={{ color: 'rgba(255,255,255,0.55)' }}>{o.p}%</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-auto pt-1 flex items-center justify-center rounded-[10px] py-2"
+          style={{ background: `linear-gradient(135deg, ${box.color}28, ${box.color}10)`, border: `1px solid ${box.color}45` }}>
+          <span className="text-[8px] font-bold mr-1" style={{ color: 'rgba(255,255,255,0.6)' }}>R$</span>
+          <span className="font-display text-[18px] leading-none" style={{ color: '#fff' }}>{box.priceBRL}</span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* ───────────────────────── Detail modal ────────────────────────── */
+function DetailModal({ item, box, onClose }: { item?: Item; box?: BoxDef; onClose: () => void }) {
+  const color = item ? RARITY[item.rarity].color : box!.color;
+  const onlyBox = item?.note?.toLowerCase().includes('caixa');
+  const canBuy = item ? (!onlyBox && !item.soon) : true;
+
+  const buy = () => {
+    if (box) { toast.success(`${box.name} adquirida!`, { description: `${box.items} itens foram adicionados ao seu inventário.` }); }
+    else if (item) {
+      if (item.soon) { toast('Em breve', { description: `${item.name} estará disponível em breve.` }); return; }
+      if (onlyBox) { toast('Item exclusivo de caixas', { description: `${item.name} só pode ser obtido abrindo caixas.` }); return; }
+      toast.success(`${item.name} adquirido!`, { description: 'O item foi adicionado ao seu perfil.' });
+    }
+    onClose();
+  };
 
   return (
     <motion.div
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      transition={{ duration: 0.18 }}
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}
       className="absolute inset-0 z-50 flex items-end"
-      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)' }}
-      onClick={onCancel}
+      style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
+      onClick={onClose}
     >
       <motion.div
         initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
         transition={{ type: 'spring', stiffness: 400, damping: 42 }}
-        className="relative w-full rounded-t-[28px] overflow-hidden flex flex-col"
-        style={{
-          background: 'rgba(8,8,12,0.98)', backdropFilter: 'blur(40px)', WebkitBackdropFilter: 'blur(40px)',
-          border: `1px solid ${rarityColor}28`, borderBottom: 'none',
-          boxShadow: `0 -24px 60px rgba(0,0,0,0.85), 0 0 50px ${rarityColor}12`,
-          maxHeight: '82vh',
-        }}
         onClick={e => e.stopPropagation()}
+        className="relative w-full rounded-t-[26px] overflow-hidden flex flex-col"
+        style={{
+          background: 'linear-gradient(160deg, rgba(22,22,25,0.99) 0%, rgba(10,10,13,0.99) 100%)',
+          border: `1px solid ${color}30`, borderBottom: 'none',
+          boxShadow: `0 -24px 60px rgba(0,0,0,0.85), 0 0 50px ${color}14`, maxHeight: '88vh',
+        }}
       >
-        <div className="absolute top-0 inset-x-0 z-10 rounded-t-[28px]"
-          style={{ height: '3px', background: rarityColor }} />
-        <EdgeLayers accent={rarityColor} />
-
-        <div className="flex items-center justify-center pt-5 pb-1 shrink-0">
+        <div className="absolute top-0 inset-x-0 h-[3px] z-10" style={{ background: color, boxShadow: `0 0 10px ${color}` }} />
+        <div className="flex items-center justify-center pt-4 pb-1 shrink-0">
           <div className="w-10 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.15)' }} />
         </div>
-
-        <motion.button
-          whileTap={{ scale: 0.88 }} onClick={onCancel}
-          className="absolute top-4 right-5 w-8 h-8 rounded-full flex items-center justify-center z-20"
-          style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}
-        >
-          <X size={14} style={{ color: 'rgba(255,255,255,0.45)' }} />
+        <motion.button whileTap={{ scale: 0.9 }} onClick={onClose}
+          className="absolute top-3.5 right-5 w-8 h-8 rounded-full flex items-center justify-center z-20"
+          style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
+          <X size={14} style={{ color: 'rgba(255,255,255,0.5)' }} />
         </motion.button>
 
-        <div className="flex flex-col px-5 pb-8 gap-4 overflow-y-auto no-scrollbar">
-          {/* Visual */}
-          <div className="relative rounded-[16px] overflow-hidden shrink-0"
-            style={{ height: '180px', background: `linear-gradient(145deg, ${item.accent}22 0%, rgba(8,8,12,0.9) 100%)` }}>
-            {item.image && (
-              <>
-                <img src={item.image} alt={item.name} className="w-full h-full object-cover opacity-75" />
-                <div className="absolute inset-0"
-                  style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.5) 100%)' }} />
-              </>
-            )}
-            {item.avatarUrl && (
-              <div className="w-full h-full flex items-center justify-center"
-                style={{ background: `radial-gradient(circle at 50% 55%, ${item.accent}28 0%, rgba(6,6,10,0.9) 72%)` }}>
-                <img src={item.avatarUrl} alt={item.name} className="w-[130px] h-[130px] rounded-full"
-                  style={{ border: `3px solid ${item.accent}60`, boxShadow: `0 0 40px ${item.accent}35` }} />
-              </div>
-            )}
-            {item.tableColor && (
-              <div className="w-full h-full flex items-center justify-center p-5"
-                style={{ background: `radial-gradient(circle at 50% 50%, ${item.accent}12 0%, rgba(6,6,10,0.9) 75%)` }}>
-                <TablePreview color={item.tableColor} />
-              </div>
-            )}
-            {item.chestGradient && (
-              <div className="w-full h-full flex items-center justify-center" style={{ background: item.chestGradient }}>
-                <span className="text-[72px] leading-none"
-                  style={{ filter: 'drop-shadow(0 0 24px rgba(255,255,255,0.35))' }}>{item.chestIcon}</span>
-              </div>
-            )}
-            <div className="absolute top-0 inset-x-0 h-[3px] rounded-t-[16px]" style={{ background: rarityColor }} />
-            {item.badge && (
-              <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider"
-                style={{ background: item.accent, color: '#000', boxShadow: `0 2px 10px ${item.accent}55` }}>
-                {item.badge}
-              </div>
-            )}
+        <div className="flex gap-4 px-5 pb-6 pt-2 overflow-y-auto no-scrollbar">
+          {/* visual */}
+          <div className="relative rounded-[16px] overflow-hidden shrink-0" style={{ width: 200, height: 180, background: `radial-gradient(ellipse at 50% 40%, ${color}1c, rgba(8,8,12,0.9) 72%)` }}>
+            {box ? <ChestVisual color={color} big /> : <ItemVisual item={item!} size="big" />}
+            <div className="absolute top-0 inset-x-0 h-[3px]" style={{ background: color }} />
           </div>
 
-          {/* Info */}
-          <div className="flex flex-col gap-2">
-            <span className="self-start px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.18em]"
-              style={{ background: `${rarityColor}18`, border: `1px solid ${rarityColor}45`, color: rarityColor }}>
-              {item.rarity}
-            </span>
-            <h2 className="font-display leading-none"
-              style={{ fontSize: '34px', letterSpacing: '0.04em', color: 'rgba(255,255,255,0.95)' }}>
-              {item.name}
-            </h2>
-            {item.description && (
-              <p className="text-[12px] leading-[1.65]" style={{ color: 'rgba(255,255,255,0.38)' }}>{item.description}</p>
+          {/* details */}
+          <div className="flex flex-col flex-1 min-w-0 gap-2 pt-1">
+            {item && <RarityPill rarity={item.rarity} />}
+            {box && (
+              <span className="self-start text-[9px] font-black uppercase tracking-[0.16em] px-2 py-0.5 rounded-full"
+                style={{ color: box.color, background: `${box.color}1a`, border: `1px solid ${box.color}45` }}>Caixa · {box.items} itens</span>
             )}
-          </div>
+            <h2 className="font-display leading-none" style={{ fontSize: 30, letterSpacing: '0.03em', color: '#fff' }}>{item?.name ?? box?.name}</h2>
+            {item?.note && <p className="text-[11px]" style={{ color: `${color}cc` }}>{item.note}</p>}
 
-          {/* Price */}
-          <div className="flex items-center gap-2">
-            {!isPasse ? (
-              <>
-                <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0"
-                  style={{ background: 'linear-gradient(145deg,#00e870,#00a84a)', boxShadow: '0 0 12px rgba(0,210,106,0.55)' }}>
-                  <span className="text-[11px] font-black text-black leading-none">$</span>
+            {/* box odds */}
+            {box && (
+              <div className="flex flex-col gap-1.5 mt-1">
+                <span className="text-[9px] font-black uppercase tracking-[0.16em]" style={{ color: 'rgba(255,255,255,0.4)' }}>Probabilidades</span>
+                {box.odds.map(o => (
+                  <div key={o.r} className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full" style={{ background: RARITY[o.r].color }} />
+                    <span className="text-[10px] font-bold w-20" style={{ color: RARITY[o.r].color }}>{RARITY[o.r].label}</span>
+                    <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                      <div className="h-full rounded-full" style={{ width: `${o.p}%`, background: RARITY[o.r].color }} />
+                    </div>
+                    <span className="text-[10px] font-black w-8 text-right" style={{ color: 'rgba(255,255,255,0.7)' }}>{o.p}%</span>
+                  </div>
+                ))}
+                {box.bonus && (
+                  <div className="flex items-center gap-1.5 mt-1 px-2.5 py-1.5 rounded-lg" style={{ background: 'rgba(245,197,24,0.12)', border: '1px solid rgba(245,197,24,0.3)' }}>
+                    <Ticket size={13} style={{ color: '#f5c518' }} />
+                    <span className="text-[10px] font-bold" style={{ color: '#f5c518' }}>{box.bonus}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="mt-auto pt-2 flex items-center gap-3">
+              {box ? (
+                <div className="flex items-baseline gap-1">
+                  <span className="text-[12px] font-bold" style={{ color: 'rgba(255,255,255,0.55)' }}>R$</span>
+                  <span className="font-display text-[26px] leading-none text-white">{box.priceBRL}</span>
                 </div>
-                <span className="text-[28px] font-black leading-none"
-                  style={{ color: '#00e870', textShadow: '0 0 16px rgba(0,210,106,0.45)' }}>{item.price}</span>
-                <span className="text-[12px] font-bold mt-1" style={{ color: 'rgba(0,210,106,0.4)' }}>moedas</span>
-              </>
-            ) : (
-              <span className="text-[13px] font-black uppercase tracking-wider" style={{ color: '#ff004c' }}>
-                Exclusivo do Passe Ace
-              </span>
-            )}
-          </div>
+              ) : item?.coins != null ? (
+                <CoinPrice coins={item.coins} old={item.oldCoins} size="lg" />
+              ) : null}
 
-          {/* Buy button */}
-          <motion.button
-            whileTap={canAfford ? { scale: 0.97 } : {}}
-            onClick={canAfford ? onConfirm : undefined}
-            className="w-full py-4 rounded-[16px] font-black text-[15px] uppercase tracking-widest relative overflow-hidden"
-            style={
-              isPasse
-                ? { background: 'rgba(255,0,76,0.12)', border: '1px solid rgba(255,0,76,0.4)', color: '#ff004c' }
-                : !canAfford
-                  ? { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.2)', cursor: 'not-allowed' }
-                  : { background: 'linear-gradient(135deg,#00e870,#00b050)', color: '#000', boxShadow: '0 0 24px rgba(0,210,106,0.4), inset 0 1px 0 rgba(255,255,255,0.28)' }
-            }
-          >
-            {canAfford && !isPasse && (
-              <div className="absolute inset-0 pointer-events-none"
-                style={{ background: 'linear-gradient(180deg,rgba(255,255,255,0.16) 0%,transparent 55%)' }} />
-            )}
-            <span className="relative z-10">
-              {isPasse ? 'Ver Passe Ace' : !canAfford ? 'Saldo insuficiente' : 'Comprar agora'}
-            </span>
-          </motion.button>
+              <motion.button whileTap={canBuy ? { scale: 0.97 } : {}} onClick={buy}
+                className="ml-auto relative overflow-hidden rounded-[14px] px-6 py-3 font-display tracking-[0.12em]"
+                style={canBuy
+                  ? { background: 'linear-gradient(160deg,#00e870,#00c058 55%,#008a3a)', color: '#000', fontSize: 18, border: '1px solid rgba(255,255,255,0.28)', boxShadow: '0 0 22px rgba(0,232,112,0.45), inset 0 2px 0 rgba(255,255,255,0.65)' }
+                  : { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)', fontSize: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
+                <div className="absolute inset-x-0 top-0 h-1/2 pointer-events-none" style={{ borderRadius: '14px 14px 0 0', background: 'linear-gradient(180deg, rgba(255,255,255,0.5), transparent)' }} />
+                <span className="relative z-10">{box ? 'COMPRAR' : item?.soon ? 'EM BREVE' : onlyBox ? 'SÓ EM CAIXAS' : 'COMPRAR'}</span>
+              </motion.button>
+            </div>
+          </div>
         </div>
       </motion.div>
     </motion.div>
   );
 }
 
-/* ── Main Store ─────────────────────────────────────────────────── */
+/* ───────────────────────── Sidebar menu button ─────────────────── */
+function MenuButton({ menu, active, onClick }: { menu: typeof MENUS[number]; active: boolean; onClick: () => void }) {
+  const { Icon, color } = menu;
+  return (
+    <motion.button
+      onClick={onClick} whileHover={{ x: 3, scale: 1.01 }} whileTap={{ scale: 0.97 }}
+      className="relative flex flex-col justify-between px-3.5 py-3 rounded-[15px] overflow-hidden text-left cursor-pointer w-full flex-1 min-h-0"
+      style={{
+        background: active
+          ? `linear-gradient(155deg, rgba(20,20,23,0.97) 0%, rgba(9,9,12,0.99) 60%, ${color}0d 100%)`
+          : 'linear-gradient(155deg, rgba(16,16,20,0.95) 0%, rgba(7,7,10,0.98) 100%)',
+        border: `1px solid ${active ? color + '55' : 'rgba(255,255,255,0.1)'}`,
+        boxShadow: active
+          ? `0 0 0 1px ${color}22, inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.5)`
+          : 'inset 0 1px 0 rgba(255,255,255,0.13), inset 0 -1px 0 rgba(0,0,0,0.4)',
+      }}
+    >
+      {active && (
+        <motion.div layoutId="store-menu-bar" className="absolute left-0 top-[18%] bottom-[18%] w-[4px] rounded-r-full"
+          style={{ background: color, boxShadow: `0 0 12px ${color}, 0 0 24px ${color}60` }}
+          transition={{ type: 'spring', stiffness: 420, damping: 34 }} />
+      )}
+      <EdgeLayers accent={active ? color : undefined} />
+      <Icon size={17} strokeWidth={2} color={active ? color : 'rgba(255,255,255,0.32)'} className="relative z-10 shrink-0" />
+      <div className="relative z-10 font-display leading-tight tracking-[0.05em]"
+        style={{ fontSize: 14, color: active ? color : 'rgba(255,255,255,0.4)', textShadow: active ? `0 0 18px ${color}55` : 'none' }}>
+        {menu.label}
+      </div>
+    </motion.button>
+  );
+}
+
+/* ───────────────────────── Chip ────────────────────────────────── */
+function Chip({ label, active, color, onClick }: { label: string; active: boolean; color: string; onClick: () => void }) {
+  return (
+    <button onClick={onClick}
+      className="shrink-0 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer"
+      style={{
+        color: active ? (color === '#9ca3af' ? '#fff' : color) : 'rgba(255,255,255,0.45)',
+        background: active ? `${color}1f` : 'rgba(255,255,255,0.04)',
+        border: `1px solid ${active ? color + '55' : 'rgba(255,255,255,0.08)'}`,
+      }}>
+      {label}
+    </button>
+  );
+}
+
+/* ───────────────────────── Horizontal scroll ───────────────────── */
+function CardRow({ children, k }: { children: ReactNode; k: string }) {
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div key={k}
+        initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.22 }}
+        className="flex-1 overflow-x-auto no-scrollbar flex gap-3 items-stretch p-3 min-h-0">
+        {children}
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+/* ───────────────────────── Main Store ──────────────────────────── */
 export default function Store() {
-  const [activeTab, setActiveTab] = useState<TabId>('destaque');
-  const [confirmItem, setConfirmItem] = useState<StoreItem | null>(null);
+  const [menu, setMenu] = useState<Menu>('ofertas');
+  const [sub, setSub] = useState<CatalogSub>('nivel');
+  const [rarityFilter, setRarityFilter] = useState<Rarity | 'all'>('all');
+  const [typeFilter, setTypeFilter] = useState<ItemKind | 'all'>('all');
+  const [detailItem, setDetailItem] = useState<Item | null>(null);
+  const [detailBox, setDetailBox] = useState<BoxDef | null>(null);
 
-  const items = TAB_ITEMS[activeTab];
-  const activeCat = CATEGORIES.find(c => c.id === activeTab)!;
+  const activeMenu = MENUS.find(m => m.id === menu)!;
 
-  const handleConfirm = () => {
-    if (!confirmItem) return;
-    if (confirmItem.price === 'PASSE') {
-      toast('Abra o Passe Ace para resgatar este item!');
-    } else {
-      toast.success(`${confirmItem.name} adquirido!`, { description: 'O item foi adicionado ao seu perfil.' });
-    }
-    setConfirmItem(null);
-  };
+  const catalogItems = (() => {
+    if (sub === 'consumivel') return CONSUMIVEIS;
+    let list = CATALOG;
+    if (sub === 'nivel' && rarityFilter !== 'all') list = list.filter(i => i.rarity === rarityFilter);
+    if (sub === 'tipo' && typeFilter !== 'all') list = list.filter(i => i.kind === typeFilter);
+    return list;
+  })();
 
   return (
     <div
       className="h-full w-full select-none relative overflow-hidden"
       style={{
         display: 'grid',
-        gridTemplateColumns: '155px 1fr',
+        gridTemplateColumns: '150px 1fr',
         gridTemplateRows: 'minmax(0, 1fr)',
-        columnGap: '8px',
-        padding: 'calc(12px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left))',
+        columnGap: 8,
+        padding: 'calc(10px + env(safe-area-inset-top)) calc(12px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left))',
       }}
     >
-      {/* ══ LEFT: Category sidebar ══ */}
+      {/* ── LEFT: main menus ── */}
       <div className="flex flex-col gap-2 z-10 min-h-0">
-        {CATEGORIES.map(cat => (
-          <CategorySideButton
-            key={cat.id} cat={cat}
-            isActive={activeTab === cat.id}
-            onClick={() => setActiveTab(cat.id)}
-          />
+        {MENUS.map(m => (
+          <MenuButton key={m.id} menu={m} active={menu === m.id} onClick={() => setMenu(m.id)} />
         ))}
       </div>
 
-      {/* ══ RIGHT: Glass frame containing header + horizontal card scroll ══ */}
-      <div
-        className="relative flex flex-col min-w-0 z-10 rounded-[18px] overflow-hidden"
+      {/* ── RIGHT: content frame ── */}
+      <div className="relative flex flex-col min-w-0 z-10 rounded-[18px] overflow-hidden"
         style={{
-          background: 'linear-gradient(155deg, rgba(12,12,18,0.78) 0%, rgba(5,5,8,0.92) 100%)',
+          background: 'linear-gradient(160deg, rgba(16,16,20,0.82) 0%, rgba(7,7,10,0.92) 100%)',
           backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255,255,255,0.08)',
-          boxShadow: '0 12px 40px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.4)',
-        }}
-      >
-        {/* Top edge highlight on the frame */}
+          border: '1px solid rgba(255,255,255,0.1)',
+          boxShadow: '0 12px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1), inset 0 -1px 0 rgba(0,0,0,0.4)',
+        }}>
         <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
-          style={{ background: `linear-gradient(90deg, transparent 5%, ${activeCat.color}45 30%, rgba(255,255,255,0.32) 50%, ${activeCat.color}30 70%, transparent 95%)` }} />
-        {/* Soft accent glow following selected category */}
+          style={{ background: `linear-gradient(90deg, transparent 5%, ${activeMenu.color}50 30%, rgba(255,255,255,0.32) 50%, ${activeMenu.color}30 70%, transparent 95%)` }} />
         <div className="absolute inset-0 pointer-events-none"
-          style={{ background: `radial-gradient(ellipse at 20% -10%, ${activeCat.color}14 0%, transparent 55%)` }} />
+          style={{ background: `radial-gradient(ellipse at 25% -10%, ${activeMenu.color}12 0%, transparent 55%)` }} />
 
-        {/* Category header */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab + '-header'}
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="shrink-0 flex items-center justify-between px-4 pt-3 pb-2 relative z-10"
-          >
-            <div className="flex items-baseline gap-2.5 min-w-0">
-              <h2 className="font-display leading-none shrink-0"
-                style={{ fontSize: '24px', letterSpacing: '0.08em', color: activeCat.color,
-                  textShadow: `0 0 26px ${activeCat.color}55, 0 2px 8px rgba(0,0,0,0.8)` }}>
-                {activeCat.label}
-              </h2>
-              <span className="text-[10px] font-bold uppercase tracking-[0.18em] truncate"
-                style={{ color: 'rgba(255,255,255,0.32)' }}>
-                {activeCat.description}
-              </span>
+        {/* Header */}
+        <div className="shrink-0 flex items-center justify-between gap-2 px-4 pt-3 pb-2 relative z-10">
+          <h2 className="font-display leading-none shrink-0"
+            style={{ fontSize: 24, letterSpacing: '0.06em', color: activeMenu.color, textShadow: `0 0 24px ${activeMenu.color}55, 0 2px 8px rgba(0,0,0,0.8)` }}>
+            {activeMenu.label}
+          </h2>
+
+          {/* Catalog sub-tabs in header */}
+          {menu === 'catalogo' && (
+            <div className="flex items-center gap-1.5">
+              {([['nivel', 'Por Nível'], ['tipo', 'Por Tipo'], ['consumivel', 'Consumíveis']] as [CatalogSub, string][]).map(([id, label]) => (
+                <button key={id} onClick={() => setSub(id)}
+                  className="px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider cursor-pointer transition-colors"
+                  style={{
+                    color: sub === id ? '#000' : 'rgba(255,255,255,0.5)',
+                    background: sub === id ? activeMenu.color : 'rgba(255,255,255,0.05)',
+                    border: `1px solid ${sub === id ? activeMenu.color : 'rgba(255,255,255,0.1)'}`,
+                  }}>
+                  {label}
+                </button>
+              ))}
             </div>
-            {/* Item count pill */}
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full shrink-0"
-              style={{ background: `${activeCat.color}14`, border: `1px solid ${activeCat.color}38` }}>
-              <span className="font-display text-[11px] leading-none" style={{ color: activeCat.color }}>{activeCat.count}</span>
-              <span className="text-[8px] font-black uppercase tracking-[0.18em] leading-none"
-                style={{ color: activeCat.color + 'bb' }}>itens</span>
-            </div>
-          </motion.div>
-        </AnimatePresence>
+          )}
+        </div>
 
-        {/* Divider */}
-        <div className="shrink-0 mx-4 h-px"
-          style={{ background: `linear-gradient(90deg, ${activeCat.color}38 0%, transparent 70%)` }} />
+        <div className="shrink-0 mx-4 h-px" style={{ background: `linear-gradient(90deg, ${activeMenu.color}38 0%, transparent 70%)` }} />
 
-        {/* Horizontal card scroll */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab + '-items'}
-            initial={{ opacity: 0, x: 16 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="flex-1 overflow-x-auto no-scrollbar flex gap-3 items-stretch p-3 min-h-0"
-          >
-            {items.map((item, i) => (
-              <div key={item.id} style={{ width: '180px', flexShrink: 0, height: '100%' }}>
-                <StoreCard item={item} index={i} onBuy={setConfirmItem} />
+        {/* Catalog filter chips */}
+        {menu === 'catalogo' && sub !== 'consumivel' && (
+          <div className="shrink-0 flex gap-1.5 px-3 pt-2 overflow-x-auto no-scrollbar">
+            <Chip label="Todos" active={(sub === 'nivel' ? rarityFilter : typeFilter) === 'all'} color={activeMenu.color}
+              onClick={() => sub === 'nivel' ? setRarityFilter('all') : setTypeFilter('all')} />
+            {sub === 'nivel'
+              ? (['comum', 'raro', 'super', 'lendario', 'elite', 'passe'] as Rarity[]).map(r => (
+                  <Chip key={r} label={RARITY[r].label} active={rarityFilter === r} color={RARITY[r].color} onClick={() => setRarityFilter(r)} />
+                ))
+              : (['taco', 'mesa', 'adesivo', 'emoji', 'avatar', 'moldura'] as ItemKind[]).map(t => (
+                  <Chip key={t} label={KIND_LABEL[t]} active={typeFilter === t} color={activeMenu.color} onClick={() => setTypeFilter(t)} />
+                ))}
+          </div>
+        )}
+
+        {/* ── Content per menu ── */}
+        {menu === 'ofertas' && (
+          <CardRow k="ofertas">
+            {/* Passe da Temporada — destaque */}
+            <motion.div
+              initial={{ opacity: 0, x: 16, scale: 0.97 }} animate={{ opacity: 1, x: 0, scale: 1 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => toast('Passe da Temporada', { description: 'Compra antecipada com preço promocional — acesso a itens exclusivos por nível.' })}
+              className="relative rounded-[18px] overflow-hidden flex flex-col cursor-pointer h-full shrink-0"
+              style={{ width: 230, ...rarityCardStyle('passe') }}>
+              <div className="absolute top-0 inset-x-0 h-[2px] z-20" style={{ background: '#10b981', boxShadow: '0 0 8px #10b981' }} />
+              <EdgeLayers accent="#10b981" />
+              <div className="relative shrink-0 flex items-center justify-center" style={{ height: 122, background: 'radial-gradient(ellipse at 50% 35%, rgba(16,185,129,0.25), rgba(8,8,12,0.85) 72%)' }}>
+                <Sparkles size={46} style={{ color: '#10b981', filter: 'drop-shadow(0 0 14px rgba(16,185,129,0.7))' }} />
+                <div className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[8px] font-black" style={{ background: '#ef4444', color: '#fff' }}>-40%</div>
               </div>
-            ))}
-          </motion.div>
-        </AnimatePresence>
+              <div className="flex flex-col flex-1 px-3.5 pt-2.5 pb-3 gap-1">
+                <span className="text-[8px] font-black uppercase tracking-[0.16em]" style={{ color: '#10b981' }}>Compra antecipada</span>
+                <h3 className="font-display leading-none" style={{ fontSize: 22, color: '#fff' }}>PASSE DA TEMPORADA</h3>
+                <p className="text-[9px] leading-snug" style={{ color: 'rgba(255,255,255,0.4)' }}>Acesso a itens exclusivos ao progredir nos níveis do passe.</p>
+                <div className="mt-auto pt-1.5 flex items-center justify-center rounded-[11px] py-2.5"
+                  style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.25), rgba(16,185,129,0.08))', border: '1px solid rgba(16,185,129,0.45)' }}>
+                  <span className="text-[9px] font-bold mr-1" style={{ color: 'rgba(255,255,255,0.5)' }}>R$</span>
+                  <span className="font-display text-[19px] leading-none text-white">29,90</span>
+                  <span className="text-[11px] font-bold line-through ml-2" style={{ color: 'rgba(255,255,255,0.3)' }}>49,90</span>
+                </div>
+              </div>
+            </motion.div>
+
+            {OFFERS.map((it, i) => <div key={it.id} style={{ width: 178, flexShrink: 0, height: '100%' }}><ItemCard item={it} index={i + 1} onOpen={setDetailItem} /></div>)}
+          </CardRow>
+        )}
+
+        {menu === 'caixas' && (
+          <CardRow k="caixas">
+            {BOXES.map((b, i) => <div key={b.id} style={{ width: 200, flexShrink: 0, height: '100%' }}><BoxCard box={b} index={i} onOpen={setDetailBox} /></div>)}
+          </CardRow>
+        )}
+
+        {menu === 'catalogo' && (
+          catalogItems.length > 0 ? (
+            <CardRow k={'cat-' + sub + rarityFilter + typeFilter}>
+              {catalogItems.map((it, i) => <div key={it.id} style={{ width: 176, flexShrink: 0, height: '100%' }}><ItemCard item={it} index={i} onOpen={setDetailItem} /></div>)}
+            </CardRow>
+          ) : (
+            <div className="flex-1 flex items-center justify-center text-[12px]" style={{ color: 'rgba(255,255,255,0.3)' }}>Nenhum item neste filtro.</div>
+          )
+        )}
+
+        {menu === 'presente' && (
+          <div className="flex-1 flex items-stretch gap-3 p-3 min-h-0">
+            {/* Daily gift chest (locked) */}
+            <div className="relative rounded-[18px] overflow-hidden flex flex-col items-center justify-center shrink-0 px-5"
+              style={{ width: 230, ...rarityCardStyle('elite') }}>
+              <EdgeLayers accent="#ED0A65" />
+              <div className="relative">
+                <ChestVisual color="#ED0A65" big />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.15)' }}>
+                    <Lock size={18} style={{ color: 'rgba(255,255,255,0.7)' }} />
+                  </div>
+                </div>
+              </div>
+              <span className="font-display text-[18px] leading-none mt-1" style={{ color: '#ED0A65' }}>PRESENTE DIÁRIO</span>
+              <p className="text-[10px] text-center leading-snug mt-2" style={{ color: 'rgba(255,255,255,0.42)' }}>
+                Disponível para quem fez um depósito nos últimos 7 dias.
+              </p>
+              <motion.button whileTap={{ scale: 0.96 }}
+                onClick={() => toast('Faça um depósito', { description: 'Deposite para liberar seu presente diário.' })}
+                className="mt-3 w-full rounded-[12px] py-2.5 font-display tracking-[0.1em] relative overflow-hidden"
+                style={{ fontSize: 15, color: '#fff', background: 'linear-gradient(160deg,#ED0A65,#a30848)', border: '1px solid rgba(255,255,255,0.25)', boxShadow: '0 0 20px rgba(237,10,101,0.4), inset 0 2px 0 rgba(255,255,255,0.4)' }}>
+                <div className="absolute inset-x-0 top-0 h-1/2 pointer-events-none" style={{ borderRadius: '12px 12px 0 0', background: 'linear-gradient(180deg, rgba(255,255,255,0.4), transparent)' }} />
+                <span className="relative z-10">DEPOSITAR</span>
+              </motion.button>
+            </div>
+
+            {/* Possible gifts */}
+            <div className="relative rounded-[18px] overflow-hidden flex-1 min-w-0 flex flex-col p-4"
+              style={{ background: 'linear-gradient(160deg, rgba(22,22,25,0.6) 0%, rgba(10,10,13,0.7) 100%)', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <EdgeLayers />
+              <span className="font-display text-[15px] tracking-[0.06em]" style={{ color: 'rgba(255,255,255,0.85)' }}>POSSÍVEIS PRESENTES</span>
+              <div className="flex-1 grid grid-cols-1 gap-2 mt-3 content-start overflow-y-auto no-scrollbar">
+                {DAILY_GIFTS.map((g, i) => (
+                  <div key={i} className="flex items-center gap-3 rounded-[12px] px-3 py-2"
+                    style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                    <span style={{ fontSize: 22 }}>{g.glyph}</span>
+                    <span className="text-[12px] font-semibold" style={{ color: 'rgba(255,255,255,0.7)' }}>{g.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Purchase confirmation overlay */}
+      {/* Detail overlay */}
       <AnimatePresence>
-        {confirmItem && (
-          <ConfirmModal
-            item={confirmItem}
-            onConfirm={handleConfirm}
-            onCancel={() => setConfirmItem(null)}
-          />
-        )}
+        {detailItem && <DetailModal item={detailItem} onClose={() => setDetailItem(null)} />}
+        {detailBox && <DetailModal box={detailBox} onClose={() => setDetailBox(null)} />}
       </AnimatePresence>
     </div>
   );
