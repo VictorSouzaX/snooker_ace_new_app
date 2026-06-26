@@ -90,6 +90,16 @@ function AppContent() {
     <div
       className="w-full h-full relative overflow-hidden flex flex-col select-none font-sans"
     >
+        {/* Static wallpaper — lightweight, replaces the heavy animated lines */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            backgroundImage: 'url(/nova%20imagem%20de%20fundo.png)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
 
         {showSplash && <IntroSplash onComplete={() => setShowSplash(false)} />}
 
@@ -121,15 +131,22 @@ function AppContent() {
 
               <Toaster
                 position="top-center"
+                offset={14}
                 toastOptions={{
+                  className: 'app-toast',
                   style: {
-                    background: '#111',
-                    border: '1px solid rgba(255,255,255,0.08)',
+                    background: 'linear-gradient(160deg, rgba(24,24,27,0.97) 0%, rgba(10,10,13,0.99) 100%)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255,255,255,0.13)',
                     color: '#fff',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    letterSpacing: '0.02em',
                     borderRadius: '16px',
+                    padding: '13px 16px',
+                    boxShadow: [
+                      'inset 0 1px 0 rgba(255,255,255,0.22)',
+                      'inset 0 -1px 0 rgba(0,0,0,0.55)',
+                      '0 10px 30px rgba(0,0,0,0.45)',
+                    ].join(', '),
                   },
                 }}
               />

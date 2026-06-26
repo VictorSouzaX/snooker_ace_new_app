@@ -16,27 +16,31 @@ type ModeId = 'duel' | 'tournaments' | 'training' | 'store';
 
 const MODE_CFG: Record<string, {
   accent: string; glow: string; label: string; sub: string;
-  btnText: string; btnGrad: string; btnColor: string; liveLabel: string;
+  btnText: string; btnSub: string; btnGrad: string; btnColor: string; liveLabel: string;
 }> = {
   duel: {
     accent: '#00e870', glow: 'rgba(0,232,112,0.45)', label: 'DUELO', sub: '1v1 ONLINE',
-    btnText: 'JOGAR', btnGrad: 'linear-gradient(160deg, #00e870 0%, #00c058 55%, #008a3a 100%)',
+    btnText: 'JOGAR', btnSub: 'Encontre seu adversário',
+    btnGrad: 'linear-gradient(160deg, #00e870 0%, #00c058 55%, #008a3a 100%)',
     btnColor: '#000', liveLabel: 'ENCONTRAR ADVERSÁRIO',
   },
   tournaments: {
     accent: '#f5c518', glow: 'rgba(245,197,24,0.4)', label: 'TORNEIOS', sub: 'AO VIVO',
-    btnText: 'ENTRAR', btnGrad: 'linear-gradient(160deg, #f5c518 0%, #c9952a 55%, #8a6010 100%)',
+    btnText: 'ENTRAR', btnSub: 'Dispute o prêmio agora',
+    btnGrad: 'linear-gradient(160deg, #f5c518 0%, #c9952a 55%, #8a6010 100%)',
     btnColor: '#000', liveLabel: 'PRÓXIMO TORNEIO EM 03:42',
   },
   store: {
     accent: '#fbbf24', glow: 'rgba(251,191,36,0.55)', label: 'LOJA', sub: 'ITENS PREMIUM',
-    btnText: 'EXPLORAR', btnGrad: 'linear-gradient(160deg, #fbbf24 0%, #d97706 55%, #92400e 100%)',
+    btnText: 'EXPLORAR', btnSub: 'Confira as ofertas',
+    btnGrad: 'linear-gradient(160deg, #fbbf24 0%, #d97706 55%, #92400e 100%)',
     btnColor: '#000', liveLabel: 'OFERTAS ESPECIAIS',
   },
   training: {
     accent: 'rgba(255,255,255,0.65)', glow: 'rgba(255,255,255,0.12)', label: 'TREINO', sub: 'PRÁTICA SOLO',
-    btnText: 'TREINAR', btnGrad: 'linear-gradient(160deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 100%)',
-    btnColor: 'rgba(255,255,255,0.75)', liveLabel: 'MODO SOLO',
+    btnText: 'TREINAR', btnSub: 'Pratique sem gastar fichas',
+    btnGrad: 'linear-gradient(160deg, #1b1b1f 0%, #0a0a0c 100%)',
+    btnColor: 'rgba(255,255,255,0.92)', liveLabel: 'MODO SOLO',
   },
 };
 
@@ -103,8 +107,21 @@ function Ball({ size = 88, color, label, blackBall = false }: {
   );
 }
 
+const SLIDE_BG_IMAGE: Record<string, string> = {
+  'bola8':           '/bola%208-nova.png',
+  'bolinho':         '/bolinho.png',
+  'par-impar':       '/par%20e%20impar.png',
+  'news-season':     '/temporada%201.png',
+  'news-tournament': '/torneio.png',
+  'news-store':      '/tacos.png',
+  'news-update':     '/atualiza%C3%A7%C3%A3o.png',
+  'news-bonus':      '/fichas.png',
+};
+
 function SlideVisual({ id, accent }: { id: string; accent: string }) {
-  if (id === 'bola8') return <Ball size={90} color="#111" label="8" blackBall />;
+  if (id === 'bola8') return null;
+  if (id === 'bolinho') return null;
+  if (id === 'par-impar') return null;
   if (id === 'par-impar') {
     return (
       <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
@@ -197,18 +214,41 @@ function BannerCard({ slide, accent, glow, slideCount, slideIdx, onDot }: {
   slide: BannerSlide; accent: string; glow: string;
   slideCount: number; slideIdx: number; onDot: (i: number) => void;
 }) {
+  const bgImage = SLIDE_BG_IMAGE[slide.id];
+  const hasFullBg = !!bgImage;
+
   return (
     <div className="relative w-full h-full rounded-[22px] overflow-hidden" style={{
-      background: 'linear-gradient(155deg, rgba(8,8,14,0.98) 0%, rgba(3,3,6,0.99) 100%)',
-      border: `1px solid ${accent}28`,
-      boxShadow: `0 22px 64px rgba(0,0,0,0.92), inset 0 1px 0 rgba(255,255,255,0.07)`,
+      background: 'linear-gradient(160deg, rgba(18,18,20,0.97) 0%, rgba(8,8,10,0.99) 100%)',
+      backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)',
+      border: `1px solid rgba(255,255,255,0.13)`,
+      boxShadow: [
+        'inset 0 1px 0 rgba(255,255,255,0.20)',
+        'inset 0 -1px 0 rgba(0,0,0,0.50)',
+        `0 0 0 0.5px rgba(255,255,255,0.04)`,
+      ].join(', '),
     }}>
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ background: `radial-gradient(ellipse at 78% 52%, ${glow}50 0%, transparent 58%)` }} />
+
+      {/* Full bleed background image (bola8, bolinho) */}
+      {hasFullBg && (
+        <>
+          <div className="absolute inset-0 pointer-events-none"
+            style={{ backgroundImage: `url(${bgImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+          {/* Dark overlay on left so text stays readable */}
+          <div className="absolute inset-0 pointer-events-none"
+            style={{ background: 'linear-gradient(90deg, rgba(4,4,6,0.88) 0%, rgba(4,4,6,0.72) 45%, rgba(4,4,6,0.18) 75%, rgba(4,4,6,0.05) 100%)' }} />
+        </>
+      )}
+
+      {!hasFullBg && (
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: `radial-gradient(ellipse at 78% 52%, ${glow}50 0%, transparent 58%)` }} />
+      )}
       <div className="absolute top-0 inset-x-0 h-px pointer-events-none"
         style={{ background: `linear-gradient(90deg, transparent 5%, ${accent}50 30%, rgba(255,255,255,0.42) 50%, ${accent}32 70%, transparent 95%)` }} />
       <div className="absolute inset-0 pointer-events-none"
         style={{ background: 'linear-gradient(130deg, rgba(255,255,255,0.036) 0%, rgba(255,255,255,0.01) 36%, transparent 56%)' }} />
+
       <div className="absolute inset-0 flex">
         <div className="flex flex-col justify-between px-5 py-4 flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -251,9 +291,11 @@ function BannerCard({ slide, accent, glow, slideCount, slideIdx, onDot }: {
             </div>
           )}
         </div>
-        <div className="flex items-center justify-center shrink-0 pr-4" style={{ width: '132px' }}>
-          <SlideVisual id={slide.id} accent={accent} />
-        </div>
+        {!hasFullBg && (
+          <div className="flex items-center justify-center shrink-0 pr-4" style={{ width: '132px' }}>
+            <SlideVisual id={slide.id} accent={accent} />
+          </div>
+        )}
       </div>
     </div>
   );
@@ -332,10 +374,14 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
   };
 
   const glass = {
-    background: 'linear-gradient(155deg, rgba(12,12,18,0.95) 0%, rgba(5,5,8,0.98) 100%)',
+    background: 'linear-gradient(160deg, rgba(22,22,24,0.97) 0%, rgba(10,10,12,0.99) 100%)',
     backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
-    border: '1px solid rgba(255,255,255,0.1)',
-    boxShadow: '0 8px 32px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4)',
+    border: '1px solid rgba(255,255,255,0.13)',
+    boxShadow: [
+      'inset 0 1px 0 rgba(255,255,255,0.22)',  // top metallic highlight
+      'inset 0 -1px 0 rgba(0,0,0,0.55)',       // bottom dark edge
+      'inset 1px 0 0 rgba(255,255,255,0.06)',  // left subtle sheen
+    ].join(', '),
   } as const;
 
   const EdgeLayers = ({ accent }: { accent?: string }) => (
@@ -396,8 +442,8 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
                 backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
                 border: `1px solid ${isActive ? mc.accent + '55' : 'rgba(255,255,255,0.1)'}`,
                 boxShadow: isActive
-                  ? `0 12px 40px rgba(0,0,0,0.9), 0 0 0 1px ${mc.accent}22, inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.5)`
-                  : '0 8px 32px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4)',
+                  ? `0 0 0 1px ${mc.accent}22, inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.5)`
+                  : 'inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4)',
               }}
             >
               {isActive && (
@@ -509,7 +555,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         <div className="relative rounded-[16px] overflow-hidden flex-1 min-h-0 flex flex-col" style={{
           ...glass, border: '1px solid rgba(237,10,101,0.22)',
           background: 'linear-gradient(155deg, rgba(14,8,12,0.97) 0%, rgba(5,3,5,0.99) 70%, rgba(237,10,101,0.04) 100%)',
-          boxShadow: '0 8px 32px rgba(0,0,0,0.85), inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4)',
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4)',
         }}>
           <EdgeLayers accent="#ED0A65" />
           <div className="absolute inset-0 pointer-events-none"
@@ -583,7 +629,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
             background: 'linear-gradient(155deg, rgba(20,14,0,0.97) 0%, rgba(8,5,0,0.99) 60%, rgba(251,191,36,0.06) 100%)',
             backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
             border: '1px solid rgba(251,191,36,0.35)',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.85), 0 0 18px rgba(251,191,36,0.22), inset 0 1px 0 rgba(255,255,255,0.14)',
+            boxShadow: '0 0 18px rgba(251,191,36,0.22), inset 0 1px 0 rgba(255,255,255,0.14)',
           }}
         >
           <motion.div animate={{ x: ['-100%', '320%'] }}
@@ -624,41 +670,61 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
               exit={{ opacity: 0, scale: 0.92, y: 14 }}
               transition={{ duration: 0.32, ease: 'easeOut' }}
             >
+              {/* Outer pulse glow */}
               <motion.div
-                animate={{ opacity: [0.55, 1, 0.55], scale: [1, 1.04, 1] }}
-                transition={{ repeat: Infinity, duration: 2.6, ease: 'easeInOut' }}
+                animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.06, 1] }}
+                transition={{ repeat: Infinity, duration: 2.2, ease: 'easeInOut' }}
                 className="absolute inset-0 rounded-[18px] pointer-events-none"
-                style={{ boxShadow: `0 0 55px ${cfg.glow}80, 0 0 110px ${cfg.glow}35` }}
+                style={{ boxShadow: `0 0 48px ${cfg.glow}90, 0 0 90px ${cfg.glow}45, 0 0 140px ${cfg.glow}20` }}
               />
               <motion.button
-                whileHover={{ scale: 1.03, y: -3 }}
-                whileTap={{ scale: 0.97, y: 0 }}
+                whileHover={{ scale: 1.04, y: -4 }}
+                whileTap={{ scale: 0.96, y: 0 }}
                 onClick={handlePlay}
                 className="relative overflow-hidden cursor-pointer w-full h-full"
                 style={{
                   borderRadius: '18px',
                   background: cfg.btnGrad,
+                  border: `1px solid rgba(255,255,255,0.28)`,
                   boxShadow: [
-                    '0 20px 55px rgba(0,0,0,0.75)',
-                    'inset 0 2.5px 0 rgba(255,255,255,0.72)',
-                    'inset 0 -2px 0 rgba(0,0,0,0.28)',
-                    'inset 2px 0 0 rgba(255,255,255,0.22)',
-                    'inset -2px 0 0 rgba(255,255,255,0.1)',
+                    `0 0 32px ${cfg.glow}70`,
+                    'inset 0 3px 0 rgba(255,255,255,0.80)',
+                    'inset 0 -2px 0 rgba(0,0,0,0.30)',
+                    'inset 2px 0 0 rgba(255,255,255,0.28)',
+                    'inset -2px 0 0 rgba(255,255,255,0.12)',
                   ].join(', '),
                 }}
               >
+                {/* Main gloss — large top reflection */}
                 <div className="absolute inset-x-0 top-0 pointer-events-none"
-                  style={{ height: '54%', borderRadius: '18px 18px 0 0', background: 'linear-gradient(180deg, rgba(255,255,255,0.58) 0%, rgba(255,255,255,0.2) 40%, transparent 100%)' }} />
-                <div className="absolute top-0 inset-x-6 h-[2px] pointer-events-none rounded-full"
-                  style={{ background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.95), transparent)' }} />
-                <div className="absolute left-0 top-3 bottom-3 w-[2.5px] pointer-events-none rounded-r-full"
-                  style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.06) 100%)' }} />
-                <div className="absolute right-0 top-3 bottom-3 w-[1.5px] pointer-events-none rounded-l-full"
-                  style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%)' }} />
-                <div className="absolute inset-x-8 bottom-0 pointer-events-none"
-                  style={{ height: '38%', background: `linear-gradient(0deg, ${cfg.glow}38 0%, transparent 100%)` }} />
-                <span className="relative z-10 block text-center font-display leading-none tracking-[0.18em]"
-                  style={{ fontSize: '38px', color: cfg.btnColor }}>{cfg.btnText}</span>
+                  style={{ height: '52%', borderRadius: '18px 18px 0 0', background: 'linear-gradient(180deg, rgba(255,255,255,0.68) 0%, rgba(255,255,255,0.26) 45%, transparent 100%)' }} />
+                {/* Bright top edge line */}
+                <div className="absolute top-0 inset-x-4 h-[2px] pointer-events-none rounded-full"
+                  style={{ background: 'linear-gradient(90deg, transparent 5%, rgba(255,255,255,0.98) 50%, transparent 95%)' }} />
+                {/* Left edge sheen */}
+                <div className="absolute left-0 top-2 bottom-2 w-[3px] pointer-events-none rounded-r-full"
+                  style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0.08) 100%)' }} />
+                {/* Sweeping shine animation */}
+                <motion.div
+                  animate={{ x: ['-120%', '220%'] }}
+                  transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut', repeatDelay: 1.4 }}
+                  className="absolute inset-y-0 pointer-events-none"
+                  style={{ width: '40%', background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.30), rgba(255,255,255,0.18), transparent)', transform: 'skewX(-18deg)' }}
+                />
+                {/* Bottom glow reflection */}
+                <div className="absolute inset-x-6 bottom-0 pointer-events-none"
+                  style={{ height: '40%', background: `linear-gradient(0deg, ${cfg.glow}50 0%, transparent 100%)` }} />
+                {/* Label + supporting phrase */}
+                <div className="relative z-10 flex flex-col items-center justify-center h-full gap-0.5">
+                  <span className="block text-center font-display leading-none tracking-[0.2em]"
+                    style={{ fontSize: '26px', color: cfg.btnColor, textShadow: cfg.btnColor === '#000' ? '0 1px 0 rgba(255,255,255,0.35)' : `0 0 18px ${cfg.glow}, 0 2px 4px rgba(0,0,0,0.4)` }}>
+                    {cfg.btnText}
+                  </span>
+                  <span className="block text-center font-semibold uppercase leading-none tracking-[0.06em]"
+                    style={{ fontSize: '9px', color: cfg.btnColor === '#000' ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.6)' }}>
+                    {cfg.btnSub}
+                  </span>
+                </div>
               </motion.button>
             </motion.div>
           )}

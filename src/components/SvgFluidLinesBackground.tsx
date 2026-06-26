@@ -37,20 +37,25 @@ export const SvgFluidLinesBackground = () => {
     return () => cancelAnimationFrame(id);
   }, []);
 
-  // Hue drifts through blue-indigo: 210°–240°
-  const hue  = 220 + Math.sin(time * 0.34) * 16;
-  const hue2 = 252 + Math.sin(time * 0.21 + 1.4) * 12;
-  const numLines = 28;
+  const hue  = 140 + Math.sin(time * 0.34) * 10;
+  const hue2 = 155 + Math.sin(time * 0.21 + 1.4) * 8;
+  const numLines = 42;
 
   const lines = Array.from({ length: numLines }).map((_, i) => {
     const mX = mouseRef.current.currentX;
     const mY = mouseRef.current.currentY;
-    const isAccent = i % 5 === 0;
+    const isBright  = i % 4 === 0;
+    const isAccent  = i % 7 === 3;
     const distFromCenter = Math.abs(i - numLines / 2) / (numLines / 2);
-    const baseOpacity = 0.14 + (1 - distFromCenter) * 0.22;
-    const opacity = isAccent ? Math.min(0.52, baseOpacity + 0.18) : baseOpacity;
-    const strokeWidth = isAccent ? 1.2 : 0.65;
-    const lineHue = i % 7 === 3 ? hue2 : hue;
+    // Lower base opacity and reduce accent boosts for subtler lines
+    const baseOpacity = 0.22 + (1 - distFromCenter) * 0.22;
+    const opacity = isAccent
+      ? Math.min(0.60, baseOpacity + 0.20)
+      : isBright
+      ? Math.min(0.48, baseOpacity + 0.12)
+      : baseOpacity;
+    const strokeWidth = isAccent ? 1.6 : isBright ? 1.0 : 0.65;
+    const lineHue = i % 6 === 2 ? hue2 : hue;
 
     let path = "";
     for (let x = 0; x <= 100; x += 1) {
@@ -63,16 +68,16 @@ export const SvgFluidLinesBackground = () => {
       const dx = x - mX;
       const dy = cy - mY;
       const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 28) {
-        const inf = Math.pow(1 - dist / 28, 2);
-        cy += (dy / 28) * inf * 10;
+      if (dist < 30) {
+        const inf = Math.pow(1 - dist / 30, 2);
+        cy += (dy / 30) * inf * 14;
       }
       path += x === 0 ? `M ${x} ${cy.toFixed(2)} ` : `L ${x} ${cy.toFixed(2)} `;
     }
 
     return (
       <path key={i} d={path} fill="none"
-        stroke={`hsla(${lineHue.toFixed(1)}, 90%, 75%, ${opacity.toFixed(3)})`}
+        stroke={`hsla(${lineHue.toFixed(1)}, 80%, 62%, ${opacity.toFixed(3)})`}
         strokeWidth={strokeWidth} vectorEffect="non-scaling-stroke" />
     );
   });
@@ -80,82 +85,48 @@ export const SvgFluidLinesBackground = () => {
   return (
     <div className="absolute inset-0 w-full h-full z-0 pointer-events-none overflow-hidden">
 
-      {/* ── Base — mid-blue, clearly lit ── */}
-      <div className="absolute inset-0" style={{ background: '#0d1e4a' }} />
+      {/* Green base */}
+      <div className="absolute inset-0" style={{ background: '#0a2614' }} />
 
-      {/* ── Large blue radial fill — most of the visible color ── */}
+      {/* Soft center depth */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 120% 100% at 50% 50%, rgba(25,65,200,0.88) 0%, rgba(14,32,110,0.55) 55%, transparent 80%)',
+        background: 'radial-gradient(ellipse 110% 95% at 50% 45%, rgba(0,120,56,0.50) 0%, rgba(0,72,34,0.34) 55%, rgba(0,42,20,0.18) 80%)',
       }} />
 
-      {/* ── Overhead blue-white cone ── */}
+      {/* Gentle edge glows */}
       <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(80,130,255,0.75) 0%, rgba(40,80,220,0.45) 42%, transparent 65%)',
+        background: 'radial-gradient(ellipse 50% 95% at 0% 50%, rgba(0,210,84,0.30) 0%, transparent 62%)',
+      }} />
+      <div className="absolute inset-0" style={{
+        background: 'radial-gradient(ellipse 50% 95% at 100% 50%, rgba(0,210,84,0.30) 0%, transparent 62%)',
+      }} />
+      <div className="absolute inset-0" style={{
+        background: 'radial-gradient(ellipse 85% 45% at 50% 105%, rgba(0,200,80,0.28) 0%, transparent 62%)',
+      }} />
+      <div className="absolute inset-0" style={{
+        background: 'radial-gradient(ellipse 75% 40% at 50% -5%, rgba(0,215,88,0.28) 0%, transparent 62%)',
       }} />
 
-      {/* ── Left violet/indigo bloom ── */}
-      <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 65% 85% at -5% 50%, rgba(110,45,230,0.42) 0%, rgba(60,20,140,0.18) 52%, transparent 70%)',
-      }} />
-
-      {/* ── Right sky-blue accent ── */}
-      <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 60% 75% at 108% 42%, rgba(50,130,255,0.40) 0%, rgba(25,75,200,0.16) 52%, transparent 70%)',
-      }} />
-
-      {/* ── Bottom blue reflection ── */}
-      <div className="absolute inset-0" style={{
-        background: 'radial-gradient(ellipse 95% 55% at 50% 115%, rgba(50,100,240,0.62) 0%, rgba(25,55,170,0.28) 38%, transparent 58%)',
-      }} />
-
-      {/* ── Particle dust motes ── */}
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
-        {[
-          { cx: 18, cy: 32, r: 0.4,  o: 0.35 }, { cx: 42, cy: 18, r: 0.32, o: 0.28 },
-          { cx: 67, cy: 41, r: 0.45, o: 0.24 }, { cx: 83, cy: 22, r: 0.35, o: 0.30 },
-          { cx: 29, cy: 58, r: 0.38, o: 0.26 }, { cx: 54, cy: 72, r: 0.42, o: 0.22 },
-          { cx: 76, cy: 64, r: 0.30, o: 0.28 }, { cx: 11, cy: 75, r: 0.40, o: 0.22 },
-          { cx: 92, cy: 48, r: 0.35, o: 0.25 }, { cx: 35, cy: 85, r: 0.45, o: 0.18 },
-          { cx: 58, cy: 28, r: 0.32, o: 0.28 }, { cx: 88, cy: 70, r: 0.36, o: 0.22 },
-        ].map((p, i) => {
-          const pulse = 0.65 + 0.35 * Math.sin(time * 0.8 + i * 1.3);
-          const ph = i % 3 === 0 ? hue2 : hue;
-          return (
-            <circle key={i} cx={p.cx} cy={p.cy} r={p.r}
-              fill={`hsla(${ph.toFixed(0)}, 85%, 75%, ${(p.o * pulse).toFixed(3)})`} />
-          );
-        })}
-      </svg>
-
-      {/* ── Fluid lines ── */}
+      {/* Fluid lines */}
       <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
         <defs>
-          {/* Light vignette only at the very edges — no heavy darkening */}
-          <radialGradient id="bgVig" cx="50%" cy="50%" r="72%">
-            <stop offset="35%" stopColor="rgba(0,0,0,0)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.42)" />
+          <radialGradient id="bgVig" cx="50%" cy="50%" r="75%">
+            <stop offset="45%" stopColor="rgba(0,0,0,0)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.14)" />
           </radialGradient>
           <linearGradient id="bgTop" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"  stopColor="rgba(0,0,0,0.40)" />
-            <stop offset="22%" stopColor="rgba(0,0,0,0)" />
+            <stop offset="0%"  stopColor="rgba(0,0,0,0.12)" />
+            <stop offset="18%" stopColor="rgba(0,0,0,0)" />
           </linearGradient>
           <linearGradient id="bgFloor" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="78%" stopColor="rgba(0,0,0,0)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.38)" />
+            <stop offset="82%" stopColor="rgba(0,0,0,0)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.12)" />
           </linearGradient>
         </defs>
         {lines}
         <rect width="100" height="100" fill="url(#bgVig)" />
         <rect width="100" height="100" fill="url(#bgTop)" />
         <rect width="100" height="100" fill="url(#bgFloor)" />
-      </svg>
-
-      {/* ── Subtle geometry guide lines ── */}
-      <svg className="absolute inset-0 w-full h-full opacity-[0.09]" viewBox="0 0 1080 540" preserveAspectRatio="none">
-        <line x1="540" y1="270" x2="0"    y2="140" stroke="#6699ff" strokeWidth="0.6" strokeDasharray="4 8" />
-        <line x1="540" y1="270" x2="1080" y2="400" stroke="#6699ff" strokeWidth="0.6" strokeDasharray="4 8" />
-        <line x1="540" y1="270" x2="280"  y2="540" stroke="#8866ff" strokeWidth="0.5" strokeDasharray="3 10" />
-        <circle cx="540" cy="270" r="2" fill="#6699ff" opacity="0.6" />
       </svg>
 
     </div>
