@@ -371,7 +371,7 @@ function RewardCard({ lv, current, claimed, onClaim }: {
         style={{ background: 'linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 45%, transparent 80%)' }} />
 
       {/* Level + tag */}
-      <div className="relative z-10 flex items-center justify-between px-3 pt-3 pb-1">
+      <div className="relative z-10 flex items-center justify-between px-3 pt-2.5 pb-0.5">
         <span className="font-display text-[13px] leading-none tracking-[0.08em]"
           style={{ color: current ? PINK : claimed ? 'rgba(255,255,255,0.3)' : unlocked ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.2)' }}>
           LV {lv.n}
@@ -385,22 +385,22 @@ function RewardCard({ lv, current, claimed, onClaim }: {
       </div>
 
       {/* Icon */}
-      <div className={cn('relative z-10 flex-1 flex items-center justify-center py-2', !unlocked && 'opacity-12')}>
+      <div className={cn('relative z-10 flex-1 flex items-center justify-center py-1 min-h-0', !unlocked && 'opacity-12')}>
         <RewardIcon reward={lv.reward} size="lg" />
       </div>
 
       {/* Info */}
       <div className={cn('relative z-10 px-3 pb-1', !unlocked && 'opacity-22')}>
         <p className="font-display text-[15px] text-white leading-none tracking-[0.02em] truncate">{lv.reward.label}</p>
-        <p className="text-[9px] text-white/35 mt-1">{lv.reward.sub}</p>
-        <span className="inline-block mt-1.5 text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full"
+        <p className="text-[9px] text-white/35 mt-0.5">{lv.reward.sub}</p>
+        <span className="inline-block mt-1 text-[7px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded-full"
           style={{ color, backgroundColor: color + '15', border: `1px solid ${color}30` }}>
           {RARITY_LABEL[lv.reward.rarity]}
         </span>
       </div>
 
       {/* Action */}
-      <div className="relative z-10 px-3 pb-3 pt-2">
+      <div className="relative z-10 px-3 pb-2.5 pt-1.5">
         {claimed ? (
           <div className="flex items-center gap-1.5 text-brand-green/80">
             <div className="flex items-center justify-center w-4 h-4 rounded-full bg-brand-green/15">
@@ -528,7 +528,7 @@ export default function BattlePass({ isOpen, onClose }: BattlePassProps) {
           </div>
 
           {/* ── Header ── */}
-          <div className="relative z-10 flex items-center px-6 pt-4 pb-3 shrink-0"
+          <div className="relative z-10 flex items-center px-6 pt-3 pb-2.5 shrink-0"
             style={{
               background: 'rgba(8,8,12,0.55)',
               backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)',
@@ -568,7 +568,7 @@ export default function BattlePass({ isOpen, onClose }: BattlePassProps) {
           </div>
 
           {/* ── XP bar ── */}
-          <div className="relative z-10 px-12 py-3 shrink-0"
+          <div className="relative z-10 px-12 py-2 shrink-0"
             style={{
               background: 'rgba(6,6,9,0.4)',
               backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)',
@@ -608,7 +608,7 @@ export default function BattlePass({ isOpen, onClose }: BattlePassProps) {
             onMouseUp={stopDrag}
             onMouseLeave={stopDrag}
           >
-            <div className="flex items-stretch h-full px-8 py-4 gap-3" style={{ width: 'max-content', minWidth: '100%' }}>
+            <div className="flex items-stretch h-full px-8 py-2 gap-3" style={{ width: 'max-content', minWidth: '100%' }}>
               {LEVELS.map((lv) => (
                 <div key={lv.n} data-level={lv.n} className="h-full">
                   <RewardCard
@@ -623,7 +623,7 @@ export default function BattlePass({ isOpen, onClose }: BattlePassProps) {
           </div>
 
           {/* ── Bottom bar ── */}
-          <div className="relative z-10 px-8 py-4 flex items-center justify-between shrink-0"
+          <div className="relative z-10 px-8 py-3 flex items-center justify-between shrink-0"
             style={{
               background: 'rgba(8,8,12,0.55)',
               backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)',
