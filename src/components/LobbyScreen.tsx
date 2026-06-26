@@ -274,7 +274,7 @@ function BannerCard({ slide, accent, glow, slideCount, slideIdx, onDot }: {
             <h2 className="font-display leading-none" style={{ fontSize: '38px', color: '#fff', letterSpacing: '0.04em' }}>{slide.title}</h2>
             <div className="font-display leading-none mt-0.5" style={{ fontSize: '24px', color: accent, letterSpacing: '0.07em', opacity: 0.82 }}>{slide.sub}</div>
           </div>
-          <p className="text-[9.5px] leading-[1.45] pr-2" style={{ color: 'rgba(255,255,255,0.34)', letterSpacing: '0.02em', fontWeight: 500 }}>{slide.desc}</p>
+          <p className="text-[9.5px] leading-[1.45] pr-2" style={{ color: 'rgba(255,255,255,0.34)', letterSpacing: '0.02em', fontWeight: 500, maxWidth: hasFullBg ? '54%' : undefined }}>{slide.desc}</p>
           {slideCount > 1 && (
             <div className="flex items-center gap-1.5">
               {Array.from({ length: slideCount }, (_, i) => (
