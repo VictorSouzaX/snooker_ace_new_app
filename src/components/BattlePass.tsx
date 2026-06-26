@@ -6,6 +6,7 @@ import { cn } from '../lib/utils';
 interface BattlePassProps {
   isOpen: boolean;
   onClose: () => void;
+  onPlayNow?: () => void;
 }
 
 type RewardKind = 'cash' | 'cue' | 'table' | 'coins' | 'xp' | 'avatar' | 'chest';
@@ -455,7 +456,7 @@ function RewardCard({ lv, current, claimed, onClaim }: {
 }
 
 /* ── Main component ─────────────────────────────────────────────── */
-export default function BattlePass({ isOpen, onClose }: BattlePassProps) {
+export default function BattlePass({ isOpen, onClose, onPlayNow }: BattlePassProps) {
   const trackRef   = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
   const startX     = useRef(0);
@@ -646,7 +647,7 @@ export default function BattlePass({ isOpen, onClose }: BattlePassProps) {
             </div>
             <motion.button
               whileTap={{ scale: 0.96 }} whileHover={{ scale: 1.03, y: -2 }}
-              onClick={onClose}
+              onClick={() => (onPlayNow ? onPlayNow() : onClose())}
               className="group relative flex items-center gap-2 px-6 py-3 rounded-[14px] overflow-hidden cursor-pointer"
               style={{
                 background: 'linear-gradient(160deg, #00e870 0%, #00c058 55%, #008a3a 100%)',

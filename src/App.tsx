@@ -16,6 +16,7 @@ import LoginScreen from './components/LoginScreen';
 import SettingsPanel from './components/SettingsPanel';
 import FriendsPanel from './components/FriendsPanel';
 import BattlePass from './components/BattlePass';
+import PlayModal, { PlayMode } from './components/PlayModal';
 import { GameMode } from './types';
 import { LanguageProvider, useLanguage } from './i18n';
 
@@ -38,6 +39,7 @@ function AppContent() {
   const [showSettings,   setShowSettings]   = useState(false);
   const [showFriends,    setShowFriends]    = useState(false);
   const [showBattlePass, setShowBattlePass] = useState(false);
+  const [playMode, setPlayMode] = useState<PlayMode | null>(null);
   const [activeView, setActiveView] = useState<'lobby' | 'history' | 'store'>('lobby');
   const [lobbyResetKey, setLobbyResetKey] = useState(0);
 
@@ -104,7 +106,7 @@ function AppContent() {
         {showSplash && <IntroSplash onComplete={() => setShowSplash(false)} />}
 
         {/* Main layer — hidden behind overlays so only the wallpaper shows through */}
-        <div className={`flex-1 flex flex-col relative overflow-hidden${activeView !== 'lobby' ? ' invisible' : ''}`}>
+        <div className={`flex-1 flex flex-col relative overflow-hidden${activeView !== 'lobby' || showBattlePass ? ' invisible' : ''}`}>
           {!isAuthenticated && (
             <LoginScreen onLogin={() => {
               setIsAuthenticated(true);
@@ -125,6 +127,7 @@ function AppContent() {
                   onOpenFriends={() => setShowFriends(true)}
                   onViewChange={setActiveView}
                   onOpenBattlePass={() => setShowBattlePass(true)}
+                  onOpenPlay={(m) => setPlayMode(m)}
                   resetKey={lobbyResetKey}
                 />
               </main>
@@ -160,7 +163,14 @@ function AppContent() {
         {/* ── Overlays ── */}
         {isAuthenticated && (
           <>
-            <BattlePass isOpen={showBattlePass} onClose={() => setShowBattlePass(false)} />
+            <BattlePass
+              isOpen={showBattlePass}
+              onClose={() => setShowBattlePass(false)}
+              onPlayNow={() => { setShowBattlePass(false); setPlayMode('duel'); }}
+            />
+
+            {/* Shared play modal — opened from lobby JOGAR and battle pass */}
+            <PlayModal mode={playMode} onClose={() => setPlayMode(null)} />
 
             {/* Store overlay */}
             <AnimatePresence>
