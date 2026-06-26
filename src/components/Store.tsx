@@ -472,90 +472,106 @@ function DetailModal({ item, box, onClose }: { item?: Item; box?: BoxDef; onClos
     onClose();
   };
 
+  const rarityLabel = item ? RARITY[item.rarity].label : `Caixa · ${box!.items} itens`;
+  const typeLabel = item ? (item.kind === 'consumivel' ? 'Consumível' : KIND_LABEL[item.kind]) : 'Caixa surpresa';
+  const buyLabel = box ? 'ABRIR CAIXA' : item?.soon ? 'EM BREVE' : onlyBox ? 'SÓ EM CAIXAS' : 'COMPRAR';
+
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}
-      className="absolute inset-0 z-50 flex items-end"
-      style={{ background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
+      className="absolute inset-0 z-50 flex items-center justify-center p-4"
+      style={{ background: 'rgba(2,3,4,0.72)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' }}
       onClick={onClose}
     >
       <motion.div
-        initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-        transition={{ type: 'spring', stiffness: 400, damping: 42 }}
+        initial={{ scale: 0.9, y: 20, opacity: 0 }} animate={{ scale: 1, y: 0, opacity: 1 }} exit={{ scale: 0.92, y: 12, opacity: 0 }}
+        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
         onClick={e => e.stopPropagation()}
-        className="relative w-full rounded-t-[26px] overflow-hidden flex flex-col"
+        className="relative rounded-[24px] overflow-hidden flex"
         style={{
-          background: 'linear-gradient(160deg, rgba(22,22,25,0.99) 0%, rgba(10,10,13,0.99) 100%)',
-          border: `1px solid ${color}30`, borderBottom: 'none',
-          boxShadow: `0 -24px 60px rgba(0,0,0,0.85), 0 0 50px ${color}14`, maxHeight: '88vh',
+          width: 'min(94vw, 600px)', maxHeight: '90vh',
+          background: 'linear-gradient(160deg, rgba(22,22,26,0.99) 0%, rgba(10,10,13,0.99) 100%)',
+          border: `1px solid ${color}45`,
+          boxShadow: `0 30px 80px rgba(0,0,0,0.75), 0 0 60px ${color}22, inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -1px 0 rgba(0,0,0,0.5)`,
         }}
       >
-        <div className="absolute top-0 inset-x-0 h-[3px] z-10" style={{ background: color, boxShadow: `0 0 10px ${color}` }} />
-        <div className="flex items-center justify-center pt-4 pb-1 shrink-0">
-          <div className="w-10 h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.15)' }} />
-        </div>
-        <motion.button whileTap={{ scale: 0.9 }} onClick={onClose}
-          className="absolute top-3.5 right-5 w-8 h-8 rounded-full flex items-center justify-center z-20"
-          style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.12)' }}>
-          <X size={14} style={{ color: 'rgba(255,255,255,0.5)' }} />
-        </motion.button>
+        {/* top metallic accent line */}
+        <div className="absolute top-0 inset-x-0 h-px z-20 pointer-events-none"
+          style={{ background: `linear-gradient(90deg, transparent 6%, ${color}66 30%, rgba(255,255,255,0.5) 50%, ${color}44 70%, transparent 94%)` }} />
 
-        <div className="flex gap-4 px-5 pb-6 pt-2 overflow-y-auto no-scrollbar">
-          {/* visual */}
-          <div className="relative rounded-[16px] overflow-hidden shrink-0" style={{ width: 200, height: 180, background: `radial-gradient(ellipse at 50% 40%, ${color}1c, rgba(8,8,12,0.9) 72%)` }}>
+        {/* ── Left: hero visual ── */}
+        <div className="relative shrink-0 overflow-hidden" style={{ width: 220 }}>
+          <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 50% 38%, ${color}2e 0%, ${color}0c 45%, rgba(6,6,9,0.95) 75%)` }} />
+          {/* rarity glow pulse */}
+          <motion.div className="absolute inset-0 pointer-events-none"
+            animate={{ opacity: [0.25, 0.5, 0.25] }} transition={{ repeat: Infinity, duration: 2.6, ease: 'easeInOut' }}
+            style={{ background: `radial-gradient(circle at 50% 42%, ${color}30 0%, transparent 55%)` }} />
+          {/* legendary shimmer */}
+          {(box ? false : RARITY_TIER[item!.rarity] >= 5) && (
+            <motion.div className="absolute inset-0 pointer-events-none"
+              animate={{ x: ['-120%', '220%'] }} transition={{ repeat: Infinity, duration: 3.5, repeatDelay: 2.5, ease: 'linear' }}
+              style={{ background: `linear-gradient(105deg, transparent 38%, ${color}22 50%, transparent 62%)` }} />
+          )}
+          <div className="relative w-full h-full flex items-center justify-center p-4">
             {box ? <ChestVisual color={color} big /> : <ItemVisual item={item!} size="big" />}
-            <div className="absolute top-0 inset-x-0 h-[3px]" style={{ background: color }} />
           </div>
+          {/* right divider */}
+          <div className="absolute top-4 bottom-4 right-0 w-px" style={{ background: `linear-gradient(180deg, transparent, ${color}40, transparent)` }} />
+        </div>
 
-          {/* details */}
-          <div className="flex flex-col flex-1 min-w-0 gap-2 pt-1">
-            {item && <RarityPill rarity={item.rarity} />}
-            {box && (
-              <span className="self-start text-[9px] font-black uppercase tracking-[0.16em] px-2 py-0.5 rounded-full"
-                style={{ color: box.color, background: `${box.color}1a`, border: `1px solid ${box.color}45` }}>Caixa · {box.items} itens</span>
-            )}
-            <h2 className="font-display leading-none" style={{ fontSize: 30, letterSpacing: '0.03em', color: '#fff' }}>{item?.name ?? box?.name}</h2>
-            {item?.note && <p className="text-[11px]" style={{ color: `${color}cc` }}>{item.note}</p>}
+        {/* ── Right: details ── */}
+        <div className="relative flex flex-col flex-1 min-w-0 px-5 py-5 overflow-y-auto no-scrollbar">
+          <motion.button whileTap={{ scale: 0.9 }} whileHover={{ scale: 1.08 }} onClick={onClose}
+            className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center z-20 cursor-pointer"
+            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}>
+            <X size={14} style={{ color: 'rgba(255,255,255,0.6)' }} />
+          </motion.button>
 
-            {/* box odds */}
-            {box && (
-              <div className="flex flex-col gap-1.5 mt-1">
-                <span className="text-[9px] font-black uppercase tracking-[0.16em]" style={{ color: 'rgba(255,255,255,0.4)' }}>Probabilidades</span>
-                {box.odds.map(o => (
-                  <div key={o.r} className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full" style={{ background: RARITY[o.r].color }} />
-                    <span className="text-[10px] font-bold w-20" style={{ color: RARITY[o.r].color }}>{RARITY[o.r].label}</span>
-                    <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
-                      <div className="h-full rounded-full" style={{ width: `${o.p}%`, background: RARITY[o.r].color }} />
-                    </div>
-                    <span className="text-[10px] font-black w-8 text-right" style={{ color: 'rgba(255,255,255,0.7)' }}>{o.p}%</span>
+          <span className="self-start text-[9px] font-black uppercase tracking-[0.18em] px-2.5 py-1 rounded-full mb-2"
+            style={{ color, background: `${color}1a`, border: `1px solid ${color}50` }}>{rarityLabel}</span>
+
+          <h2 className="font-display leading-none pr-8" style={{ fontSize: 30, letterSpacing: '0.02em', color: '#fff' }}>{item?.name ?? box?.name}</h2>
+          <span className="text-[10px] font-bold uppercase tracking-[0.16em] mt-1.5" style={{ color: 'rgba(255,255,255,0.35)' }}>{typeLabel}</span>
+          {item?.note && <p className="text-[11px] leading-snug mt-2" style={{ color: `${color}cc` }}>{item.note}</p>}
+
+          {/* box odds */}
+          {box && (
+            <div className="flex flex-col gap-1.5 mt-3">
+              <span className="text-[9px] font-black uppercase tracking-[0.16em]" style={{ color: 'rgba(255,255,255,0.4)' }}>Probabilidades de drop</span>
+              {box.odds.map(o => (
+                <div key={o.r} className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold w-[72px] shrink-0" style={{ color: RARITY[o.r].color }}>{RARITY[o.r].label}</span>
+                  <div className="flex-1 h-[6px] rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                    <motion.div className="h-full rounded-full" initial={{ width: 0 }} animate={{ width: `${o.p}%` }} transition={{ duration: 0.7, ease: 'easeOut' }}
+                      style={{ background: RARITY[o.r].color, boxShadow: `0 0 8px ${RARITY[o.r].color}80` }} />
                   </div>
-                ))}
-                {box.bonus && (
-                  <div className="flex items-center gap-1.5 mt-1 px-2.5 py-1.5 rounded-lg" style={{ background: 'rgba(245,197,24,0.12)', border: '1px solid rgba(245,197,24,0.3)' }}>
-                    <Ticket size={13} style={{ color: '#f5c518' }} />
-                    <span className="text-[10px] font-bold" style={{ color: '#f5c518' }}>{box.bonus}</span>
-                  </div>
-                )}
-              </div>
-            )}
-
-            <div className="mt-auto pt-2 flex items-center gap-3">
-              {box ? (
-                <CoinPrice coins={box.coins} size="lg" />
-              ) : item?.coins != null ? (
-                <CoinPrice coins={item.coins} old={item.oldCoins} size="lg" />
-              ) : null}
-
-              <motion.button whileTap={canBuy ? { scale: 0.97 } : {}} onClick={buy}
-                className="ml-auto relative overflow-hidden rounded-[14px] px-6 py-3 font-display tracking-[0.12em]"
-                style={canBuy
-                  ? { background: 'linear-gradient(160deg,#00e870,#00c058 55%,#008a3a)', color: '#000', fontSize: 18, border: '1px solid rgba(255,255,255,0.28)', boxShadow: '0 0 22px rgba(0,232,112,0.45), inset 0 2px 0 rgba(255,255,255,0.65)' }
-                  : { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)', fontSize: 16, border: '1px solid rgba(255,255,255,0.1)' }}>
-                <div className="absolute inset-x-0 top-0 h-1/2 pointer-events-none" style={{ borderRadius: '14px 14px 0 0', background: 'linear-gradient(180deg, rgba(255,255,255,0.5), transparent)' }} />
-                <span className="relative z-10">{box ? 'COMPRAR' : item?.soon ? 'EM BREVE' : onlyBox ? 'SÓ EM CAIXAS' : 'COMPRAR'}</span>
-              </motion.button>
+                  <span className="text-[10px] font-black w-9 text-right shrink-0" style={{ color: 'rgba(255,255,255,0.75)' }}>{o.p}%</span>
+                </div>
+              ))}
+              {box.bonus && (
+                <div className="flex items-center gap-1.5 mt-1 px-2.5 py-1.5 rounded-lg" style={{ background: 'rgba(245,197,24,0.12)', border: '1px solid rgba(245,197,24,0.3)' }}>
+                  <Ticket size={13} style={{ color: '#f5c518' }} className="shrink-0" />
+                  <span className="text-[10px] font-bold leading-tight" style={{ color: '#f5c518' }}>{box.bonus}</span>
+                </div>
+              )}
             </div>
+          )}
+
+          {/* price + buy */}
+          <div className="mt-auto pt-4 flex items-center gap-3">
+            {box ? <CoinPrice coins={box.coins} size="lg" />
+              : item?.coins != null ? <CoinPrice coins={item.coins} old={item.oldCoins} size="lg" />
+              : <span className="font-display text-[16px]" style={{ color: '#10b981' }}>Passe da Temporada</span>}
+
+            <motion.button whileTap={canBuy ? { scale: 0.96, y: 0 } : {}} whileHover={canBuy ? { scale: 1.03, y: -2 } : {}} onClick={buy}
+              className="ml-auto relative overflow-hidden rounded-[14px] px-6 py-3 font-display tracking-[0.12em] cursor-pointer flex items-center gap-2"
+              style={canBuy
+                ? { background: 'linear-gradient(160deg,#00e870,#00c058 55%,#008a3a)', color: '#000', fontSize: 18, border: '1px solid rgba(255,255,255,0.28)', boxShadow: `0 0 24px rgba(0,232,112,0.45), inset 0 2px 0 rgba(255,255,255,0.65), inset 0 -2px 0 rgba(0,0,0,0.25)` }
+                : { background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.4)', fontSize: 15, border: '1px solid rgba(255,255,255,0.1)' }}>
+              {canBuy && <div className="absolute inset-x-0 top-0 h-1/2 pointer-events-none" style={{ borderRadius: '14px 14px 0 0', background: 'linear-gradient(180deg, rgba(255,255,255,0.55), transparent)' }} />}
+              {!canBuy && onlyBox && <Lock size={14} className="relative z-10" />}
+              <span className="relative z-10">{buyLabel}</span>
+            </motion.button>
           </div>
         </div>
       </motion.div>
