@@ -108,7 +108,7 @@ function Ball({ size = 88, color, label, blackBall = false }: {
 }
 
 const SLIDE_BG_IMAGE: Record<string, string> = {
-  'bola8':     '/bola%208.png',
+  'bola8':     '/bola%208-nova.png',
   'bolinho':   '/bolinho.png',
   'par-impar': '/par%20e%20impar.png',
 };
