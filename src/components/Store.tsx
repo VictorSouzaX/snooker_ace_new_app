@@ -91,21 +91,25 @@ const OFFERS: Item[] = [
 
 interface BoxOdd { r: Rarity; p: number; }
 interface BoxDef {
-  id: string; name: string; priceBRL: string; items: number; color: string;
+  id: string; name: string; coins: number; items: number; color: string;
   odds: BoxOdd[]; bonus?: string;
 }
 
 const BOXES: BoxDef[] = [
-  { id: 'bronze',   name: 'Bronze Box',   priceBRL: '9,90',   items: 3, color: '#cd7f32',
+  { id: 'bronze',   name: 'Bronze Box',   coins: 1000,  items: 3, color: '#cd7f32',
     odds: [{ r: 'comum', p: 70 }, { r: 'raro', p: 25 }, { r: 'super', p: 5 }] },
-  { id: 'silver',   name: 'Silver Box',   priceBRL: '24,90',  items: 4, color: '#c4c9d4',
+  { id: 'silver',   name: 'Silver Box',   coins: 2500,  items: 4, color: '#c4c9d4',
     odds: [{ r: 'comum', p: 50 }, { r: 'raro', p: 35 }, { r: 'super', p: 15 }] },
-  { id: 'gold',     name: 'Gold Box',     priceBRL: '59,90',  items: 5, color: '#f5c518',
+  { id: 'gold',     name: 'Gold Box',     coins: 6000,  items: 5, color: '#f5c518',
     odds: [{ r: 'comum', p: 30 }, { r: 'raro', p: 40 }, { r: 'super', p: 29 }, { r: 'lendario', p: 1 }] },
-  { id: 'platinum', name: 'Platinum Box', priceBRL: '149,90', items: 7, color: '#67e8f9',
+  { id: 'platinum', name: 'Platinum Box', coins: 15000, items: 7, color: '#67e8f9',
     odds: [{ r: 'comum', p: 20 }, { r: 'raro', p: 30 }, { r: 'super', p: 35 }, { r: 'lendario', p: 15 }],
     bonus: 'Ticket do Torneio Principal Semanal' },
 ];
+
+// Catalog organisation
+const CATALOG_TYPES: ItemKind[] = ['taco', 'mesa', 'moldura', 'avatar', 'adesivo', 'emoji'];
+const CATALOG_RARITY_ORDER: Rarity[] = ['lendario', 'elite', 'passe', 'super', 'raro', 'comum'];
 
 const DAILY_GIFTS = [
   { glyph: '💵', label: 'R$ 1 em aposta' },
@@ -331,6 +335,67 @@ function ItemCard({ item, index, onOpen }: { item: Item; index: number; onOpen: 
   );
 }
 
+/* ───────────────────────── Shelf (compact) card ────────────────── */
+function ShelfCard({ item, onOpen }: { item: Item; onOpen: (i: Item) => void }) {
+  const { color } = RARITY[item.rarity];
+  const onlyBox = item.note?.toLowerCase().includes('caixa');
+  return (
+    <motion.div whileTap={{ scale: 0.95 }} onClick={() => onOpen(item)}
+      className="relative rounded-[14px] overflow-hidden flex flex-col cursor-pointer shrink-0"
+      style={{ width: 132, height: '100%', ...rarityCardStyle(item.rarity) }}>
+      <div className="absolute top-0 inset-x-0 h-[2px] z-20" style={{ background: color, boxShadow: RARITY_TIER[item.rarity] >= 4 ? `0 0 7px ${color}` : 'none' }} />
+      <EdgeLayers accent={RARITY_TIER[item.rarity] >= 3 ? color : undefined} />
+      <div className="relative shrink-0 overflow-hidden" style={{ height: 56 }}>
+        <ItemVisual item={item} />
+      </div>
+      <div className="flex flex-col flex-1 px-2.5 py-1.5 min-h-0 justify-between gap-1">
+        <div className="flex flex-col gap-1">
+          <RarityPill rarity={item.rarity} small />
+          <h3 className="font-display leading-none tracking-wide truncate" style={{ fontSize: 13, color: 'rgba(255,255,255,0.94)' }}>{item.name}</h3>
+        </div>
+        <div>
+          {onlyBox ? (
+            <div className="flex items-center justify-center gap-1 rounded-[8px] py-1.5" style={{ background: `${color}14`, border: `1px solid ${color}38` }}>
+              <Lock size={9} style={{ color }} />
+              <span className="text-[7.5px] font-black uppercase tracking-wide" style={{ color }}>Caixas</span>
+            </div>
+          ) : item.coins != null ? (
+            <div className="flex items-center justify-center rounded-[8px] py-1.5" style={{ background: 'rgba(0,232,112,0.12)', border: '1px solid rgba(0,232,112,0.28)' }}>
+              <CoinPrice coins={item.coins} />
+            </div>
+          ) : item.soon ? (
+            <div className="flex items-center justify-center rounded-[8px] py-1.5" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <span className="text-[7.5px] font-black uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.4)' }}>Em breve</span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center rounded-[8px] py-1.5" style={{ background: 'rgba(16,185,129,0.14)', border: '1px solid rgba(16,185,129,0.38)' }}>
+              <span className="text-[7.5px] font-black uppercase tracking-wide" style={{ color: '#10b981' }}>Passe</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* horizontal shelf with a labelled header */
+function Shelf({ title, items, color, onOpen }: { title: string; items: Item[]; color: string; onOpen: (i: Item) => void }) {
+  if (items.length === 0) return null;
+  return (
+    <div className="shrink-0">
+      <div className="flex items-center gap-2 px-1 mb-1.5">
+        <span className="font-display tracking-[0.06em]" style={{ fontSize: 13, color: 'rgba(255,255,255,0.82)' }}>{title}</span>
+        <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full leading-none"
+          style={{ color, background: `${color}1a`, border: `1px solid ${color}38` }}>{items.length}</span>
+        <div className="flex-1 h-px" style={{ background: `linear-gradient(90deg, ${color}40 0%, transparent 80%)` }} />
+      </div>
+      <div className="flex gap-2.5 overflow-x-auto no-scrollbar pb-1" style={{ height: 152 }}>
+        {items.map(it => <ShelfCard key={it.id} item={it} onOpen={onOpen} />)}
+      </div>
+    </div>
+  );
+}
+
 /* ───────────────────────── Box card ────────────────────────────── */
 function BoxCard({ box, index, onOpen }: { box: BoxDef; index: number; onOpen: (b: BoxDef) => void }) {
   return (
@@ -384,8 +449,7 @@ function BoxCard({ box, index, onOpen }: { box: BoxDef; index: number; onOpen: (
 
         <div className="mt-auto pt-1 flex items-center justify-center rounded-[10px] py-2"
           style={{ background: `linear-gradient(135deg, ${box.color}28, ${box.color}10)`, border: `1px solid ${box.color}45` }}>
-          <span className="text-[8px] font-bold mr-1" style={{ color: 'rgba(255,255,255,0.6)' }}>R$</span>
-          <span className="font-display text-[18px] leading-none" style={{ color: '#fff' }}>{box.priceBRL}</span>
+          <CoinPrice coins={box.coins} />
         </div>
       </div>
     </motion.div>
@@ -478,10 +542,7 @@ function DetailModal({ item, box, onClose }: { item?: Item; box?: BoxDef; onClos
 
             <div className="mt-auto pt-2 flex items-center gap-3">
               {box ? (
-                <div className="flex items-baseline gap-1">
-                  <span className="text-[12px] font-bold" style={{ color: 'rgba(255,255,255,0.55)' }}>R$</span>
-                  <span className="font-display text-[26px] leading-none text-white">{box.priceBRL}</span>
-                </div>
+                <CoinPrice coins={box.coins} size="lg" />
               ) : item?.coins != null ? (
                 <CoinPrice coins={item.coins} old={item.oldCoins} size="lg" />
               ) : null}
@@ -534,21 +595,6 @@ function MenuButton({ menu, active, onClick }: { menu: typeof MENUS[number]; act
   );
 }
 
-/* ───────────────────────── Chip ────────────────────────────────── */
-function Chip({ label, active, color, onClick }: { label: string; active: boolean; color: string; onClick: () => void }) {
-  return (
-    <button onClick={onClick}
-      className="shrink-0 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer"
-      style={{
-        color: active ? (color === '#9ca3af' ? '#fff' : color) : 'rgba(255,255,255,0.45)',
-        background: active ? `${color}1f` : 'rgba(255,255,255,0.04)',
-        border: `1px solid ${active ? color + '55' : 'rgba(255,255,255,0.08)'}`,
-      }}>
-      {label}
-    </button>
-  );
-}
-
 /* ───────────────────────── Horizontal scroll ───────────────────── */
 function CardRow({ children, k }: { children: ReactNode; k: string }) {
   return (
@@ -565,21 +611,11 @@ function CardRow({ children, k }: { children: ReactNode; k: string }) {
 /* ───────────────────────── Main Store ──────────────────────────── */
 export default function Store() {
   const [menu, setMenu] = useState<Menu>('ofertas');
-  const [sub, setSub] = useState<CatalogSub>('nivel');
-  const [rarityFilter, setRarityFilter] = useState<Rarity | 'all'>('all');
-  const [typeFilter, setTypeFilter] = useState<ItemKind | 'all'>('all');
+  const [catalogView, setCatalogView] = useState<CatalogSub>('tipo');
   const [detailItem, setDetailItem] = useState<Item | null>(null);
   const [detailBox, setDetailBox] = useState<BoxDef | null>(null);
 
   const activeMenu = MENUS.find(m => m.id === menu)!;
-
-  const catalogItems = (() => {
-    if (sub === 'consumivel') return CONSUMIVEIS;
-    let list = CATALOG;
-    if (sub === 'nivel' && rarityFilter !== 'all') list = list.filter(i => i.rarity === rarityFilter);
-    if (sub === 'tipo' && typeFilter !== 'all') list = list.filter(i => i.kind === typeFilter);
-    return list;
-  })();
 
   return (
     <div
@@ -619,16 +655,15 @@ export default function Store() {
             {activeMenu.label}
           </h2>
 
-          {/* Catalog sub-tabs in header */}
+          {/* Catalog grouping segmented control */}
           {menu === 'catalogo' && (
-            <div className="flex items-center gap-1.5">
-              {([['nivel', 'Por Nível'], ['tipo', 'Por Tipo'], ['consumivel', 'Consumíveis']] as [CatalogSub, string][]).map(([id, label]) => (
-                <button key={id} onClick={() => setSub(id)}
-                  className="px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider cursor-pointer transition-colors"
+            <div className="flex items-center gap-1 p-0.5 rounded-full" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+              {([['tipo', 'Por Tipo'], ['nivel', 'Por Nível'], ['consumivel', 'Consumíveis']] as [CatalogSub, string][]).map(([id, label]) => (
+                <button key={id} onClick={() => setCatalogView(id)}
+                  className="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider cursor-pointer transition-colors"
                   style={{
-                    color: sub === id ? '#000' : 'rgba(255,255,255,0.5)',
-                    background: sub === id ? activeMenu.color : 'rgba(255,255,255,0.05)',
-                    border: `1px solid ${sub === id ? activeMenu.color : 'rgba(255,255,255,0.1)'}`,
+                    color: catalogView === id ? '#000' : 'rgba(255,255,255,0.5)',
+                    background: catalogView === id ? activeMenu.color : 'transparent',
                   }}>
                   {label}
                 </button>
@@ -638,21 +673,6 @@ export default function Store() {
         </div>
 
         <div className="shrink-0 mx-4 h-px" style={{ background: `linear-gradient(90deg, ${activeMenu.color}38 0%, transparent 70%)` }} />
-
-        {/* Catalog filter chips */}
-        {menu === 'catalogo' && sub !== 'consumivel' && (
-          <div className="shrink-0 flex gap-1.5 px-3 pt-2 overflow-x-auto no-scrollbar">
-            <Chip label="Todos" active={(sub === 'nivel' ? rarityFilter : typeFilter) === 'all'} color={activeMenu.color}
-              onClick={() => sub === 'nivel' ? setRarityFilter('all') : setTypeFilter('all')} />
-            {sub === 'nivel'
-              ? (['comum', 'raro', 'super', 'lendario', 'elite', 'passe'] as Rarity[]).map(r => (
-                  <Chip key={r} label={RARITY[r].label} active={rarityFilter === r} color={RARITY[r].color} onClick={() => setRarityFilter(r)} />
-                ))
-              : (['taco', 'mesa', 'adesivo', 'emoji', 'avatar', 'moldura'] as ItemKind[]).map(t => (
-                  <Chip key={t} label={KIND_LABEL[t]} active={typeFilter === t} color={activeMenu.color} onClick={() => setTypeFilter(t)} />
-                ))}
-          </div>
-        )}
 
         {/* ── Content per menu ── */}
         {menu === 'ofertas' && (
@@ -677,9 +697,7 @@ export default function Store() {
                 <p className="text-[9px] leading-snug" style={{ color: 'rgba(255,255,255,0.4)' }}>Acesso a itens exclusivos ao progredir nos níveis do passe.</p>
                 <div className="mt-auto pt-1.5 flex items-center justify-center rounded-[11px] py-2.5"
                   style={{ background: 'linear-gradient(135deg, rgba(16,185,129,0.25), rgba(16,185,129,0.08))', border: '1px solid rgba(16,185,129,0.45)' }}>
-                  <span className="text-[9px] font-bold mr-1" style={{ color: 'rgba(255,255,255,0.5)' }}>R$</span>
-                  <span className="font-display text-[19px] leading-none text-white">29,90</span>
-                  <span className="text-[11px] font-bold line-through ml-2" style={{ color: 'rgba(255,255,255,0.3)' }}>49,90</span>
+                  <CoinPrice coins={3000} old={5000} />
                 </div>
               </div>
             </motion.div>
@@ -695,13 +713,23 @@ export default function Store() {
         )}
 
         {menu === 'catalogo' && (
-          catalogItems.length > 0 ? (
-            <CardRow k={'cat-' + sub + rarityFilter + typeFilter}>
-              {catalogItems.map((it, i) => <div key={it.id} style={{ width: 176, flexShrink: 0, height: '100%' }}><ItemCard item={it} index={i} onOpen={setDetailItem} /></div>)}
-            </CardRow>
-          ) : (
-            <div className="flex-1 flex items-center justify-center text-[12px]" style={{ color: 'rgba(255,255,255,0.3)' }}>Nenhum item neste filtro.</div>
-          )
+          <AnimatePresence mode="wait">
+            <motion.div key={'cat-' + catalogView}
+              initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
+              className="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-3 px-3 py-3 min-h-0">
+              {catalogView === 'tipo' && CATALOG_TYPES.map(t => (
+                <Shelf key={t} title={KIND_LABEL[t]} color={activeMenu.color}
+                  items={CATALOG.filter(i => i.kind === t)} onOpen={setDetailItem} />
+              ))}
+              {catalogView === 'nivel' && CATALOG_RARITY_ORDER.map(r => (
+                <Shelf key={r} title={RARITY[r].label} color={RARITY[r].color}
+                  items={CATALOG.filter(i => i.rarity === r)} onOpen={setDetailItem} />
+              ))}
+              {catalogView === 'consumivel' && (
+                <Shelf title="Itens Consumíveis" color={activeMenu.color} items={CONSUMIVEIS} onOpen={setDetailItem} />
+              )}
+            </motion.div>
+          </AnimatePresence>
         )}
 
         {menu === 'presente' && (
