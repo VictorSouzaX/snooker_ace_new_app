@@ -592,7 +592,11 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
         </div>
 
         {/* Passe Ace fills the remaining space */}
-        <div className="relative rounded-[16px] overflow-hidden flex-1 min-h-0 flex flex-col" style={{
+        <motion.div
+          role="button"
+          onClick={onOpenBattlePass}
+          whileTap={{ scale: 0.985 }}
+          className="relative rounded-[16px] overflow-hidden flex-1 min-h-0 flex flex-col cursor-pointer" style={{
           ...glass, border: '1px solid rgba(237,10,101,0.22)',
           background: 'linear-gradient(155deg, rgba(14,8,12,0.97) 0%, rgba(5,3,5,0.99) 70%, rgba(237,10,101,0.04) 100%)',
           boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.14), inset 0 -1px 0 rgba(0,0,0,0.4)',
@@ -654,7 +658,7 @@ export default function LobbyScreen({ modes, onOpenFriends, onViewChange, onOpen
               </div>
             ))}
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* ══ ROW 2, COL 1: LOJA — always visible ══ */}
