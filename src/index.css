@@ -62,6 +62,55 @@
   @apply bg-black/40 backdrop-blur-md border border-white/10;
 }
 
+/* Toast notifications — match the platform glass/metallic look */
+.app-toast {
+  position: relative;
+  overflow: hidden;
+}
+/* Metallic highlight line across the top edge */
+.app-toast::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 5%;
+  right: 5%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(0,232,112,0.45) 28%, rgba(255,255,255,0.55) 50%, rgba(0,232,112,0.32) 72%, transparent 100%);
+  pointer-events: none;
+}
+/* Green accent bar on the left */
+.app-toast::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 22%;
+  bottom: 22%;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: #00e870;
+  box-shadow: 0 0 10px rgba(0,232,112,0.7);
+  pointer-events: none;
+}
+.app-toast [data-content] {
+  padding-left: 6px;
+}
+.app-toast [data-title] {
+  font-size: 14.5px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: #fff;
+}
+.app-toast [data-description] {
+  font-size: 12.5px;
+  font-weight: 500;
+  line-height: 1.45;
+  color: rgba(255,255,255,0.62);
+  margin-top: 2px;
+}
+.app-toast [data-icon] {
+  color: #00e870;
+}
+
 .btn-gradient-green {
   @apply bg-linear-to-b from-[#00d26a] to-[#00a855] text-black font-bold;
 }
