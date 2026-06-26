@@ -10,7 +10,9 @@ import { Toaster, toast } from 'sonner';
 import Header from './components/Header';
 import LobbyScreen from './components/LobbyScreen';
 import MatchHistory from './components/MatchHistory';
-import Store from './components/Store';
+// NOTE: testing the horizontal store layout. The original vertical store is
+// preserved in ./components/Store — swap this import back to restore it.
+import Store from './components/StoreHorizontal';
 import IntroSplash from './components/IntroSplash';
 import LoginScreen from './components/LoginScreen';
 import SettingsPanel from './components/SettingsPanel';
