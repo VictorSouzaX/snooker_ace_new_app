@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, type ReactNode } from 'react';
+import { useRef, useState, useEffect, type ReactNode, type RefObject } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { Tag, Box, LayoutGrid, Gift, X, Lock, Ticket, Sparkles, ChevronRight, Check, type LucideIcon } from 'lucide-react';
@@ -354,20 +354,36 @@ function Roulette({ compact }: { compact?: boolean }) {
 }
 
 /* ═══════════════════ Section start tag ═══════════════════ */
-function SectionTag({ Icon, label, color }: { Icon: LucideIcon; label: string; color: string }) {
-  return (
-    <div className="shrink-0 h-full flex items-stretch" style={{ width: 50 }}>
-      <div className="relative w-full h-full rounded-[14px] flex flex-col items-center justify-center gap-2.5 py-3 overflow-hidden"
-        style={{ background: 'linear-gradient(180deg, rgba(22,22,27,0.96), rgba(11,11,14,0.98))', border: `1px solid ${color}66`, boxShadow: `inset 0 0 18px ${color}1f, 0 0 12px ${color}22` }}>
-        <div className="absolute top-0 inset-x-1 h-[3px] rounded-full" style={{ background: color, boxShadow: `0 0 8px ${color}` }} />
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${color}26`, border: `1px solid ${color}66` }}>
-          <Icon size={16} style={{ color }} />
-        </div>
-        <span className="font-display uppercase" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontSize: 13, fontWeight: 700, letterSpacing: '0.14em', color, textShadow: `0 0 10px ${color}66, 0 1px 2px rgba(0,0,0,0.6)` }}>{label}</span>
+/* A category panel — a larger bordered rectangle that wraps the category's
+   cards with its own header, making each store category clearly distinct. */
+const CategoryPanel = ({ innerRef, Icon, title, sub, color, children }: {
+  innerRef: RefObject<HTMLDivElement>; Icon: LucideIcon; title: string; sub: string; color: string; children: ReactNode;
+}) => (
+  <div ref={innerRef} className="shrink-0 h-full rounded-[22px] relative flex flex-col overflow-hidden"
+    style={{
+      background: `linear-gradient(180deg, ${color}1f 0%, rgba(12,12,16,0.74) 24%, rgba(9,9,12,0.72) 100%)`,
+      backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+      border: `1px solid ${color}55`,
+      boxShadow: `0 0 28px ${color}1c, inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -2px 10px rgba(0,0,0,0.4)`,
+    }}>
+    <div className="absolute top-0 inset-x-0 h-px pointer-events-none" style={{ background: `linear-gradient(90deg, transparent 4%, ${color}66 28%, rgba(255,255,255,0.4) 50%, ${color}48 72%, transparent 96%)` }} />
+    {/* header */}
+    <div className="shrink-0 flex items-center gap-2.5 px-4 pt-3 pb-2 relative z-10">
+      <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${color}26`, border: `1px solid ${color}5a`, boxShadow: `0 0 14px ${color}26` }}>
+        <Icon size={18} style={{ color }} />
+      </div>
+      <div className="min-w-0">
+        <h2 className="font-display leading-none" style={{ fontSize: 22, letterSpacing: '0.05em', color, textShadow: `0 0 18px ${color}55, 0 1px 4px rgba(0,0,0,0.7)` }}>{title}</h2>
+        <span className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{ color: 'rgba(255,255,255,0.34)' }}>{sub}</span>
       </div>
     </div>
-  );
-}
+    <div className="shrink-0 mx-4 h-px" style={{ background: `linear-gradient(90deg, ${color}40 0%, transparent 75%)` }} />
+    {/* cards */}
+    <div className="flex-1 flex items-stretch gap-3 px-4 py-3 min-h-0">
+      {children}
+    </div>
+  </div>
+);
 
 /* ═══════════════════ Fullscreen overlays ═══════════════════ */
 function FullHeader({ title, color, onClose }: { title: string; color: string; onClose: () => void }) {
@@ -512,7 +528,6 @@ export default function StoreHorizontal() {
     return () => el.removeEventListener('scroll', onScroll);
   }, []);
 
-  const PASSE = MENUS[0];
   return (
     <div className="h-full w-full relative flex flex-col select-none">
 
@@ -520,8 +535,7 @@ export default function StoreHorizontal() {
       <div ref={scrollRef} className="flex-1 relative flex items-stretch overflow-x-auto overflow-y-hidden no-scrollbar gap-4 px-4 py-3 min-h-0">
 
         {/* OFERTAS */}
-        <div ref={secRefs[0]} className="flex items-stretch gap-3 h-full shrink-0">
-          <SectionTag Icon={PASSE.Icon} label="Ofertas" color="#fbbf24" />
+        <CategoryPanel innerRef={secRefs[0]} Icon={MENUS[0].Icon} title="OFERTAS" sub="Promoções da semana" color="#fbbf24">
           {/* Passe destaque */}
           <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }} onClick={() => setFull('passe')}
             className="relative rounded-[18px] overflow-hidden flex flex-col cursor-pointer h-full shrink-0" style={{ width: 300, ...rarityBg('passe') }}>
@@ -542,19 +556,17 @@ export default function StoreHorizontal() {
             </div>
           </motion.div>
           {OFFERS.map(it => <ItemCardV key={it.id} item={it} w={162} onOpen={setDetailItem} />)}
-        </div>
+        </CategoryPanel>
 
         {/* CAIXAS */}
-        <div ref={secRefs[1]} className="flex items-stretch gap-3 h-full shrink-0">
-          <SectionTag Icon={MENUS[1].Icon} label="Caixas" color="#a855f7" />
+        <CategoryPanel innerRef={secRefs[1]} Icon={MENUS[1].Icon} title="CAIXAS" sub="Itens aleatórios" color="#a855f7">
           {BOXES.map(b => <BoxCardV key={b.id} box={b} onOpen={setDetailBox} />)}
-        </div>
+        </CategoryPanel>
 
         {/* CATÁLOGO — card especial que abre fullscreen */}
-        <div ref={secRefs[2]} className="flex items-stretch gap-3 h-full shrink-0">
-          <SectionTag Icon={MENUS[2].Icon} label="Catálogo" color="#00e870" />
+        <CategoryPanel innerRef={secRefs[2]} Icon={MENUS[2].Icon} title="CATÁLOGO" sub="Coleção completa" color="#00e870">
           <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }} onClick={() => setFull('catalog')}
-            className="relative rounded-[18px] overflow-hidden flex flex-col cursor-pointer h-full shrink-0" style={{ width: 300, ...rarityBg('passe'), background: tintedSurface('#00e870', true), border: '1px solid rgba(0,232,112,0.55)' }}>
+            className="relative rounded-[18px] overflow-hidden flex flex-col cursor-pointer h-full shrink-0" style={{ width: 320, ...rarityBg('passe'), background: tintedSurface('#00e870', true), border: '1px solid rgba(0,232,112,0.55)' }}>
             <div className="absolute top-0 inset-x-0 h-[2px] z-20" style={{ background: '#00e870', boxShadow: '0 0 8px #00e870' }} />
             <div className="relative flex-1 flex items-center justify-center">
               <div className="grid grid-cols-3 gap-2.5 opacity-90">
@@ -564,35 +576,32 @@ export default function StoreHorizontal() {
               </div>
             </div>
             <div className="px-4 pb-4 pt-1 relative z-10">
-              <span className="text-[8px] font-black uppercase tracking-[0.16em]" style={{ color: '#00e870' }}>Coleção completa</span>
-              <h3 className="font-display leading-none mt-1" style={{ fontSize: 25, color: '#fff' }}>CATÁLOGO</h3>
+              <span className="text-[8px] font-black uppercase tracking-[0.16em]" style={{ color: '#00e870' }}>Explore tudo</span>
+              <h3 className="font-display leading-none mt-1" style={{ fontSize: 25, color: '#fff' }}>VER CATÁLOGO</h3>
               <div className="mt-2.5 flex items-center justify-between">
                 <span className="text-[9px] font-bold uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.4)' }}>Tacos · Mesas · Molduras…</span>
                 <div className="flex items-center gap-1 font-display" style={{ fontSize: 13, color: '#00e870' }}>ABRIR <ChevronRight size={15} /></div>
               </div>
             </div>
           </motion.div>
-        </div>
+        </CategoryPanel>
 
         {/* PRESENTE DIÁRIO — roleta */}
-        <div ref={secRefs[3]} className="flex items-stretch gap-3 h-full shrink-0 pr-2">
-          <SectionTag Icon={MENUS[3].Icon} label="Presente" color="#ED0A65" />
-          <div className="relative rounded-[18px] overflow-hidden flex items-center justify-center gap-5 px-6 h-full shrink-0" style={{ width: 470, ...rarityBg('elite'), background: tintedSurface('#ED0A65', true), border: '1px solid rgba(237,10,101,0.5)' }}>
-            <div className="absolute top-0 inset-x-0 h-[2px] z-20" style={{ background: '#ED0A65', boxShadow: '0 0 8px #ED0A65' }} />
+        <CategoryPanel innerRef={secRefs[3]} Icon={MENUS[3].Icon} title="PRESENTE DIÁRIO" sub="Gire e ganhe · 1 grátis/dia" color="#ED0A65">
+          <div className="relative flex items-center justify-center gap-5 px-3 h-full shrink-0" style={{ width: 460 }}>
             <Roulette compact />
-            <div className="flex flex-col gap-2 max-w-[190px]">
-              <span className="font-display text-[15px] tracking-wide" style={{ color: '#fff' }}>PRESENTE DIÁRIO</span>
-              <span className="text-[9px] font-bold uppercase tracking-wide" style={{ color: '#ED0A65' }}>1 giro grátis por dia</span>
+            <div className="flex flex-col gap-2 max-w-[200px]">
+              <span className="font-display text-[14px] tracking-wide" style={{ color: '#fff' }}>POSSÍVEIS PRÊMIOS</span>
               <div className="flex flex-col gap-1.5 mt-1">
-                {PRIZES.slice(0, 4).map((p, i) => (
-                  <div key={i} className="flex items-center gap-2 rounded-[9px] px-2 py-1.5" style={{ background: `${p.color}14`, border: `1px solid ${p.color}30` }}>
+                {PRIZES.slice(0, 5).map((p, i) => (
+                  <div key={i} className="flex items-center gap-2 rounded-[9px] px-2.5 py-1.5" style={{ background: `${p.color}14`, border: `1px solid ${p.color}30` }}>
                     <span style={{ fontSize: 15 }}>{p.glyph}</span><span className="text-[10px] font-semibold truncate" style={{ color: 'rgba(255,255,255,0.7)' }}>{p.label}</span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
-        </div>
+        </CategoryPanel>
       </div>
 
       {/* ── Bottom anchor nav (flush to bottom, extends into safe area) ── */}
