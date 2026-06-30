@@ -228,7 +228,7 @@ function ItemCardV({ item, w, onOpen }: { item: Item; w: number; onOpen: (i: Ite
 function BoxCardV({ box, onOpen }: { box: BoxDef; onOpen: (b: BoxDef) => void }) {
   return (
     <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.97 }} onClick={() => onOpen(box)}
-      className="relative rounded-[18px] overflow-hidden flex flex-col cursor-pointer h-full shrink-0" style={{ width: 184,
+      className="relative rounded-[18px] overflow-hidden flex flex-col cursor-pointer h-full shrink-0" style={{ width: 198,
         background: tintedSurface(box.color, true), border: `1px solid ${box.color}66`, boxShadow: `0 0 20px ${box.color}26, inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -2px 8px rgba(0,0,0,0.45)` }}>
       <div className="absolute top-0 inset-x-0 h-[2px] z-20" style={{ background: box.color, boxShadow: `0 0 8px ${box.color}` }} />
       {box.timer && <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded-md text-[8px] font-black z-20" style={{ background: 'rgba(0,0,0,0.6)', color: '#fff' }}>{box.timer}</div>}
@@ -355,31 +355,30 @@ function Roulette({ compact }: { compact?: boolean }) {
 
 /* ═══════════════════ Section start tag ═══════════════════ */
 /* A category panel — a larger bordered rectangle that wraps the category's
-   cards with its own header, making each store category clearly distinct. */
-const CategoryPanel = ({ innerRef, Icon, title, sub, color, children }: {
-  innerRef: RefObject<HTMLDivElement>; Icon: LucideIcon; title: string; sub: string; color: string; children: ReactNode;
+   cards. The category label sits as a vertical tag on the LEFT side so the
+   cards keep the full height (bigger cards). */
+const CategoryPanel = ({ innerRef, Icon, title, color, children }: {
+  innerRef: RefObject<HTMLDivElement>; Icon: LucideIcon; title: string; color: string; children: ReactNode;
 }) => (
-  <div ref={innerRef} className="shrink-0 h-full rounded-[22px] relative flex flex-col overflow-hidden"
+  <div ref={innerRef} className="shrink-0 h-full rounded-[22px] relative flex items-stretch gap-3 p-2.5 overflow-hidden"
     style={{
-      background: `linear-gradient(180deg, ${color}1f 0%, rgba(12,12,16,0.74) 24%, rgba(9,9,12,0.72) 100%)`,
+      background: `linear-gradient(160deg, ${color}1c 0%, rgba(12,12,16,0.72) 30%, rgba(9,9,12,0.7) 100%)`,
       backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
       border: `1px solid ${color}55`,
       boxShadow: `0 0 28px ${color}1c, inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -2px 10px rgba(0,0,0,0.4)`,
     }}>
     <div className="absolute top-0 inset-x-0 h-px pointer-events-none" style={{ background: `linear-gradient(90deg, transparent 4%, ${color}66 28%, rgba(255,255,255,0.4) 50%, ${color}48 72%, transparent 96%)` }} />
-    {/* header */}
-    <div className="shrink-0 flex items-center gap-2.5 px-4 pt-3 pb-2 relative z-10">
-      <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: `${color}26`, border: `1px solid ${color}5a`, boxShadow: `0 0 14px ${color}26` }}>
-        <Icon size={18} style={{ color }} />
+    {/* side vertical tag */}
+    <div className="shrink-0 h-full rounded-[16px] relative flex flex-col items-center justify-center gap-3 overflow-hidden"
+      style={{ width: 50, background: 'linear-gradient(180deg, rgba(24,24,29,0.96), rgba(11,11,14,0.98))', border: `1px solid ${color}5a`, boxShadow: `inset 0 0 18px ${color}1f` }}>
+      <div className="absolute top-0 inset-x-1.5 h-[3px] rounded-full" style={{ background: color, boxShadow: `0 0 8px ${color}` }} />
+      <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${color}26`, border: `1px solid ${color}66` }}>
+        <Icon size={17} style={{ color }} />
       </div>
-      <div className="min-w-0">
-        <h2 className="font-display leading-none" style={{ fontSize: 22, letterSpacing: '0.05em', color, textShadow: `0 0 18px ${color}55, 0 1px 4px rgba(0,0,0,0.7)` }}>{title}</h2>
-        <span className="text-[9px] font-bold uppercase tracking-[0.16em]" style={{ color: 'rgba(255,255,255,0.34)' }}>{sub}</span>
-      </div>
+      <span className="font-display uppercase" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontSize: 14, fontWeight: 700, letterSpacing: '0.16em', color, textShadow: `0 0 10px ${color}66, 0 1px 2px rgba(0,0,0,0.7)` }}>{title}</span>
     </div>
-    <div className="shrink-0 mx-4 h-px" style={{ background: `linear-gradient(90deg, ${color}40 0%, transparent 75%)` }} />
-    {/* cards */}
-    <div className="flex-1 flex items-stretch gap-3 px-4 py-3 min-h-0">
+    {/* cards (full height → bigger) */}
+    <div className="flex items-stretch gap-3 h-full">
       {children}
     </div>
   </div>
@@ -535,10 +534,10 @@ export default function StoreHorizontal() {
       <div ref={scrollRef} className="flex-1 relative flex items-stretch overflow-x-auto overflow-y-hidden no-scrollbar gap-4 px-4 py-3 min-h-0">
 
         {/* OFERTAS */}
-        <CategoryPanel innerRef={secRefs[0]} Icon={MENUS[0].Icon} title="OFERTAS" sub="Promoções da semana" color="#fbbf24">
+        <CategoryPanel innerRef={secRefs[0]} Icon={MENUS[0].Icon} title="OFERTAS" color="#fbbf24">
           {/* Passe destaque */}
           <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }} onClick={() => setFull('passe')}
-            className="relative rounded-[18px] overflow-hidden flex flex-col cursor-pointer h-full shrink-0" style={{ width: 300, ...rarityBg('passe') }}>
+            className="relative rounded-[18px] overflow-hidden flex flex-col cursor-pointer h-full shrink-0" style={{ width: 332, ...rarityBg('passe') }}>
             <div className="absolute top-0 inset-x-0 h-[2px] z-20" style={{ background: '#10b981', boxShadow: '0 0 8px #10b981' }} />
             <div className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[10px] font-black z-20" style={{ background: '#ef4444', color: '#fff' }}>-40%</div>
             <div className="relative flex-1 flex items-center justify-center" style={{ background: 'radial-gradient(ellipse at 50% 35%, rgba(16,185,129,0.3), transparent 70%)' }}>
@@ -555,18 +554,18 @@ export default function StoreHorizontal() {
               </div>
             </div>
           </motion.div>
-          {OFFERS.map(it => <ItemCardV key={it.id} item={it} w={162} onOpen={setDetailItem} />)}
+          {OFFERS.map(it => <ItemCardV key={it.id} item={it} w={176} onOpen={setDetailItem} />)}
         </CategoryPanel>
 
         {/* CAIXAS */}
-        <CategoryPanel innerRef={secRefs[1]} Icon={MENUS[1].Icon} title="CAIXAS" sub="Itens aleatórios" color="#a855f7">
+        <CategoryPanel innerRef={secRefs[1]} Icon={MENUS[1].Icon} title="CAIXAS" color="#a855f7">
           {BOXES.map(b => <BoxCardV key={b.id} box={b} onOpen={setDetailBox} />)}
         </CategoryPanel>
 
         {/* CATÁLOGO — card especial que abre fullscreen */}
-        <CategoryPanel innerRef={secRefs[2]} Icon={MENUS[2].Icon} title="CATÁLOGO" sub="Coleção completa" color="#00e870">
+        <CategoryPanel innerRef={secRefs[2]} Icon={MENUS[2].Icon} title="CATÁLOGO" color="#00e870">
           <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }} onClick={() => setFull('catalog')}
-            className="relative rounded-[18px] overflow-hidden flex flex-col cursor-pointer h-full shrink-0" style={{ width: 320, ...rarityBg('passe'), background: tintedSurface('#00e870', true), border: '1px solid rgba(0,232,112,0.55)' }}>
+            className="relative rounded-[18px] overflow-hidden flex flex-col cursor-pointer h-full shrink-0" style={{ width: 332, ...rarityBg('passe'), background: tintedSurface('#00e870', true), border: '1px solid rgba(0,232,112,0.55)' }}>
             <div className="absolute top-0 inset-x-0 h-[2px] z-20" style={{ background: '#00e870', boxShadow: '0 0 8px #00e870' }} />
             <div className="relative flex-1 flex items-center justify-center">
               <div className="grid grid-cols-3 gap-2.5 opacity-90">
@@ -587,8 +586,8 @@ export default function StoreHorizontal() {
         </CategoryPanel>
 
         {/* PRESENTE DIÁRIO — roleta */}
-        <CategoryPanel innerRef={secRefs[3]} Icon={MENUS[3].Icon} title="PRESENTE DIÁRIO" sub="Gire e ganhe · 1 grátis/dia" color="#ED0A65">
-          <div className="relative flex items-center justify-center gap-5 px-3 h-full shrink-0" style={{ width: 460 }}>
+        <CategoryPanel innerRef={secRefs[3]} Icon={MENUS[3].Icon} title="PRESENTE DIÁRIO" color="#ED0A65">
+          <div className="relative flex items-center justify-center gap-5 px-3 h-full shrink-0" style={{ width: 480 }}>
             <Roulette compact />
             <div className="flex flex-col gap-2 max-w-[200px]">
               <span className="font-display text-[14px] tracking-wide" style={{ color: '#fff' }}>POSSÍVEIS PRÊMIOS</span>
