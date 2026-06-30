@@ -16,14 +16,19 @@ const RARITY: Record<Rarity, { label: string; color: string; tint: boolean }> = 
 const TIER: Record<Rarity, number> = { comum: 1, raro: 2, super: 3, passe: 4, elite: 4, lendario: 5 };
 const fmt = (n: number) => n.toLocaleString('pt-BR');
 
-/* Opaque rarity-tinted card surface (no wallpaper bleed-through) */
+/* Opaque rarity-tinted surface — a solid dark base + rarity tint overlay so
+   the wallpaper never bleeds through. `strong` boosts the tint for hero cards. */
+function tintedSurface(color: string, strong?: boolean) {
+  const tint = strong
+    ? `linear-gradient(168deg, ${color}4a 0%, ${color}22 38%, ${color}0a 70%, transparent 100%)`
+    : `linear-gradient(168deg, ${color}33 0%, ${color}12 42%, ${color}03 72%, transparent 100%)`;
+  return `${tint}, #16161b`;
+}
 function rarityBg(r: Rarity) {
   const { color, tint } = RARITY[r];
   const t = TIER[r];
   return {
-    background: tint
-      ? `linear-gradient(168deg, ${color}40 0%, ${color}1c 36%, #100f13 76%, #0b0a0d 100%)`
-      : 'linear-gradient(168deg, #26262b 0%, #16161a 55%, #0d0d10 100%)',
+    background: tint ? tintedSurface(color, t >= 4) : 'linear-gradient(168deg, #24242a 0%, #161619 60%, #101013 100%), #16161b',
     border: `1px solid ${tint ? color + (t >= 5 ? '88' : t >= 3 ? '66' : '4d') : 'rgba(255,255,255,0.14)'}`,
     boxShadow: t >= 4
       ? `0 0 22px ${color}33, inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -2px 8px rgba(0,0,0,0.45)`
@@ -224,7 +229,7 @@ function BoxCardV({ box, onOpen }: { box: BoxDef; onOpen: (b: BoxDef) => void })
   return (
     <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.97 }} onClick={() => onOpen(box)}
       className="relative rounded-[18px] overflow-hidden flex flex-col cursor-pointer h-full shrink-0" style={{ width: 184,
-        background: `linear-gradient(168deg, ${box.color}3a 0%, ${box.color}16 38%, #100f13 78%, #0b0a0d 100%)`, border: `1px solid ${box.color}66`, boxShadow: `0 0 20px ${box.color}26, inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -2px 8px rgba(0,0,0,0.45)` }}>
+        background: tintedSurface(box.color, true), border: `1px solid ${box.color}66`, boxShadow: `0 0 20px ${box.color}26, inset 0 1px 0 rgba(255,255,255,0.18), inset 0 -2px 8px rgba(0,0,0,0.45)` }}>
       <div className="absolute top-0 inset-x-0 h-[2px] z-20" style={{ background: box.color, boxShadow: `0 0 8px ${box.color}` }} />
       {box.timer && <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded-md text-[8px] font-black z-20" style={{ background: 'rgba(0,0,0,0.6)', color: '#fff' }}>{box.timer}</div>}
       {box.bonus && <div className="absolute top-2 right-2 flex items-center gap-1 px-1.5 py-0.5 rounded-full z-20" style={{ background: 'rgba(245,197,24,0.2)', border: '1px solid rgba(245,197,24,0.5)' }}><Ticket size={9} style={{ color: '#f5c518' }} /><span className="text-[7px] font-black" style={{ color: '#f5c518' }}>BRINDE</span></div>}
@@ -351,11 +356,15 @@ function Roulette({ compact }: { compact?: boolean }) {
 /* ═══════════════════ Section start tag ═══════════════════ */
 function SectionTag({ Icon, label, color }: { Icon: LucideIcon; label: string; color: string }) {
   return (
-    <div className="shrink-0 h-full flex flex-col items-center justify-center gap-2 pr-1" style={{ width: 58 }}>
-      <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `${color}1c`, border: `1px solid ${color}45`, boxShadow: `0 0 14px ${color}25` }}>
-        <Icon size={18} style={{ color }} />
+    <div className="shrink-0 h-full flex items-stretch" style={{ width: 50 }}>
+      <div className="relative w-full h-full rounded-[14px] flex flex-col items-center justify-center gap-2.5 py-3 overflow-hidden"
+        style={{ background: 'linear-gradient(180deg, rgba(22,22,27,0.96), rgba(11,11,14,0.98))', border: `1px solid ${color}66`, boxShadow: `inset 0 0 18px ${color}1f, 0 0 12px ${color}22` }}>
+        <div className="absolute top-0 inset-x-1 h-[3px] rounded-full" style={{ background: color, boxShadow: `0 0 8px ${color}` }} />
+        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${color}26`, border: `1px solid ${color}66` }}>
+          <Icon size={16} style={{ color }} />
+        </div>
+        <span className="font-display uppercase" style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)', fontSize: 13, fontWeight: 700, letterSpacing: '0.14em', color, textShadow: `0 0 10px ${color}66, 0 1px 2px rgba(0,0,0,0.6)` }}>{label}</span>
       </div>
-      <span className="font-display tracking-[0.04em] text-center leading-tight" style={{ fontSize: 12, color, writingMode: 'vertical-rl', transform: 'rotate(180deg)', textShadow: `0 0 12px ${color}55` }}>{label}</span>
     </div>
   );
 }
@@ -545,7 +554,7 @@ export default function StoreHorizontal() {
         <div ref={secRefs[2]} className="flex items-stretch gap-3 h-full shrink-0">
           <SectionTag Icon={MENUS[2].Icon} label="Catálogo" color="#00e870" />
           <motion.div whileHover={{ y: -3 }} whileTap={{ scale: 0.98 }} onClick={() => setFull('catalog')}
-            className="relative rounded-[18px] overflow-hidden flex flex-col cursor-pointer h-full shrink-0" style={{ width: 300, ...rarityBg('passe'), background: 'linear-gradient(168deg, rgba(0,232,112,0.30) 0%, rgba(0,232,112,0.12) 38%, #0c100d 78%, #0a0d0b 100%)', border: '1px solid rgba(0,232,112,0.55)' }}>
+            className="relative rounded-[18px] overflow-hidden flex flex-col cursor-pointer h-full shrink-0" style={{ width: 300, ...rarityBg('passe'), background: tintedSurface('#00e870', true), border: '1px solid rgba(0,232,112,0.55)' }}>
             <div className="absolute top-0 inset-x-0 h-[2px] z-20" style={{ background: '#00e870', boxShadow: '0 0 8px #00e870' }} />
             <div className="relative flex-1 flex items-center justify-center">
               <div className="grid grid-cols-3 gap-2.5 opacity-90">
@@ -568,7 +577,7 @@ export default function StoreHorizontal() {
         {/* PRESENTE DIÁRIO — roleta */}
         <div ref={secRefs[3]} className="flex items-stretch gap-3 h-full shrink-0 pr-2">
           <SectionTag Icon={MENUS[3].Icon} label="Presente" color="#ED0A65" />
-          <div className="relative rounded-[18px] overflow-hidden flex items-center justify-center gap-5 px-6 h-full shrink-0" style={{ width: 470, ...rarityBg('elite'), background: 'linear-gradient(168deg, rgba(237,10,101,0.26) 0%, rgba(237,10,101,0.1) 40%, #100b0e 80%, #0b0a0d 100%)', border: '1px solid rgba(237,10,101,0.5)' }}>
+          <div className="relative rounded-[18px] overflow-hidden flex items-center justify-center gap-5 px-6 h-full shrink-0" style={{ width: 470, ...rarityBg('elite'), background: tintedSurface('#ED0A65', true), border: '1px solid rgba(237,10,101,0.5)' }}>
             <div className="absolute top-0 inset-x-0 h-[2px] z-20" style={{ background: '#ED0A65', boxShadow: '0 0 8px #ED0A65' }} />
             <Roulette compact />
             <div className="flex flex-col gap-2 max-w-[190px]">
@@ -587,7 +596,7 @@ export default function StoreHorizontal() {
       </div>
 
       {/* ── Bottom anchor nav (flush to bottom, extends into safe area) ── */}
-      <div className="shrink-0 relative z-20" style={{ background: 'rgba(8,8,12,0.78)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', borderTop: '1px solid rgba(255,255,255,0.08)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <div className="shrink-0 relative z-20" style={{ background: 'rgba(8,8,12,0.92)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', borderTop: '1px solid rgba(255,255,255,0.08)', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.06)', paddingBottom: 'max(env(safe-area-inset-bottom), 4px)' }}>
         <div className="absolute top-0 inset-x-0 h-px pointer-events-none" style={{ background: `linear-gradient(90deg, transparent 5%, ${MENUS[active].color}45 30%, rgba(255,255,255,0.25) 50%, ${MENUS[active].color}35 70%, transparent 95%)` }} />
         <div className="flex items-stretch" style={{ height: 50 }}>
           {MENUS.map((m, i) => {
